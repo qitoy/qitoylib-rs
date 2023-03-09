@@ -4,3 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+ac-library-rs = { git = "https://github.com/rust-lang-ja/ac-library-rs", rev = "c03e2cab25a5997ed00674fee5f821e5a5433b42" }
+amplify = "=3.13.0"
+num = "=0.4.0"
+rand = { version = "=0.8.5", features = ["small_rng"] }
+
+[dev-dependencies]
