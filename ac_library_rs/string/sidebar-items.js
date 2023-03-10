@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":[["lcp_array",""],["lcp_array_arbitrary",""],["suffix_array",""],["suffix_array_arbitrary",""],["suffix_array_manual",""],["z_algorithm",""],["z_algorithm_arbitrary",""]]};

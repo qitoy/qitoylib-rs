@@ -1,0 +1,1 @@
+window.ALL_CRATES = ["ac_library_rs","amplify","amplify_derive","amplify_num","amplify_syn","cfg_if","getrandom","katexit","libc","num","num_bigint","num_complex","num_integer","num_iter","num_rational","num_traits","ppv_lite86","proc_macro2","qitoy","quote","rand","rand_chacha","rand_core","syn","unicode_ident"];

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["TwoSat","A 2-SAT Solver."]]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":[["Dsu","A Disjoint set union (DSU) with union by size and path compression."]]};

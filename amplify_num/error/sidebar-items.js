@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":[["DivError",""],["PositDecodeError",""]],"struct":[["OverflowError","Error indicating that a value does not fit integer dimension"],["ParseLengthError","Invalid slice length"]]};
