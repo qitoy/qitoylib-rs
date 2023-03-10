@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"macro":[["chmax",""],["chmin",""]],"struct":[["Combi","組み合わせで頻出の計算をModIntで計算します。"]]};
