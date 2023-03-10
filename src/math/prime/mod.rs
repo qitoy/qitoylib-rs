@@ -1,6 +1,13 @@
-pub mod sieve;
+mod sieve;
 pub mod pi;
-pub mod check;
-pub mod factorise;
+mod check;
+mod factorise;
 
+#[doc(inline)]
 pub use sieve::*;
+
+#[doc(inline)]
+pub use check::PrimeCheck;
+
+#[doc(inline)]
+pub use factorise::Factorise;

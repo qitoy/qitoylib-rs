@@ -1,4 +1,5 @@
 pub trait PrimeCheck {
+    /// 素数判定をする。
     fn prime_check(self) -> bool;
 }
 

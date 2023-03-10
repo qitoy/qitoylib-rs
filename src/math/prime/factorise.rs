@@ -1,11 +1,29 @@
-use super::check::PrimeCheck;
+use super::{
+    check::PrimeCheck,
+    super::{
+        Gcd,
+        super::vec::Merge,
+    }
+};
+use std::ops::Div;
 use rand::{SeedableRng, rngs::SmallRng, distributions::{Distribution, Uniform}};
-use num::integer::gcd;
+use num::traits::One;
 
-trait Factorise
-where Self: Sized {
+pub trait Factorise: PrimeCheck {
+    /// `self`が合成数のとき非自明な素因数を一つ返す。
     fn find_factor(self) -> Self;
-    fn factorise(self) -> Vec<Self>;
+
+    /// `self`を素因数分解する。結果はソートされる。
+    fn factorise(self) -> Vec<Self>
+    where Self: Sized + Div<Output = Self> + PartialEq + One + Copy,
+          Vec<Self>: Merge {
+        let n = self;
+        if n == Self::one() { return vec![]; }
+        if n.prime_check() { return vec![self]; }
+        let d = n.find_factor();
+        let r = d.factorise();
+        r.merge(&mut (n/d).factorise())
+    }
 }
 
 impl Factorise for u64 {
@@ -33,7 +51,7 @@ impl Factorise for u64 {
                         y = f(y);
                         q = (q * x.abs_diff(y) % n).try_into().unwrap();
                     }
-                    g = gcd(q, n); k += m;
+                    g = q.gcd(n); k += m;
                     k < r && g == 1
                 } {}
                 r <<= 1;
@@ -42,22 +60,13 @@ impl Factorise for u64 {
             if g == n {
                 while {
                     ys = f(ys);
-                    g = gcd(x.abs_diff(ys), n);
+                    g = x.abs_diff(ys).gcd(n);
                     g == 1
                 } {}
             }
             g == n
         } {}
         g.try_into().unwrap()
-    }
-    fn factorise(self) -> Vec<Self> {
-        let n = self;
-        if n == 1 { return vec![]; }
-        if n.prime_check() { return vec![self]; }
-        let d = n.find_factor();
-        let mut r = d.factorise();
-        r.append(&mut (n/d).factorise());
-        r
     }
 }
 
@@ -67,29 +76,34 @@ mod tests {
 
     #[test]
     fn test_4033_4681() {
-        let mut v = 4033.factorise();
-        v.sort();
+        let v = 4033.factorise();
         assert_eq!(v, vec![37, 109]);
-        let mut v = 4681.factorise();
-        v.sort();
+        let v = 4681.factorise();
         assert_eq!(v, vec![31, 151]);
     }
     #[test]
     fn test_4295098369() {
-        let mut v = 4295098369.factorise();
-        v.sort();
+        let v = 4295098369.factorise();
         assert_eq!(v, vec![65537, 65537]);
     }
     #[test]
     fn test_999381247093216751() {
-        let mut v = 999381247093216751.factorise();
-        v.sort();
+        let v = 999381247093216751.factorise();
         assert_eq!(v, vec![999665081, 999716071]);
     }
     #[test]
     fn test_124376107291() {
-        let mut v = 124376107291.factorise();
-        v.sort();
+        let v = 124376107291.factorise();
         assert_eq!(v, vec![352523, 352817]);
+    }
+
+    #[test]
+    fn test_897612484786617600() {
+        let v = 897612484786617600.factorise();
+        assert_eq!(v, vec![
+                   2, 2, 2, 2, 2, 2, 2, 2,
+                   3, 3, 3, 3, 5, 5, 7, 7,
+                   11, 13, 17, 19, 23, 29, 31, 37,
+        ]);
     }
 }
