@@ -1,17 +1,8 @@
+use super::super::montgomery::*;
+
 pub trait PrimeCheck {
     /// 素数判定をする。
     fn prime_check(self) -> bool;
-}
-
-fn mod_pow(a: u64, mut n: u64, m: u64) -> u64 {
-    let (mut a, m): (u128, u128) = (a.into(), m.into());
-    let mut r = 1;
-    while n > 0 {
-        if n & 1 == 1 { r = r * a % m; }
-        a = a * a % m;
-        n >>= 1;
-    }
-    r.try_into().unwrap()
 }
 
 impl PrimeCheck for u64 {
@@ -21,14 +12,17 @@ impl PrimeCheck for u64 {
         if n & 1 == 0 { return false; }
         let r = (n-1).trailing_zeros();
         let d = n-1 >> r;
+        let m = Montgomery::new(n);
         for a in [2, 325, 9375, 28178, 450775, 9780504, 1795265022] {
             if a % n == 0 { return true; }
-            let mut x = mod_pow(a, d, n);
-            if x == 1 || x == n-1 { continue; }
+            let mut x = m.trans(a).pow(d);
+            let v = x.val();
+            if v == 1 || v == n-1 { continue; }
             for i in 0..r {
-                x = mod_pow(x, 2, n);
-                if x == n-1 { break; }
-                if x == 1 || i == r-1 { return false; }
+                x = x.clone() * x;
+                let v = x.val();
+                if v == n-1 { break; }
+                if v == 1 || i == r-1 { return false; }
             }
         }
         true

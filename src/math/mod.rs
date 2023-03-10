@@ -1,5 +1,6 @@
 mod combi;
 pub mod prime;
+pub mod montgomery;
 mod numeric;
 
 #[doc(inline)]

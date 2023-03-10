@@ -1,6 +1,7 @@
 use super::{
     check::PrimeCheck,
     super::{
+        montgomery::*,
         Gcd,
         super::vec::Merge,
     }
@@ -28,30 +29,32 @@ pub trait Factorise: PrimeCheck {
 
 impl Factorise for u64 {
     fn find_factor(self) -> Self {
-        let n: u128 = self.into();
+        let n = self;
         if n & 1 == 0 { return 2; }
         let mut g;
         let mut rng = SmallRng::from_entropy();
         let range = Uniform::from(1..n);
+        let mo = Montgomery::new(n);
         while {
-            let (mut x, mut ys, mut k);
-            let (mut y, c) = (range.sample(&mut rng), range.sample(&mut rng));
-            let (mut r, mut q) = (1, 1);
+            let (mut x, mut ys);
+            let (y, c) = (range.sample(&mut rng), range.sample(&mut rng));
+            let (mut y, c, mut q) = (mo.trans(y), mo.trans(c), mo.trans(1));
+            let mut r = 1;
             let m = 128;
-            let f = |x| {
-                (x * x + c) % n
+            let f = |x: Mvalue| {
+                x.clone() * x + c.clone()
             };
             while {
-                x = y;
+                x = y.clone();
                 for _ in 0..r { y = f(y); }
-                k = 0;
+                let mut k = 0;
                 while {
-                    ys = y;
+                    ys = y.clone();
                     for _ in 0..m.min(r-k) {
                         y = f(y);
-                        q = (q * x.abs_diff(y) % n).try_into().unwrap();
+                        q = q * (x.clone() - y.clone());
                     }
-                    g = q.gcd(n); k += m;
+                    g = q.val().gcd(n); k += m;
                     k < r && g == 1
                 } {}
                 r <<= 1;
@@ -60,13 +63,13 @@ impl Factorise for u64 {
             if g == n {
                 while {
                     ys = f(ys);
-                    g = x.abs_diff(ys).gcd(n);
+                    g = (x.clone() - ys.clone()).val().gcd(n);
                     g == 1
                 } {}
             }
             g == n
         } {}
-        g.try_into().unwrap()
+        g
     }
 }
 
