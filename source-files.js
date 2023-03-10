@@ -17,7 +17,7 @@ var sourcesIndex = JSON.parse('{\
 "num_traits":["",[["ops",[],["checked.rs","euclid.rs","inv.rs","mod.rs","mul_add.rs","overflowing.rs","saturating.rs","wrapping.rs"]]],["bounds.rs","cast.rs","float.rs","identities.rs","int.rs","lib.rs","macros.rs","pow.rs","real.rs","sign.rs"]],\
 "ppv_lite86":["",[["x86_64",[],["mod.rs","sse2.rs"]]],["lib.rs","soft.rs","types.rs"]],\
 "proc_macro2":["",[],["detection.rs","fallback.rs","lib.rs","marker.rs","parse.rs","rcvec.rs","wrapper.rs"]],\
-"qitoy":["",[["data_structure",[],["bit_vec.rs","mod.rs","wavelet_matrix.rs"]],["math",[["prime",[],["check.rs","factorise.rs","mod.rs","pi.rs","sieve.rs"]]],["combi.rs","mod.rs","numeric.rs"]],["utils",[],["bound.rs","mod.rs"]]],["lib.rs","prelude.rs"]],\
+"qitoy":["",[["data_structure",[],["bit_vec.rs","mod.rs","wavelet_matrix.rs"]],["math",[["prime",[],["check.rs","factorise.rs","mod.rs","pi.rs","sieve.rs"]]],["combi.rs","mod.rs","numeric.rs"]],["utils",[],["bound.rs","mod.rs"]],["vec",[],["merge.rs","mod.rs"]]],["lib.rs","prelude.rs"]],\
 "quote":["",[],["ext.rs","format.rs","ident_fragment.rs","lib.rs","runtime.rs","spanned.rs","to_tokens.rs"]],\
 "rand":["",[["distributions",[],["bernoulli.rs","distribution.rs","float.rs","integer.rs","mod.rs","other.rs","slice.rs","uniform.rs","utils.rs","weighted.rs","weighted_index.rs"]],["rngs",[["adapter",[],["mod.rs","read.rs","reseeding.rs"]]],["mock.rs","mod.rs","small.rs","std.rs","thread.rs","xoshiro256plusplus.rs"]],["seq",[],["index.rs","mod.rs"]]],["lib.rs","prelude.rs","rng.rs"]],\
 "rand_chacha":["",[],["chacha.rs","guts.rs","lib.rs"]],\
