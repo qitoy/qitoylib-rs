@@ -107,9 +107,13 @@
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
 </pre><pre class="rust"><code><span class="kw">use super</span>::{
     check::PrimeCheck,
     <span class="kw">super</span>::{
+        montgomery::<span class="kw-2">*</span>,
         Gcd,
         <span class="kw">super</span>::vec::Merge,
     }
@@ -137,30 +141,32 @@
 
 <span class="kw">impl </span>Factorise <span class="kw">for </span>u64 {
     <span class="kw">fn </span>find_factor(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>n: u128 = <span class="self">self</span>.into();
+        <span class="kw">let </span>n = <span class="self">self</span>;
         <span class="kw">if </span>n &amp; <span class="number">1 </span>== <span class="number">0 </span>{ <span class="kw">return </span><span class="number">2</span>; }
         <span class="kw">let </span><span class="kw-2">mut </span>g;
         <span class="kw">let </span><span class="kw-2">mut </span>rng = SmallRng::from_entropy();
         <span class="kw">let </span>range = Uniform::from(<span class="number">1</span>..n);
+        <span class="kw">let </span>mo = Montgomery::new(n);
         <span class="kw">while </span>{
-            <span class="kw">let </span>(<span class="kw-2">mut </span>x, <span class="kw-2">mut </span>ys, <span class="kw-2">mut </span>k);
-            <span class="kw">let </span>(<span class="kw-2">mut </span>y, c) = (range.sample(<span class="kw-2">&amp;mut </span>rng), range.sample(<span class="kw-2">&amp;mut </span>rng));
-            <span class="kw">let </span>(<span class="kw-2">mut </span>r, <span class="kw-2">mut </span>q) = (<span class="number">1</span>, <span class="number">1</span>);
+            <span class="kw">let </span>(<span class="kw-2">mut </span>x, <span class="kw-2">mut </span>ys);
+            <span class="kw">let </span>(y, c) = (range.sample(<span class="kw-2">&amp;mut </span>rng), range.sample(<span class="kw-2">&amp;mut </span>rng));
+            <span class="kw">let </span>(<span class="kw-2">mut </span>y, c, <span class="kw-2">mut </span>q) = (mo.trans(y), mo.trans(c), mo.trans(<span class="number">1</span>));
+            <span class="kw">let </span><span class="kw-2">mut </span>r = <span class="number">1</span>;
             <span class="kw">let </span>m = <span class="number">128</span>;
-            <span class="kw">let </span>f = |x| {
-                (x * x + c) % n
+            <span class="kw">let </span>f = |x: Mvalue| {
+                x.clone() * x + c.clone()
             };
             <span class="kw">while </span>{
-                x = y;
+                x = y.clone();
                 <span class="kw">for _ in </span><span class="number">0</span>..r { y = f(y); }
-                k = <span class="number">0</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>k = <span class="number">0</span>;
                 <span class="kw">while </span>{
-                    ys = y;
+                    ys = y.clone();
                     <span class="kw">for _ in </span><span class="number">0</span>..m.min(r-k) {
                         y = f(y);
-                        q = (q * x.abs_diff(y) % n).try_into().unwrap();
+                        q = q * (x.clone() - y.clone());
                     }
-                    g = q.gcd(n); k += m;
+                    g = q.val().gcd(n); k += m;
                     k &lt; r &amp;&amp; g == <span class="number">1
                 </span>} {}
                 r &lt;&lt;= <span class="number">1</span>;
@@ -169,13 +175,13 @@
             <span class="kw">if </span>g == n {
                 <span class="kw">while </span>{
                     ys = f(ys);
-                    g = x.abs_diff(ys).gcd(n);
+                    g = (x.clone() - ys.clone()).val().gcd(n);
                     g == <span class="number">1
                 </span>} {}
             }
             g == n
         } {}
-        g.try_into().unwrap()
+        g
     }
 }
 
