@@ -8,5 +8,6 @@ ac-library-rs = { git = "https://github.com/rust-lang-ja/ac-library-rs", rev = "
 amplify = "=3.13.0"
 num = "=0.4.0"
 rand = { version = "=0.8.5", features = ["small_rng"] }
+katexit = "0.1.0"
 
 [dev-dependencies]

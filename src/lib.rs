@@ -21,3 +21,4 @@ macro_rules! chmin {
 pub mod data_structure;
 pub mod utils;
 pub mod math;
+pub mod prelude;

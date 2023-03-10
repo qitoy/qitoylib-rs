@@ -1,9 +1,9 @@
-trait LowerBound {
+pub trait LowerBound {
     type T: Ord;
     fn lower_bound(&self, v: Self::T) -> usize;
 }
 
-trait UpperBound {
+pub trait UpperBound {
     type T: Ord;
     fn upper_bound(&self, v: Self::T) -> usize;
 }
