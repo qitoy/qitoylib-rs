@@ -23,3 +23,5 @@ pub mod utils;
 pub mod math;
 pub mod prelude;
 pub mod vec;
+pub mod string;
+pub mod algorithm;

@@ -40,6 +40,7 @@ mod tests {
         assert!(1_000_000_007.prime_check());
         assert!(998_244_353.prime_check());
         assert!(65537.prime_check());
+        assert!(((1<<61)-1).prime_check());
         assert!(!10.prime_check());
         assert!(!4033.prime_check());
         assert!(!4681.prime_check());
