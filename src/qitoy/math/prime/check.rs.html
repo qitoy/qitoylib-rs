@@ -45,6 +45,7 @@
 <a href="#45" id="45">45</a>
 <a href="#46" id="46">46</a>
 <a href="#47" id="47">47</a>
+<a href="#48" id="48">48</a>
 </pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::montgomery::<span class="kw-2">*</span>;
 
 <span class="kw">pub trait </span>PrimeCheck {
@@ -87,6 +88,7 @@
         <span class="macro">assert!</span>(<span class="number">1_000_000_007</span>.prime_check());
         <span class="macro">assert!</span>(<span class="number">998_244_353</span>.prime_check());
         <span class="macro">assert!</span>(<span class="number">65537</span>.prime_check());
+        <span class="macro">assert!</span>(((<span class="number">1</span>&lt;&lt;<span class="number">61</span>)-<span class="number">1</span>).prime_check());
         <span class="macro">assert!</span>(!<span class="number">10</span>.prime_check());
         <span class="macro">assert!</span>(!<span class="number">4033</span>.prime_check());
         <span class="macro">assert!</span>(!<span class="number">4681</span>.prime_check());

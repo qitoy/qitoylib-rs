@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"macro":[["chmax",""],["chmin",""]],"mod":[["data_structure",""],["math",""],["prelude",""],["utils",""],["vec",""]]};
+window.SIDEBAR_ITEMS = {"macro":[["chmax",""],["chmin",""]],"mod":[["algorithm",""],["data_structure",""],["math",""],["prelude",""],["string",""],["utils",""],["vec",""]]};
