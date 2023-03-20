@@ -9,9 +9,8 @@ pub trait Lcm: Gcd + Mul<Output = Self> + Div<Output = Self> {
     fn lcm(self, rhs: Self) -> Self;
 }
 
-#[cfg_attr(doc, katexit::katexit)]
 /// gcdを計算します。  
-/// 計算量$O(\log \max(self, rhs))$
+/// 計算量$`O(\log \max(self, rhs))`$
 impl<T: Rem<Output = Self> + Zero + PartialEq + Copy> Gcd for T {
     fn gcd(mut self, mut rhs: Self) -> Self {
         while rhs != T::zero() {
@@ -21,9 +20,8 @@ impl<T: Rem<Output = Self> + Zero + PartialEq + Copy> Gcd for T {
     }
 }
 
-#[cfg_attr(doc, katexit::katexit)]
 /// lcmを計算します。  
-/// 計算量$O(\log \max(self, rhs))$
+/// 計算量$`O(\log \max(self, rhs))`$
 impl<T: Gcd + Mul<Output = Self> + Div<Output = Self>> Lcm for T {
     fn lcm(self, rhs: Self) -> Self {
         self / self.gcd(rhs) * rhs

@@ -1,6 +1,5 @@
-#[cfg_attr(doc, katexit::katexit)]
 /// エラトステネスの篩  
-/// 計算量$O(n \log n)$
+/// 計算量$`O(n \log n)`$
 pub fn eratosthenes(n: usize) -> Vec<bool> {
     let mut vec = vec![true; n+1];
     vec[0] = false; vec[1] = false;

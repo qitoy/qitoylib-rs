@@ -19,6 +19,11 @@ jobs:
         with:
           command: doc
 
+      - uses: actions-rs/cargo@v1
+        with:
+          command: rustdoc
+          args: -- --html-in-header katex.html
+
       - uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
