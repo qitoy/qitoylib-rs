@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"trait":[["Merge",""]]};
+window.SIDEBAR_ITEMS = {};

@@ -19,7 +19,7 @@ var sourcesIndex = JSON.parse('{\
 "once_cell":["",[],["imp_std.rs","lib.rs","race.rs"]],\
 "ppv_lite86":["",[["x86_64",[],["mod.rs","sse2.rs"]]],["lib.rs","soft.rs","types.rs"]],\
 "proc_macro2":["",[],["detection.rs","extra.rs","fallback.rs","lib.rs","marker.rs","parse.rs","rcvec.rs","wrapper.rs"]],\
-"qitoy":["",[["algorithm",[],["mo.rs","mod.rs"]],["data_structure",[],["bit_vec.rs","mod.rs","wavelet_matrix.rs"]],["math",[["prime",[],["check.rs","factorise.rs","mod.rs","pi.rs","sieve.rs"]]],["combi.rs","matrix.rs","mod.rs","montgomery.rs","numeric.rs"]],["string",[],["mod.rs","rolling_hash.rs"]],["utils",[],["bound.rs","mod.rs"]],["vec",[],["merge.rs","mod.rs"]]],["lib.rs","prelude.rs"]],\
+"qitoy":["",[["algorithm",[],["mo.rs","mod.rs"]],["data_structure",[],["bit_vec.rs","mod.rs","wavelet_matrix.rs"]],["math",[["algebra",[],["mod.rs","ring.rs"]],["prime",[],["check.rs","factorise.rs","mod.rs","pi.rs","sieve.rs"]]],["combi.rs","matrix.rs","mod.rs","montgomery.rs","numeric.rs"]],["string",[],["mod.rs","rolling_hash.rs"]],["utils",[],["bound.rs","float2uint.rs","mod.rs"]],["vec",[],["mod.rs"]]],["lib.rs","prelude.rs"]],\
 "quote":["",[],["ext.rs","format.rs","ident_fragment.rs","lib.rs","runtime.rs","spanned.rs","to_tokens.rs"]],\
 "rand":["",[["distributions",[],["bernoulli.rs","distribution.rs","float.rs","integer.rs","mod.rs","other.rs","slice.rs","uniform.rs","utils.rs","weighted.rs","weighted_index.rs"]],["rngs",[["adapter",[],["mod.rs","read.rs","reseeding.rs"]]],["mock.rs","mod.rs","small.rs","std.rs","thread.rs","xoshiro256plusplus.rs"]],["seq",[],["index.rs","mod.rs"]]],["lib.rs","prelude.rs","rng.rs"]],\
 "rand_chacha":["",[],["chacha.rs","guts.rs","lib.rs"]],\

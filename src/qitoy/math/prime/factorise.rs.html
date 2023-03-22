@@ -150,12 +150,12 @@
     <span class="kw">super</span>::{
         montgomery::<span class="kw-2">*</span>,
         Gcd,
-        <span class="kw">super</span>::vec::Merge,
     }
 };
 <span class="kw">use </span>std::ops::Div;
 <span class="kw">use </span>rand::{SeedableRng, rngs::SmallRng, distributions::{Distribution, Uniform}};
 <span class="kw">use </span>num::traits::One;
+<span class="kw">use </span>itertools::Itertools;
 
 <span class="kw">pub trait </span>Factorise: PrimeCheck {
     <span class="doccomment">/// `self`が合成数のとき非自明な素因数を一つ返す。
@@ -163,14 +163,14 @@
 
     <span class="doccomment">/// `self`を素因数分解する。結果はソートされる。
     </span><span class="kw">fn </span>factorise(<span class="self">self</span>) -&gt; Vec&lt;<span class="self">Self</span>&gt;
-    <span class="kw">where </span><span class="self">Self</span>: Sized + Div&lt;Output = <span class="self">Self</span>&gt; + PartialEq + One + Copy,
-          Vec&lt;<span class="self">Self</span>&gt;: Merge {
+    <span class="kw">where </span><span class="self">Self</span>: Div&lt;Output = <span class="self">Self</span>&gt; + One + Copy + PartialOrd
+    {
         <span class="kw">let </span>n = <span class="self">self</span>;
         <span class="kw">if </span>n == <span class="self">Self</span>::one() { <span class="kw">return </span><span class="macro">vec!</span>[]; }
         <span class="kw">if </span>n.prime_check() { <span class="kw">return </span><span class="macro">vec!</span>[<span class="self">self</span>]; }
         <span class="kw">let </span>d = n.find_factor();
         <span class="kw">let </span>r = d.factorise();
-        r.merge(<span class="kw-2">&amp;mut </span>(n/d).factorise())
+        r.into_iter().merge((n/d).factorise().into_iter()).collect()
     }
 }
 

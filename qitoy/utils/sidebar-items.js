@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":[["bound",""]]};
+window.SIDEBAR_ITEMS = {"mod":[["bound",""]],"trait":[["ToFloat",""],["ToUint",""]]};
