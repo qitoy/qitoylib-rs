@@ -3,12 +3,12 @@ use super::{
     super::{
         montgomery::*,
         Gcd,
-        super::vec::Merge,
     }
 };
 use std::ops::Div;
 use rand::{SeedableRng, rngs::SmallRng, distributions::{Distribution, Uniform}};
 use num::traits::One;
+use itertools::Itertools;
 
 pub trait Factorise: PrimeCheck {
     /// `self`が合成数のとき非自明な素因数を一つ返す。
@@ -16,14 +16,14 @@ pub trait Factorise: PrimeCheck {
 
     /// `self`を素因数分解する。結果はソートされる。
     fn factorise(self) -> Vec<Self>
-    where Self: Sized + Div<Output = Self> + PartialEq + One + Copy,
-          Vec<Self>: Merge {
+    where Self: Div<Output = Self> + One + Copy + PartialOrd
+    {
         let n = self;
         if n == Self::one() { return vec![]; }
         if n.prime_check() { return vec![self]; }
         let d = n.find_factor();
         let r = d.factorise();
-        r.merge(&mut (n/d).factorise())
+        r.into_iter().merge((n/d).factorise().into_iter()).collect()
     }
 }
 
