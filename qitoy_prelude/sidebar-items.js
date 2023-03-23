@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"externcrate":[["qitoy_utils_bound",""]],"macro":[["chmax",""],["chmin",""]],"trait":[["BiSearchBy",""],["LowerBound",""],["UpperBound",""]]};

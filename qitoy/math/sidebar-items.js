@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":[["algebra",""],["montgomery",""],["prime",""]],"struct":[["Combi","組み合わせで頻出の計算をModIntで計算します。"],["Matrix",""]],"trait":[["Gcd",""],["Lcm",""]]};

@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"struct":[["Holder","Helper type allowing implementation of trait object for generic types multiple times. In practice this type is never used"]]};
