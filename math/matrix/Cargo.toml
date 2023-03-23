@@ -1,0 +1,6 @@
+[package]
+name = "qitoy-math-matrix"
+version = "0.1.0"
+
+[dependencies]
+qitoy-algebra-ring = { path = "../../algebra/ring" }

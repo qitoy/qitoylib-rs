@@ -1,0 +1,6 @@
+[package]
+name = "qitoy-algebra-ring"
+version = "0.1.0"
+
+[dependencies]
+ac-library-rs = { workspace = true }

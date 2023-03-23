@@ -1,0 +1,6 @@
+[package]
+name = "qitoy-data_structure-wavelet_matrix"
+version = "0.1.0"
+
+[dependencies]
+qitoy-data_structure-bit_vec = { path = "../bit_vec" }

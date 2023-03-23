@@ -1,0 +1,6 @@
+[package]
+name = "qitoy-math-numeric"
+version = "0.1.0"
+
+[dependencies]
+num = { workspace = true }

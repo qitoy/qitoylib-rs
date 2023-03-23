@@ -18,11 +18,9 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: doc
-
-      - uses: actions-rs/cargo@v1
-        with:
-          command: rustdoc
-          args: -- --html-in-header katex.html
+          args: --nodeps --workspace
+        env:
+          RUSTDOCFLAGS: --html-in-header katex.html
 
       - uses: peaceiris/actions-gh-pages@v3
         with:

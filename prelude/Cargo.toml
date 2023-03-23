@@ -1,0 +1,6 @@
+[package]
+name = "qitoy-prelude"
+version = "0.1.0"
+
+[dependencies]
+qitoy-utils-bound = { path = "../utils/bound" }
