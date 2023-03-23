@@ -18,7 +18,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: doc
-          args: --nodeps --workspace
+          args: --no-deps --workspace
         env:
           RUSTDOCFLAGS: --html-in-header katex.html
 
