@@ -1,5 +1,5 @@
-extern crate ac_library_rs;
-use ac_library_rs::modint::ModIntBase;
+extern crate ac_library;
+use ac_library::modint::ModIntBase;
 
 /// 組み合わせで頻出の計算をModIntで計算します。
 pub struct Combi<T: ModIntBase> {

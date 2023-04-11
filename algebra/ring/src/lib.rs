@@ -29,6 +29,6 @@ macro_rules! impl_ring_mint {
     }
 }
 
-extern crate ac_library_rs;
-use ac_library_rs::modint::{ModInt, ModInt998244353, ModInt1000000007};
+extern crate ac_library;
+use ac_library::modint::{ModInt, ModInt998244353, ModInt1000000007};
 impl_ring_mint!(ModInt, ModInt998244353, ModInt1000000007);
