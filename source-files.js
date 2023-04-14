@@ -1,6 +1,7 @@
 var sourcesIndex = JSON.parse('{\
 "qitoy_algebra_ring":["",[],["lib.rs"]],\
 "qitoy_algorithm_mo":["",[],["lib.rs"]],\
+"qitoy_algorithm_rerooting_dp":["",[],["lib.rs"]],\
 "qitoy_data_structure_bit_vec":["",[],["lib.rs"]],\
 "qitoy_data_structure_wavelet_matrix":["",[],["lib.rs"]],\
 "qitoy_math_combi":["",[],["lib.rs"]],\
