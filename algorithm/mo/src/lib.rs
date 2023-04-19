@@ -5,20 +5,19 @@ use std::convert::TryInto;
 pub trait Mo {
     type T;
 
-    fn push_left(&self, val: &mut Self::T, idx: usize);
+    fn push_left(&mut self, val: &mut Self::T, idx: usize);
 
-    fn pop_left(&self, val: &mut Self::T, idx: usize);
+    fn pop_left(&mut self, val: &mut Self::T, idx: usize);
 
-    fn push_right(&self, val: &mut Self::T, idx: usize);
+    fn push_right(&mut self, val: &mut Self::T, idx: usize);
 
-    fn pop_right(&self, val: &mut Self::T, idx: usize);
+    fn pop_right(&mut self, val: &mut Self::T, idx: usize);
     
     /// * `val` - クエリに対応する値
     /// * `idx` - クエリの何番目か
-    fn apply(&self, val: &Self::T, idx: usize);
+    fn apply(&mut self, val: &Self::T, idx: usize);
 
-    /// Mo's algorithmをします。
-    fn solve(&self, query: &[(usize, usize)], init: Self::T) {
+    fn solve(&mut self, query: &[(usize, usize)], init: Self::T) {
         let k = query.iter().map(|x| x.1).max().unwrap();
         let k: usize = (k.ilog2()+1).try_into().unwrap();
         let mut query: Vec<_> = query.into_iter().zip(0..).collect();
