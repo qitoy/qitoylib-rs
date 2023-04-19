@@ -89,31 +89,27 @@
 <a href="#54" id="54">54</a>
 <a href="#55" id="55">55</a>
 <a href="#56" id="56">56</a>
-<a href="#57" id="57">57</a>
-<a href="#58" id="58">58</a>
-<a href="#59" id="59">59</a>
 </pre><pre class="rust"><code><span class="doccomment">//! Mo&#39;s algorithmを提供するトレイトです。  
 
 </span><span class="kw">use </span>std::convert::TryInto;
 
-<span class="doccomment">/// 実装が必要な4つの関数は、範囲を伸ばし縮みさせたときに呼ばれ、範囲からpush/popされたindexを用いて`val`を変更します。
-</span><span class="kw">pub trait </span>Mo {
-    <span class="kw">type </span>T: Default + Copy;
+<span class="kw">pub trait </span>Mo {
+    <span class="kw">type </span>T;
 
-    <span class="doccomment">/// 範囲の左側を伸ばしたときに呼ばれます。
-    </span><span class="kw">fn </span>push_left(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::T, idx: usize);
+    <span class="kw">fn </span>push_left(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::T, idx: usize);
 
-    <span class="doccomment">/// 範囲の左側を縮めたときに呼ばれます。
-    </span><span class="kw">fn </span>pop_left(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::T, idx: usize);
+    <span class="kw">fn </span>pop_left(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::T, idx: usize);
 
-    <span class="doccomment">/// 範囲の右側を伸ばしたときに呼ばれます。
-    </span><span class="kw">fn </span>push_right(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::T, idx: usize);
+    <span class="kw">fn </span>push_right(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::T, idx: usize);
 
-    <span class="doccomment">/// 範囲の右側を縮めたときに呼ばれます。
-    </span><span class="kw">fn </span>pop_right(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::T, idx: usize);
+    <span class="kw">fn </span>pop_right(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::T, idx: usize);
+    
+    <span class="doccomment">/// * `val` - クエリに対応する値
+    /// * `idx` - クエリの何番目か
+    </span><span class="kw">fn </span>apply(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="kw-2">&amp;</span><span class="self">Self</span>::T, idx: usize);
 
-    <span class="doccomment">/// 複数の範囲クエリに対して、それに対応する値を格納したベクタを返します。
-    </span><span class="kw">fn </span>solve(<span class="kw-2">&amp;mut </span><span class="self">self</span>, query: <span class="kw-2">&amp;</span>[(usize, usize)]) -&gt; Vec&lt;<span class="self">Self</span>::T&gt; {
+    <span class="doccomment">/// Mo&#39;s algorithmをします。
+    </span><span class="kw">fn </span>solve(<span class="kw-2">&amp;</span><span class="self">self</span>, query: <span class="kw-2">&amp;</span>[(usize, usize)], init: <span class="self">Self</span>::T) {
         <span class="kw">let </span>k = query.iter().map(|x| x.<span class="number">1</span>).max().unwrap();
         <span class="kw">let </span>k: usize = (k.ilog2()+<span class="number">1</span>).try_into().unwrap();
         <span class="kw">let </span><span class="kw-2">mut </span>query: Vec&lt;<span class="kw">_</span>&gt; = query.into_iter().zip(<span class="number">0</span>..).collect();
@@ -121,17 +117,15 @@
             <span class="kw">let </span>(l, r) = <span class="kw-2">*</span>x.<span class="number">0</span>;
             hilbert_order(k, l, r)
         });
-        <span class="kw">let </span><span class="kw-2">mut </span>ret = <span class="macro">vec!</span>[<span class="self">Self</span>::T::default(); query.len()];
-        <span class="kw">let </span><span class="kw-2">mut </span>val = <span class="self">Self</span>::T::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>val = init;
         <span class="kw">let </span>(<span class="kw-2">mut </span>l, <span class="kw-2">mut </span>r) = (<span class="number">0</span>, <span class="number">0</span>);
-        <span class="kw">for </span>(<span class="kw-2">&amp;</span>(nl, nr), i) <span class="kw">in </span>query.into_iter() {
+        <span class="kw">for </span>(<span class="kw-2">&amp;</span>(nl, nr), idx) <span class="kw">in </span>query.into_iter() {
             <span class="kw">while </span>r &lt; nr { <span class="self">self</span>.push_right(<span class="kw-2">&amp;mut </span>val, r); r += <span class="number">1</span>; }
             <span class="kw">while </span>nl &lt; l { l -= <span class="number">1</span>; <span class="self">self</span>.push_left(<span class="kw-2">&amp;mut </span>val, l); }
             <span class="kw">while </span>nr &lt; r { r -= <span class="number">1</span>; <span class="self">self</span>.pop_right(<span class="kw-2">&amp;mut </span>val, r); }
             <span class="kw">while </span>l &lt; nl { <span class="self">self</span>.pop_left(<span class="kw-2">&amp;mut </span>val, l); l += <span class="number">1</span>; }
-            ret[i] = val;
+            <span class="self">self</span>.apply(<span class="kw-2">&amp;</span>val, idx);
         }
-        ret
     }
 }
 
