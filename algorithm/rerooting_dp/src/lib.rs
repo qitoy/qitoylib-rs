@@ -23,7 +23,7 @@ where T: Monoid,
             add_vertex,
             add_edge,
             cnt: 0,
-            _phantom_data: PhantomData::<fn() -> T>,
+            _phantom_data: PhantomData,
         }
     }
 
