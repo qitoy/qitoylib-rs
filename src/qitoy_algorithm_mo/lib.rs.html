@@ -88,28 +88,42 @@
 <a href="#53" id="53">53</a>
 <a href="#54" id="54">54</a>
 <a href="#55" id="55">55</a>
-</pre><pre class="rust"><code><span class="doccomment">//! Mo&#39;s algorithmを提供するトレイトです。  
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+</pre><pre class="rust"><code><span class="kw">use </span>std::convert::TryInto;
 
-</span><span class="kw">use </span>std::convert::TryInto;
+<span class="kw">pub struct </span>Mo&lt;PushLeft, PopLeft, PushRight, PopRight, Assign&gt; {
+    <span class="kw">pub </span>push_left: PushLeft,
+    <span class="kw">pub </span>pop_left: PopLeft,
+    <span class="kw">pub </span>push_right: PushRight,
+    <span class="kw">pub </span>pop_right: PopRight,
+    <span class="kw">pub </span>assign: Assign,
+}
 
-<span class="kw">pub trait </span>Mo {
-    <span class="kw">type </span>T;
-
-    <span class="kw">fn </span>push_left(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::T, idx: usize);
-
-    <span class="kw">fn </span>pop_left(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::T, idx: usize);
-
-    <span class="kw">fn </span>push_right(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::T, idx: usize);
-
-    <span class="kw">fn </span>pop_right(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::T, idx: usize);
-    
-    <span class="doccomment">/// * `val` - クエリに対応する値
-    /// * `idx` - クエリの何番目か
-    </span><span class="kw">fn </span>apply(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: <span class="kw-2">&amp;</span><span class="self">Self</span>::T, idx: usize);
-
-    <span class="kw">fn </span>solve(<span class="kw-2">&amp;mut </span><span class="self">self</span>, query: <span class="kw-2">&amp;</span>[(usize, usize)], init: <span class="self">Self</span>::T) {
+<span class="kw">impl</span>&lt;PushLeft, PopLeft, PushRight, PopRight, Assign&gt;
+    Mo&lt;PushLeft, PopLeft, PushRight, PopRight, Assign&gt;
+{
+    <span class="kw">pub fn </span>solve&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, query: <span class="kw-2">&amp;</span>[(usize, usize)], init: T)
+    <span class="kw">where
+        </span>PushLeft: FnMut(<span class="kw-2">&amp;mut </span>T, usize),
+        PopLeft: FnMut(<span class="kw-2">&amp;mut </span>T, usize),
+        PushRight: FnMut(<span class="kw-2">&amp;mut </span>T, usize),
+        PopRight: FnMut(<span class="kw-2">&amp;mut </span>T, usize),
+        Assign: FnMut(<span class="kw-2">&amp;</span>T, usize),
+    {
         <span class="kw">let </span>k = query.iter().map(|x| x.<span class="number">1</span>).max().unwrap();
-        <span class="kw">let </span>k: usize = (k.ilog2()+<span class="number">1</span>).try_into().unwrap();
+        <span class="kw">let </span>k: usize = (k.ilog2() + <span class="number">1</span>).try_into().unwrap();
         <span class="kw">let </span><span class="kw-2">mut </span>query: Vec&lt;<span class="kw">_</span>&gt; = query.into_iter().zip(<span class="number">0</span>..).collect();
         query.sort_by_cached_key(|x| {
             <span class="kw">let </span>(l, r) = <span class="kw-2">*</span>x.<span class="number">0</span>;
@@ -118,11 +132,23 @@
         <span class="kw">let </span><span class="kw-2">mut </span>val = init;
         <span class="kw">let </span>(<span class="kw-2">mut </span>l, <span class="kw-2">mut </span>r) = (<span class="number">0</span>, <span class="number">0</span>);
         <span class="kw">for </span>(<span class="kw-2">&amp;</span>(nl, nr), idx) <span class="kw">in </span>query.into_iter() {
-            <span class="kw">while </span>r &lt; nr { <span class="self">self</span>.push_right(<span class="kw-2">&amp;mut </span>val, r); r += <span class="number">1</span>; }
-            <span class="kw">while </span>nl &lt; l { l -= <span class="number">1</span>; <span class="self">self</span>.push_left(<span class="kw-2">&amp;mut </span>val, l); }
-            <span class="kw">while </span>nr &lt; r { r -= <span class="number">1</span>; <span class="self">self</span>.pop_right(<span class="kw-2">&amp;mut </span>val, r); }
-            <span class="kw">while </span>l &lt; nl { <span class="self">self</span>.pop_left(<span class="kw-2">&amp;mut </span>val, l); l += <span class="number">1</span>; }
-            <span class="self">self</span>.apply(<span class="kw-2">&amp;</span>val, idx);
+            <span class="kw">while </span>r &lt; nr {
+                (<span class="self">self</span>.push_right)(<span class="kw-2">&amp;mut </span>val, r);
+                r += <span class="number">1</span>;
+            }
+            <span class="kw">while </span>nl &lt; l {
+                l -= <span class="number">1</span>;
+                (<span class="self">self</span>.push_left)(<span class="kw-2">&amp;mut </span>val, l);
+            }
+            <span class="kw">while </span>nr &lt; r {
+                r -= <span class="number">1</span>;
+                (<span class="self">self</span>.pop_right)(<span class="kw-2">&amp;mut </span>val, r);
+            }
+            <span class="kw">while </span>l &lt; nl {
+                (<span class="self">self</span>.pop_left)(<span class="kw-2">&amp;mut </span>val, l);
+                l += <span class="number">1</span>;
+            }
+            (<span class="self">self</span>.assign)(<span class="kw-2">&amp;</span>val, idx);
         }
     }
 }
