@@ -13,14 +13,14 @@ pub trait UpperBound {
 impl<T: PartialOrd> LowerBound for [T] {
     type T = T;
     fn lower_bound(&self, v: Self::T) -> usize {
-        self.partition_point(|a| v <= *a)
+        self.partition_point(|a| a < &v)
     }
 }
 
 impl<T: PartialOrd> UpperBound for [T] {
     type T = T;
     fn upper_bound(&self, v: Self::T) -> usize {
-        self.partition_point(|a| v < *a)
+        self.partition_point(|a| a <= &v)
     }
 }
 
