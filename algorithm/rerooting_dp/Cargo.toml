@@ -2,5 +2,8 @@
 name = "qitoy-algorithm-rerooting_dp"
 version = "0.1.0"
 
+[lib]
+name = "qitoy_rerooting_dp"
+
 [dependencies]
 ac-library-rs = { workspace = true }
