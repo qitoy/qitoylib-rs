@@ -21,7 +21,7 @@ impl<PushLeft, PopLeft, PushRight, PopRight, Assign>
     {
         let k = query.iter().map(|x| x.1).max().unwrap();
         let k: usize = (k.ilog2() + 1).try_into().unwrap();
-        let mut query: Vec<_> = query.into_iter().zip(0..).collect();
+        let mut query: Vec<_> = query.iter().zip(0..).collect();
         query.sort_by_cached_key(|x| {
             let (l, r) = *x.0;
             hilbert_order(k, l, r)
@@ -55,7 +55,7 @@ fn hilbert_order(k: usize, x: usize, y: usize) -> u64 {
     let mut d = 0;
     for i in (0..k).rev() {
         let (rx, ry) = (x >> i & 1, y >> i & 1);
-        d += (1 << 2 * i) * (3 * rx ^ ry);
+        d += (1 << (2 * i)) * ((3 * rx) ^ ry);
         if ry == 0 {
             if rx == 1 {
                 x = (1 << k) - 1 - x;

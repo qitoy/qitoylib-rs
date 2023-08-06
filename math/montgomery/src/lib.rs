@@ -1,7 +1,7 @@
 //! モンゴメリ乗算
 
+use std::ops::{Add, Mul, Neg, Sub};
 use std::rc::Rc;
-use std::ops::{Add, Neg, Sub, Mul};
 
 /// モンゴメリ乗算で内部的に使われる型。
 #[derive(Debug, Clone)]
@@ -19,7 +19,9 @@ impl Mvalue {
     pub fn pow(mut self, mut rhs: u64) -> Self {
         let mut r = self.p.trans(1);
         while rhs > 0 {
-            if rhs & 1 == 1 { r = r * self.clone(); }
+            if rhs & 1 == 1 {
+                r = r * self.clone();
+            }
             self = self.clone() * self;
             rhs >>= 1;
         }
@@ -41,8 +43,13 @@ impl Add for Mvalue {
 impl Neg for Mvalue {
     type Output = Self;
     fn neg(self) -> Self::Output {
-        if self.val == 0 { self } else {
-            Self { val: self.p.m - self.val, p: self.p }
+        if self.val == 0 {
+            self
+        } else {
+            Self {
+                val: self.p.m - self.val,
+                p: self.p,
+            }
         }
     }
 }
@@ -66,7 +73,8 @@ impl Mul for Mvalue {
 /// モンゴメリ乗算をするための構造体。
 #[derive(Debug, PartialEq)]
 pub struct Montgomery {
-    r: u128, m: u128,
+    r: u128,
+    m: u128,
 }
 
 impl Montgomery {
@@ -88,14 +96,21 @@ impl Montgomery {
     pub fn trans(self: &Rc<Self>, val: u64) -> Mvalue {
         let val: u128 = val.into();
         let val = (val << 64) % self.m;
-        Mvalue { val, p: Rc::clone(self) }
+        Mvalue {
+            val,
+            p: Rc::clone(self),
+        }
     }
 
     fn reduction(&self, val: u128) -> u128 {
         let mask: u128 = u64::MAX.into();
         let b = ((val & mask) * self.r) & mask;
         let c = (val + b * self.m) >> 64;
-        if c >= self.m { c - self.m } else { c }
+        if c >= self.m {
+            c - self.m
+        } else {
+            c
+        }
     }
 }
 
@@ -125,5 +140,4 @@ mod test {
         let a = m.trans(114514).pow(1919810);
         assert_eq!(a.val(), 306961278);
     }
-
 }

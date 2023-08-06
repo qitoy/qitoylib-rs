@@ -1,17 +1,21 @@
-extern crate qitoy_prime_check;
+extern crate itertools;
+extern crate num;
 extern crate qitoy_math_montgomery;
 extern crate qitoy_math_numeric;
-extern crate num;
-extern crate itertools;
+extern crate qitoy_prime_check;
 extern crate rand;
 
-use qitoy_prime_check::PrimeCheck;
-use qitoy_math_montgomery::*;
-use qitoy_math_numeric::Gcd;
-use std::ops::Div;
-use rand::{SeedableRng, rngs::SmallRng, distributions::{Distribution, Uniform}};
-use num::traits::One;
 use itertools::Itertools;
+use num::traits::One;
+use qitoy_math_montgomery::{Montgomery, Mvalue};
+use qitoy_math_numeric::Gcd;
+use qitoy_prime_check::PrimeCheck;
+use rand::{
+    distributions::{Distribution, Uniform},
+    rngs::SmallRng,
+    SeedableRng,
+};
+use std::ops::Div;
 
 pub trait Factorise: PrimeCheck {
     /// `self`が合成数のとき非自明な素因数を一つ返す。
@@ -19,21 +23,30 @@ pub trait Factorise: PrimeCheck {
 
     /// `self`を素因数分解する。結果はソートされる。
     fn factorise(self) -> Vec<Self>
-    where Self: Div<Output = Self> + One + Copy + PartialOrd
+    where
+        Self: Div<Output = Self> + One + Copy + PartialOrd,
     {
         let n = self;
-        if n == Self::one() { return vec![]; }
-        if n.prime_check() { return vec![self]; }
+        if n == Self::one() {
+            return vec![];
+        }
+        if n.prime_check() {
+            return vec![self];
+        }
         let d = n.find_factor();
         let r = d.factorise();
-        r.into_iter().merge((n/d).factorise().into_iter()).collect()
+        r.into_iter()
+            .merge((n / d).factorise().into_iter())
+            .collect()
     }
 }
 
 impl Factorise for u64 {
     fn find_factor(self) -> Self {
         let n = self;
-        if n & 1 == 0 { return 2; }
+        if n & 1 == 0 {
+            return 2;
+        }
         let mut g;
         let mut rng = SmallRng::from_entropy();
         let range = Uniform::from(1..n);
@@ -44,20 +57,21 @@ impl Factorise for u64 {
             let (mut y, c, mut q) = (mo.trans(y), mo.trans(c), mo.trans(1));
             let mut r = 1;
             let m = 128;
-            let f = |x: Mvalue| {
-                x.clone() * x + c.clone()
-            };
+            let f = |x: Mvalue| x.clone() * x + c.clone();
             while {
                 x = y.clone();
-                for _ in 0..r { y = f(y); }
+                for _ in 0..r {
+                    y = f(y);
+                }
                 let mut k = 0;
                 while {
                     ys = y.clone();
-                    for _ in 0..m.min(r-k) {
+                    for _ in 0..m.min(r - k) {
                         y = f(y);
                         q = q * (x.clone() - y.clone());
                     }
-                    g = q.val().gcd(n); k += m;
+                    g = q.val().gcd(n);
+                    k += m;
                     k < r && g == 1
                 } {}
                 r <<= 1;
@@ -106,10 +120,9 @@ mod tests {
     #[test]
     fn test_897612484786617600() {
         let v = 897612484786617600.factorise();
-        assert_eq!(v, vec![
-                   2, 2, 2, 2, 2, 2, 2, 2,
-                   3, 3, 3, 3, 5, 5, 7, 7,
-                   11, 13, 17, 19, 23, 29, 31, 37,
-        ]);
+        assert_eq!(
+            v,
+            vec![2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 5, 5, 7, 7, 11, 13, 17, 19, 23, 29, 31, 37,]
+        );
     }
 }

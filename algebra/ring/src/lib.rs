@@ -36,6 +36,7 @@ impl_ring_mint!(ModInt, ModInt998244353, ModInt1000000007);
 #[derive(Clone)]
 struct XorAnd(u64);
 
+#[allow(clippy::suspicious_arithmetic_impl)]
 impl Add<Self> for XorAnd {
     type Output = Self;
     fn add(self, rhs: Self) -> Self::Output {
@@ -50,6 +51,7 @@ impl Neg for XorAnd {
     }
 }
 
+#[allow(clippy::suspicious_arithmetic_impl)]
 impl Mul<Self> for XorAnd {
     type Output = Self;
     fn mul(self, rhs: Self) -> Self::Output {
