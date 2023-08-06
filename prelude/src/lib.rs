@@ -52,7 +52,7 @@ macro_rules! chmin {
 
 
 pub extern crate qitoy_utils_bound;
-pub use qitoy_utils_bound::{BiSearchBy, LowerBound, UpperBound};
+pub use qitoy_utils_bound::{LowerBound, UpperBound};
 
 #[cfg(test)]
 mod tests {
@@ -62,6 +62,7 @@ mod tests {
     fn max() {
         assert_eq!(max!(3), 3);
         assert_eq!(max!(3, -3, 4), 4);
+        assert_eq!(max!(2+1, 4), 4);
     }
 
     #[test]

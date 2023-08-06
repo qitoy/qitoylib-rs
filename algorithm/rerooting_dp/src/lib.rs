@@ -33,7 +33,7 @@ where T: Monoid,
         self.cnt += 1;
     }
 
-    pub fn build(&mut self) -> Vec<T::S> {
+    pub fn build(&mut self) -> Vec<Vec<T::S>> {
         let n = self.tree.len();
         assert_eq!(self.cnt, n-1);
         let mut dp = Vec::with_capacity(n);
@@ -42,13 +42,7 @@ where T: Monoid,
         }
         self.dfs1(&mut dp, 0, 0);
         self.dfs2(&mut dp, 0, 0, T::identity());
-        (0..n).map(|v| {
-            let mut ret = T::identity();
-            for i in 0..self.tree[v].len() {
-                ret = T::binary_operation(&ret, &(self.add_edge)(dp[v][i].clone(), self.tree[v][i].0));
-            }
-            (self.add_vertex)(ret, v)
-        }).collect()
+        dp
     }
 
     fn dfs1(&mut self, dp: &mut Vec<Vec<T::S>>, v: usize, p: usize) -> T::S {

@@ -1,11 +1,5 @@
 //! 配列上の二分探索をします
 
-pub trait BiSearchBy {
-    type T;
-    fn bisearch_by<F>(&self, f: F) -> usize
-        where F: Fn(&Self::T) -> bool;
-}
-
 pub trait LowerBound {
     type T: PartialOrd;
     fn lower_bound(&self, v: Self::T) -> usize;
@@ -16,30 +10,17 @@ pub trait UpperBound {
     fn upper_bound(&self, v: Self::T) -> usize;
 }
 
-impl<T> BiSearchBy for [T] {
-    type T = T;
-    fn bisearch_by<F>(&self, f: F) -> usize
-        where F: Fn(&Self::T) -> bool {
-            let (mut ok, mut ng) = (self.len() as i32, -1);
-            while ok.abs_diff(ng) > 1 {
-                let mid = (ok + ng) / 2;
-                if f(&self[mid as usize]) { ok = mid; } else { ng = mid; }
-            }
-            ok as _
-        }
-}
-
 impl<T: PartialOrd> LowerBound for [T] {
     type T = T;
     fn lower_bound(&self, v: Self::T) -> usize {
-        self.bisearch_by(|a| v <= *a)
+        self.partition_point(|a| v <= *a)
     }
 }
 
 impl<T: PartialOrd> UpperBound for [T] {
     type T = T;
     fn upper_bound(&self, v: Self::T) -> usize {
-        self.bisearch_by(|a| v < *a)
+        self.partition_point(|a| v < *a)
     }
 }
 

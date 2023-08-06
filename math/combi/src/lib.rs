@@ -9,13 +9,17 @@ pub struct Combi<T: ModIntBase> {
 
 impl<T: ModIntBase> Combi<T> {
     /// `n`までの階乗とその逆元を前計算します。  
-    /// 計算量$`O(n \log n)`$
+    /// 計算量$`O(n)`$
     pub fn new(n: usize) -> Self {
+        let modulus = T::modulus() as usize;
         let mut fact = vec![T::new(1); n+1];
-        for i in 1..=n {
+        let mut inv = vec![T::new(1); n+1];
+        let mut factinv = vec![T::new(1); n+1];
+        for i in 2..=n {
             fact[i] = fact[i-1] * i.into();
+            inv[i] = T::raw(modulus as u32) - inv[modulus % i] * (modulus/i).into();
+            factinv[i] = factinv[i-1] * inv[i];
         }
-        let factinv = fact.iter().map(|v| v.inv()).collect();
         Self {
             fact,
             factinv,

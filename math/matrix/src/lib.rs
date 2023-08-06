@@ -1,10 +1,4 @@
-use std::ops::{
-    Add, AddAssign,
-    Neg,
-    Sub, SubAssign,
-    Mul, MulAssign,
-    Index, IndexMut
-};
+use std::ops::{Add, AddAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign};
 
 extern crate qitoy_algebra_ring;
 use qitoy_algebra_ring::Ring;
@@ -19,7 +13,8 @@ pub struct Matrix<T: Ring> {
 impl<T: Ring> Matrix<T> {
     pub fn new(row: usize, column: usize) -> Self {
         Self {
-            row, column,
+            row,
+            column,
             mat: vec![vec![T::zero(); column]; row],
         }
     }
@@ -30,11 +25,19 @@ impl<T: Ring> Matrix<T> {
         }
         mat
     }
+    pub fn row(&self) -> usize {
+        self.row
+    }
+    pub fn column(&self) -> usize {
+        self.column
+    }
     pub fn pow(mut self, mut rhs: u64) -> Self {
         assert_eq!(self.row, self.column);
         let mut ret = Self::identity(self.row);
         while rhs > 0 {
-            if rhs & 1 == 1 { ret *= self.clone(); }
+            if rhs & 1 == 1 {
+                ret *= self.clone();
+            }
             self *= self.clone();
             rhs >>= 1;
         }
@@ -47,13 +50,17 @@ impl<T: Ring> From<Vec<Vec<T>>> for Matrix<T> {
         let row = value.len();
         if row == 0 {
             return Self {
-                row, column: 0, mat: vec![],
+                row,
+                column: 0,
+                mat: vec![],
             };
         }
         let column = value[0].len();
         assert!(value.iter().all(|v| v.len() == column));
         Self {
-            row, column, mat: value,
+            row,
+            column,
+            mat: value,
         }
     }
 }
