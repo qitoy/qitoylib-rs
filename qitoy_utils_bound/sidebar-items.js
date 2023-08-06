@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"trait":[["BiSearchBy",""],["LowerBound",""],["UpperBound",""]]};
+window.SIDEBAR_ITEMS = {"trait":["LowerBound","UpperBound"]};

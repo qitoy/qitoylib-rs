@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":[["RollingHash",""]]};
+window.SIDEBAR_ITEMS = {"struct":["RollingHash"]};

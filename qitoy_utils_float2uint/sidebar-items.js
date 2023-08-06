@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"trait":[["ToFloat",""],["ToUint",""]]};
+window.SIDEBAR_ITEMS = {"trait":["ToFloat","ToUint"]};

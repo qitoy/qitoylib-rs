@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"trait":[["PrimeCheck",""]]};
+window.SIDEBAR_ITEMS = {"trait":["PrimeCheck"]};

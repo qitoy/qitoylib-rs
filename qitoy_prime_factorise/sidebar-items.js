@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"trait":[["Factorise",""]]};
+window.SIDEBAR_ITEMS = {"trait":["Factorise"]};

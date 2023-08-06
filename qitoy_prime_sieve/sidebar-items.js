@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":[["eratosthenes","エラトステネスの篩 計算量$`O(n \\log n)`$"]]};
+window.SIDEBAR_ITEMS = {"fn":["eratosthenes"]};
