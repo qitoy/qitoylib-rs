@@ -8,7 +8,9 @@ members = [
     "prime/*",
     "string/*",
     "utils/*",
+    "verify",
 ]
+resolver = "2"
 
 [workspace.dependencies]
 ac-library-rs = "=0.1.1"
