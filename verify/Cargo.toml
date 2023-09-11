@@ -4,7 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+ac-library-rs = { workspace = true }
 anyhow = "1.0.75"
 proconio = "0.4.5"
+qitoy-algorithm-rerooting_dp = { path = "../algorithm/rerooting_dp" }
 rstest = "0.18.2"
 verify_proc = { path = "./proc" }
