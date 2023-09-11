@@ -1,11 +1,10 @@
 [package]
-name = "qitoy-prime-factorise"
+name = "qitoy-prime-factorize"
 version = "0.1.0"
 
 [dependencies]
 qitoy-prime-check = { path = "../check" }
 qitoy-math-montgomery = { path = "../../math/montgomery" }
-qitoy-math-numeric = { path = "../../math/numeric" }
 num = { workspace = true }
 itertools = { workspace = true }
 rand = { workspace = true }

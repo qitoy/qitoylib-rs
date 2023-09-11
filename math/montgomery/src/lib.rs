@@ -80,6 +80,7 @@ pub struct Montgomery {
 impl Montgomery {
     /// `modulus`で前計算をする。ただし`modulus`は奇数でなくてはならない。
     pub fn new(modulus: u64) -> Rc<Self> {
+        assert!(modulus % 2 != 0);
         let m = modulus.into();
         let (mut r, mut t) = (0, 0);
         for i in 0..64 {

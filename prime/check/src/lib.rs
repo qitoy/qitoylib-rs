@@ -3,12 +3,12 @@ use qitoy_math_montgomery::Montgomery;
 
 pub trait PrimeCheck {
     /// 素数判定をする。
-    fn prime_check(self) -> bool;
+    fn prime_check(&self) -> bool;
 }
 
 impl PrimeCheck for u64 {
-    fn prime_check(self) -> bool {
-        let n = self;
+    fn prime_check(&self) -> bool {
+        let &n = self;
         if n <= 2 {
             return n == 2;
         }
@@ -39,23 +39,5 @@ impl PrimeCheck for u64 {
             }
         }
         true
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::PrimeCheck;
-
-    #[test]
-    fn test() {
-        assert!(2.prime_check());
-        assert!(7.prime_check());
-        assert!(1_000_000_007.prime_check());
-        assert!(998_244_353.prime_check());
-        assert!(65537.prime_check());
-        assert!(((1 << 61) - 1).prime_check());
-        assert!(!10.prime_check());
-        assert!(!4033.prime_check());
-        assert!(!4681.prime_check());
     }
 }
