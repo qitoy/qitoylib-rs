@@ -176,6 +176,7 @@
 <a href="#141" id="141">141</a>
 <a href="#142" id="142">142</a>
 <a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! モンゴメリ乗算
 
 </span><span class="kw">use </span>std::ops::{Add, Mul, Neg, Sub};
@@ -258,6 +259,7 @@
 <span class="kw">impl </span>Montgomery {
     <span class="doccomment">/// `modulus`で前計算をする。ただし`modulus`は奇数でなくてはならない。
     </span><span class="kw">pub fn </span>new(modulus: u64) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
+        <span class="macro">assert!</span>(modulus % <span class="number">2 </span>!= <span class="number">0</span>);
         <span class="kw">let </span>m = modulus.into();
         <span class="kw">let </span>(<span class="kw-2">mut </span>r, <span class="kw-2">mut </span>t) = (<span class="number">0</span>, <span class="number">0</span>);
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">64 </span>{

@@ -9,7 +9,7 @@ var sourcesIndex = JSON.parse('{\
 "qitoy_mo":["",[],["lib.rs"]],\
 "qitoy_prelude":["",[],["lib.rs"]],\
 "qitoy_prime_check":["",[],["lib.rs"]],\
-"qitoy_prime_factorise":["",[],["lib.rs"]],\
+"qitoy_prime_factorize":["",[],["lib.rs"]],\
 "qitoy_prime_pi":["",[],["lib.rs"]],\
 "qitoy_prime_sieve":["",[],["lib.rs"]],\
 "qitoy_rerooting_dp":["",[],["lib.rs"]],\
