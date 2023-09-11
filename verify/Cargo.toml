@@ -8,5 +8,8 @@ ac-library-rs = { workspace = true }
 anyhow = "1.0.75"
 proconio = "0.4.5"
 qitoy-algorithm-rerooting_dp = { path = "../algorithm/rerooting_dp" }
+qitoy-prime-check = { path = "../prime/check" }
+qitoy-prime-factorize = { path = "../prime/factorize" }
 rstest = "0.18.2"
 verify_proc = { path = "./proc" }
+itertools = { workspace = true }
