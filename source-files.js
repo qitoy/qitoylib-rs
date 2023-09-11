@@ -15,6 +15,8 @@ var sourcesIndex = JSON.parse('{\
 "qitoy_rerooting_dp":["",[],["lib.rs"]],\
 "qitoy_string_rolling_hash":["",[],["lib.rs"]],\
 "qitoy_utils_bound":["",[],["lib.rs"]],\
-"qitoy_utils_float2uint":["",[],["lib.rs"]]\
+"qitoy_utils_float2uint":["",[],["lib.rs"]],\
+"verify":["",[],["lib.rs"]],\
+"verify_proc":["",[],["lib.rs"]]\
 }');
 createSourceSidebar();
