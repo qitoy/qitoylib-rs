@@ -7,3 +7,4 @@ edition = "2021"
 anyhow = "1.0.75"
 proconio = "0.4.5"
 rstest = "0.18.2"
+verify_proc = { path = "./proc" }
