@@ -8,6 +8,7 @@ ac-library-rs = { workspace = true }
 anyhow = "1.0.75"
 proconio = "0.4.5"
 qitoy-algorithm-rerooting_dp = { path = "../algorithm/rerooting_dp" }
+qitoy-data_structure-weighted_dsu = { path = "../data_structure/weighted_dsu" }
 qitoy-prime-check = { path = "../prime/check" }
 qitoy-prime-factorize = { path = "../prime/factorize" }
 rstest = "0.18.2"

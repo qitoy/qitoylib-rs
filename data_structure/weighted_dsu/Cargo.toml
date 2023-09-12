@@ -1,0 +1,6 @@
+[package]
+name = "qitoy-data_structure-weighted_dsu"
+version = "0.1.0"
+
+[lib]
+name = "weighted_dsu"
