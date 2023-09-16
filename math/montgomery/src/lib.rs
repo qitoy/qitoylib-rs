@@ -1,23 +1,22 @@
 //! モンゴメリ乗算
 
 use std::ops::{Add, Mul, Neg, Sub};
-use std::rc::Rc;
 
 /// モンゴメリ乗算で内部的に使われる型。
 #[derive(Debug, Clone)]
 pub struct Mvalue {
     val: u128,
-    p: Rc<Montgomery>,
+    m: Montgomery,
 }
 
 impl Mvalue {
     /// 保有している数値を取り出す。
     pub fn val(&self) -> u64 {
-        self.p.reduction(self.val) as u64
+        self.m.reduction(self.val) as u64
     }
 
     pub fn pow(mut self, mut rhs: u64) -> Self {
-        let mut r = self.p.trans(1);
+        let mut r = self.m.trans(1);
         while rhs > 0 {
             if rhs & 1 == 1 {
                 r = r * self.clone();
@@ -32,11 +31,11 @@ impl Mvalue {
 impl Add for Mvalue {
     type Output = Self;
     fn add(self, rhs: Self) -> Self::Output {
-        assert_eq!(self.p, rhs.p);
+        assert_eq!(self.m, rhs.m);
         let val = self.val + rhs.val;
-        let m = self.p.m;
+        let m = self.m.m;
         let val = if val >= m { val - m } else { val };
-        Self { val, p: self.p }
+        Self { val, m: self.m }
     }
 }
 
@@ -47,8 +46,8 @@ impl Neg for Mvalue {
             self
         } else {
             Self {
-                val: self.p.m - self.val,
-                p: self.p,
+                val: self.m.m - self.val,
+                m: self.m,
             }
         }
     }
@@ -64,14 +63,14 @@ impl Sub for Mvalue {
 impl Mul for Mvalue {
     type Output = Self;
     fn mul(self, rhs: Self) -> Self::Output {
-        assert_eq!(self.p, rhs.p);
-        let val = self.p.reduction(self.val * rhs.val);
-        Self { val, p: self.p }
+        assert_eq!(self.m, rhs.m);
+        let val = self.m.reduction(self.val * rhs.val);
+        Self { val, m: self.m }
     }
 }
 
 /// モンゴメリ乗算をするための構造体。
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Montgomery {
     r: u128,
     m: u128,
@@ -79,7 +78,7 @@ pub struct Montgomery {
 
 impl Montgomery {
     /// `modulus`で前計算をする。ただし`modulus`は奇数でなくてはならない。
-    pub fn new(modulus: u64) -> Rc<Self> {
+    pub fn new(modulus: u64) -> Self {
         assert!(modulus % 2 != 0);
         let m = modulus.into();
         let (mut r, mut t) = (0, 0);
@@ -90,16 +89,16 @@ impl Montgomery {
             }
             t >>= 1;
         }
-        Rc::new(Self { r, m })
+        Self { r, m }
     }
 
     /// `val`をモンゴメリ乗算用に変換する。
-    pub fn trans(self: &Rc<Self>, val: u64) -> Mvalue {
+    pub fn trans(&self, val: u64) -> Mvalue {
         let val: u128 = val.into();
         let val = (val << 64) % self.m;
         Mvalue {
             val,
-            p: Rc::clone(self),
+            m: self.clone(),
         }
     }
 
