@@ -67,7 +67,7 @@
     <span class="kw">fn </span>verify(path: std::path::PathBuf) -&gt; anyhow::Result&lt;()&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>in_txt = path.clone();
         in_txt.push(<span class="string">&quot;in.txt&quot;</span>);
-        <span class="kw">let </span><span class="kw-2">mut </span>out_txt = path.clone();
+        <span class="kw">let </span><span class="kw-2">mut </span>out_txt = path;
         out_txt.push(<span class="string">&quot;out.txt&quot;</span>);
         <span class="kw">let </span>input = std::fs::read_to_string(in_txt)<span class="question-mark">?</span>;
         <span class="kw">let </span>output = std::fs::read_to_string(out_txt)<span class="question-mark">?</span>;

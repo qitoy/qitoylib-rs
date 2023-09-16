@@ -176,27 +176,25 @@
 <a href="#141" id="141">141</a>
 <a href="#142" id="142">142</a>
 <a href="#143" id="143">143</a>
-<a href="#144" id="144">144</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! モンゴメリ乗算
 
 </span><span class="kw">use </span>std::ops::{Add, Mul, Neg, Sub};
-<span class="kw">use </span>std::rc::Rc;
 
 <span class="doccomment">/// モンゴメリ乗算で内部的に使われる型。
 </span><span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>Mvalue {
     val: u128,
-    p: Rc&lt;Montgomery&gt;,
+    m: Montgomery,
 }
 
 <span class="kw">impl </span>Mvalue {
     <span class="doccomment">/// 保有している数値を取り出す。
     </span><span class="kw">pub fn </span>val(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
-        <span class="self">self</span>.p.reduction(<span class="self">self</span>.val) <span class="kw">as </span>u64
+        <span class="self">self</span>.m.reduction(<span class="self">self</span>.val) <span class="kw">as </span>u64
     }
 
     <span class="kw">pub fn </span>pow(<span class="kw-2">mut </span><span class="self">self</span>, <span class="kw-2">mut </span>rhs: u64) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>r = <span class="self">self</span>.p.trans(<span class="number">1</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>r = <span class="self">self</span>.m.trans(<span class="number">1</span>);
         <span class="kw">while </span>rhs &gt; <span class="number">0 </span>{
             <span class="kw">if </span>rhs &amp; <span class="number">1 </span>== <span class="number">1 </span>{
                 r = r * <span class="self">self</span>.clone();
@@ -211,11 +209,11 @@
 <span class="kw">impl </span>Add <span class="kw">for </span>Mvalue {
     <span class="kw">type </span>Output = <span class="self">Self</span>;
     <span class="kw">fn </span>add(<span class="self">self</span>, rhs: <span class="self">Self</span>) -&gt; <span class="self">Self</span>::Output {
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.p, rhs.p);
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.m, rhs.m);
         <span class="kw">let </span>val = <span class="self">self</span>.val + rhs.val;
-        <span class="kw">let </span>m = <span class="self">self</span>.p.m;
+        <span class="kw">let </span>m = <span class="self">self</span>.m.m;
         <span class="kw">let </span>val = <span class="kw">if </span>val &gt;= m { val - m } <span class="kw">else </span>{ val };
-        <span class="self">Self </span>{ val, p: <span class="self">self</span>.p }
+        <span class="self">Self </span>{ val, m: <span class="self">self</span>.m }
     }
 }
 
@@ -226,8 +224,8 @@
             <span class="self">self
         </span>} <span class="kw">else </span>{
             <span class="self">Self </span>{
-                val: <span class="self">self</span>.p.m - <span class="self">self</span>.val,
-                p: <span class="self">self</span>.p,
+                val: <span class="self">self</span>.m.m - <span class="self">self</span>.val,
+                m: <span class="self">self</span>.m,
             }
         }
     }
@@ -243,14 +241,14 @@
 <span class="kw">impl </span>Mul <span class="kw">for </span>Mvalue {
     <span class="kw">type </span>Output = <span class="self">Self</span>;
     <span class="kw">fn </span>mul(<span class="self">self</span>, rhs: <span class="self">Self</span>) -&gt; <span class="self">Self</span>::Output {
-        <span class="macro">assert_eq!</span>(<span class="self">self</span>.p, rhs.p);
-        <span class="kw">let </span>val = <span class="self">self</span>.p.reduction(<span class="self">self</span>.val * rhs.val);
-        <span class="self">Self </span>{ val, p: <span class="self">self</span>.p }
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.m, rhs.m);
+        <span class="kw">let </span>val = <span class="self">self</span>.m.reduction(<span class="self">self</span>.val * rhs.val);
+        <span class="self">Self </span>{ val, m: <span class="self">self</span>.m }
     }
 }
 
 <span class="doccomment">/// モンゴメリ乗算をするための構造体。
-</span><span class="attr">#[derive(Debug, PartialEq)]
+</span><span class="attr">#[derive(Debug, Clone, PartialEq)]
 </span><span class="kw">pub struct </span>Montgomery {
     r: u128,
     m: u128,
@@ -258,7 +256,7 @@
 
 <span class="kw">impl </span>Montgomery {
     <span class="doccomment">/// `modulus`で前計算をする。ただし`modulus`は奇数でなくてはならない。
-    </span><span class="kw">pub fn </span>new(modulus: u64) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
+    </span><span class="kw">pub fn </span>new(modulus: u64) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(modulus % <span class="number">2 </span>!= <span class="number">0</span>);
         <span class="kw">let </span>m = modulus.into();
         <span class="kw">let </span>(<span class="kw-2">mut </span>r, <span class="kw-2">mut </span>t) = (<span class="number">0</span>, <span class="number">0</span>);
@@ -269,16 +267,16 @@
             }
             t &gt;&gt;= <span class="number">1</span>;
         }
-        Rc::new(<span class="self">Self </span>{ r, m })
+        <span class="self">Self </span>{ r, m }
     }
 
     <span class="doccomment">/// `val`をモンゴメリ乗算用に変換する。
-    </span><span class="kw">pub fn </span>trans(<span class="self">self</span>: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;, val: u64) -&gt; Mvalue {
+    </span><span class="kw">pub fn </span>trans(<span class="kw-2">&amp;</span><span class="self">self</span>, val: u64) -&gt; Mvalue {
         <span class="kw">let </span>val: u128 = val.into();
         <span class="kw">let </span>val = (val &lt;&lt; <span class="number">64</span>) % <span class="self">self</span>.m;
         Mvalue {
             val,
-            p: Rc::clone(<span class="self">self</span>),
+            m: <span class="self">self</span>.clone(),
         }
     }
 
