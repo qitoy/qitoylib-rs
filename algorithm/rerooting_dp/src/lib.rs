@@ -24,7 +24,7 @@ impl<T: Monoid> RerootingDP<T> {
         self._cnt += 1;
     }
 
-    pub fn build_subtree<FV, FE>(&mut self, add_edge: &FE, add_vertex: &FV) -> Vec<Vec<T::S>>
+    pub fn build_subtree<FV, FE>(&self, add_edge: &FE, add_vertex: &FV) -> Vec<Vec<T::S>>
     where
         FE: Fn(T::S, usize) -> T::S,
         FV: Fn(T::S, usize) -> T::S,
@@ -35,12 +35,12 @@ impl<T: Monoid> RerootingDP<T> {
             .iter()
             .map(|v| vec![T::identity(); v.len()])
             .collect();
-        self.dfs1(&mut dp, add_edge, add_vertex, 0, 0);
-        self.dfs2(&mut dp, add_edge, add_vertex, 0, 0, T::identity());
+        self.dfs(&mut dp, add_edge, add_vertex, 0, 0);
+        self.bfs(&mut dp, add_edge, add_vertex);
         dp
     }
 
-    pub fn build<FE, FV>(&mut self, add_edge: &FE, add_vertex: &FV) -> Vec<T::S>
+    pub fn build<FE, FV>(&self, add_edge: &FE, add_vertex: &FV) -> Vec<T::S>
     where
         FE: Fn(T::S, usize) -> T::S,
         FV: Fn(T::S, usize) -> T::S,
@@ -59,8 +59,8 @@ impl<T: Monoid> RerootingDP<T> {
             .collect()
     }
 
-    fn dfs1<FE, FV>(
-        &mut self,
+    fn dfs<FE, FV>(
+        &self,
         dp: &mut Vec<Vec<T::S>>,
         add_edge: &FE,
         add_vertex: &FV,
@@ -71,46 +71,48 @@ impl<T: Monoid> RerootingDP<T> {
         FE: Fn(T::S, usize) -> T::S,
         FV: Fn(T::S, usize) -> T::S,
     {
-        let ret = (0..self.tree[v].len()).fold(T::identity(), |acc, i| {
-            let (idx, u) = self.tree[v][i];
-            if u == p {
-                return acc;
-            }
-            dp[v][i] = self.dfs1(dp, add_edge, add_vertex, u, v);
-            T::binary_operation(&acc, &add_edge(dp[v][i].clone(), idx))
-        });
+        let ret = self.tree[v]
+            .iter()
+            .enumerate()
+            .filter(|v| v.1 .1 != p)
+            .fold(T::identity(), |acc, (i, &(idx, u))| {
+                dp[v][i] = self.dfs(dp, add_edge, add_vertex, u, v);
+                T::binary_operation(&acc, &add_edge(dp[v][i].clone(), idx))
+            });
         add_vertex(ret, v)
     }
 
-    fn dfs2<FE, FV>(
-        &mut self,
-        dp: &mut Vec<Vec<T::S>>,
-        add_edge: &FE,
-        add_vertex: &FV,
-        v: usize,
-        p: usize,
-        value: T::S,
-    ) where
+    fn bfs<FE, FV>(&self, dp: &mut Vec<Vec<T::S>>, add_edge: &FE, add_vertex: &FV)
+    where
         FE: Fn(T::S, usize) -> T::S,
         FV: Fn(T::S, usize) -> T::S,
     {
-        if let Some((i, _)) = self.tree[v].iter().enumerate().find(|v| v.1 .1 == p) {
-            dp[v][i] = value;
-        }
-        let len = self.tree[v].len();
-        let (mut cuml, mut cumr) = (vec![T::identity(); len + 1], vec![T::identity(); len + 1]);
-        for i in 0..len {
-            cuml[i + 1] =
-                T::binary_operation(&cuml[i], &add_edge(dp[v][i].clone(), self.tree[v][i].0));
-            let i = len - 1 - i;
-            cumr[i] =
-                T::binary_operation(&cumr[i + 1], &add_edge(dp[v][i].clone(), self.tree[v][i].0));
-        }
-        for i in 0..len {
-            let u = self.tree[v][i].1;
-            if u != p {
-                let value = add_vertex(T::binary_operation(&cuml[i], &cumr[i + 1]), v);
-                self.dfs2(dp, add_edge, add_vertex, u, v, value);
+        let mut que = std::collections::VecDeque::new();
+        que.push_back((0, T::identity()));
+        let mut seen = vec![false; dp.len()];
+        seen[0] = true;
+        while let Some((v, value)) = que.pop_front() {
+            if let Some((i, _)) = self.tree[v].iter().enumerate().find(|v| seen[v.1 .1]) {
+                dp[v][i] = value;
+            }
+            let len = self.tree[v].len();
+            let (mut cuml, mut cumr) = (vec![T::identity(); len + 1], vec![T::identity(); len + 1]);
+            for i in 0..len {
+                cuml[i + 1] =
+                    T::binary_operation(&cuml[i], &add_edge(dp[v][i].clone(), self.tree[v][i].0));
+                let i = len - 1 - i;
+                cumr[i] = T::binary_operation(
+                    &cumr[i + 1],
+                    &add_edge(dp[v][i].clone(), self.tree[v][i].0),
+                );
+            }
+            for i in 0..len {
+                let u = self.tree[v][i].1;
+                if !seen[u] {
+                    seen[u] = true;
+                    let value = add_vertex(T::binary_operation(&cuml[i], &cumr[i + 1]), v);
+                    que.push_back((u, value));
+                }
             }
         }
     }
