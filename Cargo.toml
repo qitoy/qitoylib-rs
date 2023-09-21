@@ -3,6 +3,7 @@ members = [
     "algebra/*",
     "algorithm/*",
     "data_structure/*",
+    "dfa/*",
     "math/*",
     "prelude",
     "prime/*",
