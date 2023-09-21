@@ -150,6 +150,8 @@
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
 <a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
 </pre></div><pre class="rust"><code><span class="kw">extern crate </span>ac_library;
 <span class="kw">use </span>ac_library::Monoid;
 <span class="kw">use </span>std::marker::PhantomData;
@@ -176,7 +178,7 @@
         <span class="self">self</span>._cnt += <span class="number">1</span>;
     }
 
-    <span class="kw">pub fn </span>build_subtree&lt;FV, FE&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, add_edge: <span class="kw-2">&amp;</span>FE, add_vertex: <span class="kw-2">&amp;</span>FV) -&gt; Vec&lt;Vec&lt;T::S&gt;&gt;
+    <span class="kw">pub fn </span>build_subtree&lt;FV, FE&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, add_edge: <span class="kw-2">&amp;</span>FE, add_vertex: <span class="kw-2">&amp;</span>FV) -&gt; Vec&lt;Vec&lt;T::S&gt;&gt;
     <span class="kw">where
         </span>FE: Fn(T::S, usize) -&gt; T::S,
         FV: Fn(T::S, usize) -&gt; T::S,
@@ -187,12 +189,12 @@
             .iter()
             .map(|v| <span class="macro">vec!</span>[T::identity(); v.len()])
             .collect();
-        <span class="self">self</span>.dfs1(<span class="kw-2">&amp;mut </span>dp, add_edge, add_vertex, <span class="number">0</span>, <span class="number">0</span>);
-        <span class="self">self</span>.dfs2(<span class="kw-2">&amp;mut </span>dp, add_edge, add_vertex, <span class="number">0</span>, <span class="number">0</span>, T::identity());
+        <span class="self">self</span>.dfs(<span class="kw-2">&amp;mut </span>dp, add_edge, add_vertex, <span class="number">0</span>, <span class="number">0</span>);
+        <span class="self">self</span>.bfs(<span class="kw-2">&amp;mut </span>dp, add_edge, add_vertex);
         dp
     }
 
-    <span class="kw">pub fn </span>build&lt;FE, FV&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, add_edge: <span class="kw-2">&amp;</span>FE, add_vertex: <span class="kw-2">&amp;</span>FV) -&gt; Vec&lt;T::S&gt;
+    <span class="kw">pub fn </span>build&lt;FE, FV&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, add_edge: <span class="kw-2">&amp;</span>FE, add_vertex: <span class="kw-2">&amp;</span>FV) -&gt; Vec&lt;T::S&gt;
     <span class="kw">where
         </span>FE: Fn(T::S, usize) -&gt; T::S,
         FV: Fn(T::S, usize) -&gt; T::S,
@@ -211,8 +213,8 @@
             .collect()
     }
 
-    <span class="kw">fn </span>dfs1&lt;FE, FV&gt;(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+    <span class="kw">fn </span>dfs&lt;FE, FV&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
         dp: <span class="kw-2">&amp;mut </span>Vec&lt;Vec&lt;T::S&gt;&gt;,
         add_edge: <span class="kw-2">&amp;</span>FE,
         add_vertex: <span class="kw-2">&amp;</span>FV,
@@ -223,46 +225,48 @@
         </span>FE: Fn(T::S, usize) -&gt; T::S,
         FV: Fn(T::S, usize) -&gt; T::S,
     {
-        <span class="kw">let </span>ret = (<span class="number">0</span>..<span class="self">self</span>.tree[v].len()).fold(T::identity(), |acc, i| {
-            <span class="kw">let </span>(idx, u) = <span class="self">self</span>.tree[v][i];
-            <span class="kw">if </span>u == p {
-                <span class="kw">return </span>acc;
-            }
-            dp[v][i] = <span class="self">self</span>.dfs1(dp, add_edge, add_vertex, u, v);
-            T::binary_operation(<span class="kw-2">&amp;</span>acc, <span class="kw-2">&amp;</span>add_edge(dp[v][i].clone(), idx))
-        });
+        <span class="kw">let </span>ret = <span class="self">self</span>.tree[v]
+            .iter()
+            .enumerate()
+            .filter(|v| v.<span class="number">1 </span>.<span class="number">1 </span>!= p)
+            .fold(T::identity(), |acc, (i, <span class="kw-2">&amp;</span>(idx, u))| {
+                dp[v][i] = <span class="self">self</span>.dfs(dp, add_edge, add_vertex, u, v);
+                T::binary_operation(<span class="kw-2">&amp;</span>acc, <span class="kw-2">&amp;</span>add_edge(dp[v][i].clone(), idx))
+            });
         add_vertex(ret, v)
     }
 
-    <span class="kw">fn </span>dfs2&lt;FE, FV&gt;(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        dp: <span class="kw-2">&amp;mut </span>Vec&lt;Vec&lt;T::S&gt;&gt;,
-        add_edge: <span class="kw-2">&amp;</span>FE,
-        add_vertex: <span class="kw-2">&amp;</span>FV,
-        v: usize,
-        p: usize,
-        value: T::S,
-    ) <span class="kw">where
+    <span class="kw">fn </span>bfs&lt;FE, FV&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, dp: <span class="kw-2">&amp;mut </span>Vec&lt;Vec&lt;T::S&gt;&gt;, add_edge: <span class="kw-2">&amp;</span>FE, add_vertex: <span class="kw-2">&amp;</span>FV)
+    <span class="kw">where
         </span>FE: Fn(T::S, usize) -&gt; T::S,
         FV: Fn(T::S, usize) -&gt; T::S,
     {
-        <span class="kw">if let </span><span class="prelude-val">Some</span>((i, <span class="kw">_</span>)) = <span class="self">self</span>.tree[v].iter().enumerate().find(|v| v.<span class="number">1 </span>.<span class="number">1 </span>== p) {
-            dp[v][i] = value;
-        }
-        <span class="kw">let </span>len = <span class="self">self</span>.tree[v].len();
-        <span class="kw">let </span>(<span class="kw-2">mut </span>cuml, <span class="kw-2">mut </span>cumr) = (<span class="macro">vec!</span>[T::identity(); len + <span class="number">1</span>], <span class="macro">vec!</span>[T::identity(); len + <span class="number">1</span>]);
-        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..len {
-            cuml[i + <span class="number">1</span>] =
-                T::binary_operation(<span class="kw-2">&amp;</span>cuml[i], <span class="kw-2">&amp;</span>add_edge(dp[v][i].clone(), <span class="self">self</span>.tree[v][i].<span class="number">0</span>));
-            <span class="kw">let </span>i = len - <span class="number">1 </span>- i;
-            cumr[i] =
-                T::binary_operation(<span class="kw-2">&amp;</span>cumr[i + <span class="number">1</span>], <span class="kw-2">&amp;</span>add_edge(dp[v][i].clone(), <span class="self">self</span>.tree[v][i].<span class="number">0</span>));
-        }
-        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..len {
-            <span class="kw">let </span>u = <span class="self">self</span>.tree[v][i].<span class="number">1</span>;
-            <span class="kw">if </span>u != p {
-                <span class="kw">let </span>value = add_vertex(T::binary_operation(<span class="kw-2">&amp;</span>cuml[i], <span class="kw-2">&amp;</span>cumr[i + <span class="number">1</span>]), v);
-                <span class="self">self</span>.dfs2(dp, add_edge, add_vertex, u, v, value);
+        <span class="kw">let </span><span class="kw-2">mut </span>que = std::collections::VecDeque::new();
+        que.push_back((<span class="number">0</span>, T::identity()));
+        <span class="kw">let </span><span class="kw-2">mut </span>seen = <span class="macro">vec!</span>[<span class="bool-val">false</span>; dp.len()];
+        seen[<span class="number">0</span>] = <span class="bool-val">true</span>;
+        <span class="kw">while let </span><span class="prelude-val">Some</span>((v, value)) = que.pop_front() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>((i, <span class="kw">_</span>)) = <span class="self">self</span>.tree[v].iter().enumerate().find(|v| seen[v.<span class="number">1 </span>.<span class="number">1</span>]) {
+                dp[v][i] = value;
+            }
+            <span class="kw">let </span>len = <span class="self">self</span>.tree[v].len();
+            <span class="kw">let </span>(<span class="kw-2">mut </span>cuml, <span class="kw-2">mut </span>cumr) = (<span class="macro">vec!</span>[T::identity(); len + <span class="number">1</span>], <span class="macro">vec!</span>[T::identity(); len + <span class="number">1</span>]);
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..len {
+                cuml[i + <span class="number">1</span>] =
+                    T::binary_operation(<span class="kw-2">&amp;</span>cuml[i], <span class="kw-2">&amp;</span>add_edge(dp[v][i].clone(), <span class="self">self</span>.tree[v][i].<span class="number">0</span>));
+                <span class="kw">let </span>i = len - <span class="number">1 </span>- i;
+                cumr[i] = T::binary_operation(
+                    <span class="kw-2">&amp;</span>cumr[i + <span class="number">1</span>],
+                    <span class="kw-2">&amp;</span>add_edge(dp[v][i].clone(), <span class="self">self</span>.tree[v][i].<span class="number">0</span>),
+                );
+            }
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..len {
+                <span class="kw">let </span>u = <span class="self">self</span>.tree[v][i].<span class="number">1</span>;
+                <span class="kw">if </span>!seen[u] {
+                    seen[u] = <span class="bool-val">true</span>;
+                    <span class="kw">let </span>value = add_vertex(T::binary_operation(<span class="kw-2">&amp;</span>cuml[i], <span class="kw-2">&amp;</span>cumr[i + <span class="number">1</span>]), v);
+                    que.push_back((u, value));
+                }
             }
         }
     }

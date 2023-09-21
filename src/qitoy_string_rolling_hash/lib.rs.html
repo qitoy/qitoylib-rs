@@ -129,22 +129,30 @@
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! ローリングハッシュ
 
-</span><span class="kw">extern crate </span>rand;
-<span class="kw">extern crate </span>once_cell;
-<span class="kw">use </span>rand::{SeedableRng, rngs::SmallRng, distributions::{Distribution, Uniform}};
+</span><span class="kw">extern crate </span>once_cell;
+<span class="kw">extern crate </span>rand;
 <span class="kw">use </span>once_cell::sync::Lazy;
+<span class="kw">use </span>rand::{
+    distributions::{Distribution, Uniform},
+    rngs::SmallRng,
+    SeedableRng,
+};
 
-<span class="kw">const </span>MOD: u64 = (<span class="number">1</span>&lt;&lt;<span class="number">61</span>)-<span class="number">1</span>;
+<span class="kw">const </span>MOD: u64 = (<span class="number">1 </span>&lt;&lt; <span class="number">61</span>) - <span class="number">1</span>;
 
-<span class="kw">static </span>BASES: Lazy&lt;(u64, u64)&gt; = Lazy::new(
-    || {
-        <span class="kw">let </span><span class="kw-2">mut </span>rng = SmallRng::from_entropy();
-        <span class="kw">let </span>range = Uniform::from(<span class="number">129</span>..MOD-<span class="number">1</span>);
-        (range.sample(<span class="kw-2">&amp;mut </span>rng), range.sample(<span class="kw-2">&amp;mut </span>rng))
-    }
-    );
+<span class="kw">static </span>BASES: Lazy&lt;(u64, u64)&gt; = Lazy::new(|| {
+    <span class="kw">let </span><span class="kw-2">mut </span>rng = SmallRng::from_entropy();
+    <span class="kw">let </span>range = Uniform::from(<span class="number">129</span>..MOD - <span class="number">1</span>);
+    (range.sample(<span class="kw-2">&amp;mut </span>rng), range.sample(<span class="kw-2">&amp;mut </span>rng))
+});
 
 <span class="kw">pub struct </span>RollingHash {
     bases: Vec&lt;(u64, u64)&gt;,
@@ -155,20 +163,20 @@
     <span class="doccomment">/// `[u8]`からハッシュを前計算します。文字列型に対しては`RollingHash::from()`を使用します。
     </span><span class="kw">pub fn </span>new(str: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>n = str.len();
-        <span class="kw">let </span><span class="kw-2">mut </span>bases = <span class="macro">vec!</span>[(<span class="number">1</span>, <span class="number">1</span>); n+<span class="number">1</span>];
-        <span class="kw">let </span><span class="kw-2">mut </span>hashes = <span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">0</span>); n+<span class="number">1</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>bases = <span class="macro">vec!</span>[(<span class="number">1</span>, <span class="number">1</span>); n + <span class="number">1</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>hashes = <span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">0</span>); n + <span class="number">1</span>];
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..n {
-            bases[i+<span class="number">1</span>] = bases[i].rhmul(<span class="kw-2">*</span>BASES);
-            hashes[i+<span class="number">1</span>] = hashes[i].rhmul(<span class="kw-2">*</span>BASES).rhadd((str[i] <span class="kw">as </span>u64, str[i] <span class="kw">as </span>u64));
-            <span class="kw">if </span>hashes[i+<span class="number">1</span>].<span class="number">0 </span>&gt;= MOD { hashes[i+<span class="number">1</span>].<span class="number">0 </span>-= MOD; }
-            <span class="kw">if </span>hashes[i+<span class="number">1</span>].<span class="number">1 </span>&gt;= MOD { hashes[i+<span class="number">1</span>].<span class="number">1 </span>-= MOD; }
+            bases[i + <span class="number">1</span>] = bases[i].rhmul(<span class="kw-2">*</span>BASES);
+            hashes[i + <span class="number">1</span>] = hashes[i]
+                .rhmul(<span class="kw-2">*</span>BASES)
+                .rhadd((str[i] <span class="kw">as </span>u64, str[i] <span class="kw">as </span>u64));
         }
         <span class="self">Self </span>{ bases, hashes }
     }
 
     <span class="doccomment">/// `str[l..r]`のハッシュを返します。
     </span><span class="kw">pub fn </span>get_hash(<span class="kw-2">&amp;</span><span class="self">self</span>, l: usize, r: usize) -&gt; (u64, u64) {
-        <span class="self">self</span>.hashes[r].rhsub(<span class="self">self</span>.hashes[l].rhmul(<span class="self">self</span>.bases[r-l]))
+        <span class="self">self</span>.hashes[r].rhsub(<span class="self">self</span>.hashes[l].rhmul(<span class="self">self</span>.bases[r - l]))
     }
 }
 
@@ -187,16 +195,20 @@
 <span class="kw">impl </span>RHHsah <span class="kw">for </span>u64 {
     <span class="kw">fn </span>rhadd(<span class="self">self</span>, rhs: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>r = <span class="self">self </span>+ rhs;
-        <span class="kw">if </span>r &gt;= MOD { r - MOD } <span class="kw">else </span>{ r }
+        <span class="kw">if </span>r &gt;= MOD {
+            r - MOD
+        } <span class="kw">else </span>{
+            r
+        }
     }
     <span class="kw">fn </span>rhsub(<span class="self">self</span>, rhs: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.rhadd(MOD - rhs)
     }
     <span class="kw">fn </span>rhmul(<span class="self">self</span>, rhs: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
-    <span class="kw">let </span>t = (<span class="self">self </span><span class="kw">as </span>u128) * (rhs <span class="kw">as </span>u128);
-    <span class="kw">let </span>m = MOD <span class="kw">as </span>u128;
-    <span class="kw">let </span>t = (t &gt;&gt; <span class="number">61</span>) + (t &amp; m);
-    (<span class="kw">if </span>t &gt;= m { t - m } <span class="kw">else </span>{ t }) <span class="kw">as </span>u64
+        <span class="kw">let </span>t = (<span class="self">self </span><span class="kw">as </span>u128) * (rhs <span class="kw">as </span>u128);
+        <span class="kw">let </span>m = MOD <span class="kw">as </span>u128;
+        <span class="kw">let </span>t = (t &gt;&gt; <span class="number">61</span>) + (t &amp; m);
+        (<span class="kw">if </span>t &gt;= m { t - m } <span class="kw">else </span>{ t }) <span class="kw">as </span>u64
     }
 }
 
