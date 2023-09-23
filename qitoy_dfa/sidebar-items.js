@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["AlphaTrans","And","Less","MultipleOf","NonZero"],"trait":["Dfa","IntoDfa"]};
+window.SIDEBAR_ITEMS = {"struct":["AlphaTrans","And","Less","MultipleOf","NonZero","Unit"],"trait":["Dfa","IntoDfa","Nfa"]};

@@ -3,7 +3,7 @@ var sourcesIndex = JSON.parse('{\
 "qitoy_combi":["",[],["lib.rs"]],\
 "qitoy_data_structure_bit_vec":["",[],["lib.rs"]],\
 "qitoy_data_structure_wavelet_matrix":["",[],["lib.rs"]],\
-"qitoy_dfa":["",[],["lib.rs"]],\
+"qitoy_dfa":["",[],["alpha_trans.rs","and.rs","dfa.rs","into_dfa.rs","less.rs","lib.rs","multiple_of.rs","nfa.rs","non_zero.rs","unit.rs"]],\
 "qitoy_math_montgomery":["",[],["lib.rs"]],\
 "qitoy_math_numeric":["",[],["lib.rs"]],\
 "qitoy_matrix":["",[],["lib.rs"]],\
