@@ -5,9 +5,8 @@ pub struct Unit<A> {
     _p: PhantomData<fn() -> A>,
 }
 
-#[allow(clippy::new_without_default)]
-impl<A> Unit<A> {
-    pub fn new() -> Self {
+impl<A> Default for Unit<A> {
+    fn default() -> Self {
         Self { _p: PhantomData }
     }
 }

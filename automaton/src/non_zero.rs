@@ -2,9 +2,8 @@ use super::Dfa;
 
 pub struct NonZero;
 
-#[allow(clippy::new_without_default)]
-impl NonZero {
-    pub fn new() -> Self {
+impl Default for NonZero {
+    fn default() -> Self {
         Self
     }
 }

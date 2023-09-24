@@ -1,10 +1,10 @@
-use super::{AlphaTrans, And};
+use super::{AlphaTrans, And, Less, MultipleOf, NonZero};
 use ac_library::Monoid;
 
 /// 決定性有限オートマトン
 pub trait Dfa {
     /// 状態の型
-    type State: Eq + Ord;
+    type State: Ord;
     /// 文字の型
     type Alphabet;
     /// 遷移関数
@@ -32,6 +32,33 @@ pub trait Dfa {
         F: Fn(&A) -> Self::Alphabet,
     {
         AlphaTrans::new(self, f)
+    }
+
+    /// `digit`進法で`m`の倍数になるとき受理する。
+    #[inline]
+    fn multiple_of(self, digit: u64, m: u64) -> And<Self, MultipleOf>
+    where
+        Self: Sized + Dfa<Alphabet = u8>,
+    {
+        self.and(MultipleOf::new(digit, m))
+    }
+
+    /// `n`をd進法表記の配列として、d進法で`n`以下の数字を受理する。
+    #[inline]
+    fn less(self, n: &[u8]) -> And<Self, Less>
+    where
+        Self: Sized + Dfa<Alphabet = u8>,
+    {
+        self.and(Less::new(n))
+    }
+
+    /// 非零の数字を受理する。
+    #[inline]
+    fn non_zero(self) -> And<Self, NonZero>
+    where
+        Self: Sized + Dfa<Alphabet = u8>,
+    {
+        self.and(NonZero::default())
     }
 
     /// DFAを用いたDPを計算する。

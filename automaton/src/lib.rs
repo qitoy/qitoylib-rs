@@ -27,6 +27,10 @@ pub use non_zero::NonZero;
 mod unit;
 pub use unit::Unit;
 
+pub fn dfa_new<T>() -> Unit<T> {
+    Unit::<T>::default()
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -61,20 +65,23 @@ mod test {
             .map(|b| b - b'0')
             .collect();
         assert_eq!(
-            MultipleOf::new(2, 3)
-                .and(Less::new(&n))
-                .and(NonZero::new())
+            dfa_new()
+                .multiple_of(2, 3)
+                .less(&n)
+                .non_zero()
                 .alpha_trans(|v: &(_, _, _)| v.0)
                 .and(
-                    MultipleOf::new(2, 8)
-                        .and(Less::new(&n))
-                        .and(NonZero::new())
+                    dfa_new()
+                        .multiple_of(2, 8)
+                        .less(&n)
+                        .non_zero()
                         .alpha_trans(|v: &(_, _, _)| v.1)
                 )
                 .and(
-                    MultipleOf::new(2, 4)
-                        .and(Less::new(&n))
-                        .and(NonZero::new())
+                    dfa_new()
+                        .multiple_of(2, 4)
+                        .less(&n)
+                        .non_zero()
                         .alpha_trans(|v: &(_, _, _)| v.2)
                 )
                 .calc::<M>(
