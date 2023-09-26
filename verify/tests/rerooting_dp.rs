@@ -26,22 +26,15 @@ impl Verify for V {
         input! {
             from &mut source,
             n: usize,
+            edges: [(Usize1, Usize1); n - 1],
         }
 
-        let mut rdp = RerootingDP::<M>::new(n);
-
-        for _ in 1..n {
-            input! {
-                from &mut source,
-                u: Usize1, v: Usize1,
-            }
-            rdp.add_edge(u, v);
-        }
+        let rdp = RerootingDP::from(&edges);
 
         // avoid stack overflow
         let v = std::thread::Builder::new()
             .stack_size(n * 2048)
-            .spawn(move || rdp.build(&|v, _| (v.0 + 1, v.1 + 1), &|v, _| v))
+            .spawn(move || rdp.build::<M>(&|v, _| (v.0 + 1, v.1 + 1), &|v, _| v))
             .unwrap()
             .join()
             .unwrap();

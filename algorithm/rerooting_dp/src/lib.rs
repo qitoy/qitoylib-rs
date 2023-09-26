@@ -1,20 +1,17 @@
 extern crate ac_library;
 use ac_library::Monoid;
-use std::marker::PhantomData;
 
-pub struct RerootingDP<T> {
+pub struct RerootingDP {
     /// (index, vertex)
     tree: Vec<Vec<(usize, usize)>>,
     _cnt: usize,
-    _phantom_data: PhantomData<fn() -> T>,
 }
 
-impl<T: Monoid> RerootingDP<T> {
+impl RerootingDP {
     pub fn new(n: usize) -> Self {
         Self {
             tree: vec![vec![]; n],
             _cnt: 0,
-            _phantom_data: PhantomData,
         }
     }
 
@@ -24,28 +21,28 @@ impl<T: Monoid> RerootingDP<T> {
         self._cnt += 1;
     }
 
-    pub fn build_subtree<FV, FE>(&self, add_edge: &FE, add_vertex: &FV) -> Vec<Vec<T::S>>
-    where
-        FE: Fn(T::S, usize) -> T::S,
-        FV: Fn(T::S, usize) -> T::S,
-    {
+    pub fn build_subtree<T: Monoid>(
+        &self,
+        add_edge: &impl Fn(T::S, usize) -> T::S,
+        add_vertex: &impl Fn(T::S, usize) -> T::S,
+    ) -> Vec<Vec<T::S>> {
         assert_eq!(self._cnt, self.tree.len() - 1);
         let mut dp = self
             .tree
             .iter()
             .map(|v| vec![T::identity(); v.len()])
             .collect();
-        self.dfs(&mut dp, add_edge, add_vertex, 0, 0);
-        self.bfs(&mut dp, add_edge, add_vertex);
+        self.dfs::<T>(&mut dp, add_edge, add_vertex, 0, 0);
+        self.bfs::<T>(&mut dp, add_edge, add_vertex);
         dp
     }
 
-    pub fn build<FE, FV>(&self, add_edge: &FE, add_vertex: &FV) -> Vec<T::S>
-    where
-        FE: Fn(T::S, usize) -> T::S,
-        FV: Fn(T::S, usize) -> T::S,
-    {
-        let dp = self.build_subtree(add_edge, add_vertex);
+    pub fn build<T: Monoid>(
+        &self,
+        add_edge: &impl Fn(T::S, usize) -> T::S,
+        add_vertex: &impl Fn(T::S, usize) -> T::S,
+    ) -> Vec<T::S> {
+        let dp = self.build_subtree::<T>(add_edge, add_vertex);
         self.tree
             .iter()
             .enumerate()
@@ -59,34 +56,31 @@ impl<T: Monoid> RerootingDP<T> {
             .collect()
     }
 
-    fn dfs<FE, FV>(
+    fn dfs<T: Monoid>(
         &self,
         dp: &mut Vec<Vec<T::S>>,
-        add_edge: &FE,
-        add_vertex: &FV,
+        add_edge: &impl Fn(T::S, usize) -> T::S,
+        add_vertex: &impl Fn(T::S, usize) -> T::S,
         v: usize,
         p: usize,
-    ) -> T::S
-    where
-        FE: Fn(T::S, usize) -> T::S,
-        FV: Fn(T::S, usize) -> T::S,
-    {
+    ) -> T::S {
         let ret = self.tree[v]
             .iter()
             .enumerate()
             .filter(|v| v.1 .1 != p)
             .fold(T::identity(), |acc, (i, &(idx, u))| {
-                dp[v][i] = self.dfs(dp, add_edge, add_vertex, u, v);
+                dp[v][i] = self.dfs::<T>(dp, add_edge, add_vertex, u, v);
                 T::binary_operation(&acc, &add_edge(dp[v][i].clone(), idx))
             });
         add_vertex(ret, v)
     }
 
-    fn bfs<FE, FV>(&self, dp: &mut Vec<Vec<T::S>>, add_edge: &FE, add_vertex: &FV)
-    where
-        FE: Fn(T::S, usize) -> T::S,
-        FV: Fn(T::S, usize) -> T::S,
-    {
+    fn bfs<T: Monoid>(
+        &self,
+        dp: &mut Vec<Vec<T::S>>,
+        add_edge: &impl Fn(T::S, usize) -> T::S,
+        add_vertex: &impl Fn(T::S, usize) -> T::S,
+    ) {
         let mut que = std::collections::VecDeque::new();
         que.push_back((0, T::identity()));
         let mut seen = vec![false; dp.len()];
@@ -115,5 +109,15 @@ impl<T: Monoid> RerootingDP<T> {
                 }
             }
         }
+    }
+}
+
+impl From<&Vec<(usize, usize)>> for RerootingDP {
+    fn from(value: &Vec<(usize, usize)>) -> Self {
+        let mut tree = Self::new(value.len() + 1);
+        for &(v, u) in value {
+            tree.add_edge(v, u);
+        }
+        tree
     }
 }
