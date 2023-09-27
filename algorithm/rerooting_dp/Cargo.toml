@@ -7,3 +7,4 @@ name = "qitoy_rerooting_dp"
 
 [dependencies]
 ac-library-rs = { workspace = true }
+qitoy-tree = { path = "../../graph/tree" }

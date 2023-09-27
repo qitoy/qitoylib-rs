@@ -19,7 +19,7 @@ struct V;
 impl Verify for V {
     fn solve(input: &str, stdout: &mut String) {
         use proconio::{input, marker::Usize1, source::once::OnceSource};
-        use qitoy_rerooting_dp::RerootingDP;
+        use qitoy_rerooting_dp::{Tree, rerooting_dp};
 
         let mut source = OnceSource::from(input);
 
@@ -29,12 +29,12 @@ impl Verify for V {
             edges: [(Usize1, Usize1); n - 1],
         }
 
-        let rdp = RerootingDP::from(&edges);
+        let tree = Tree::from(&edges);
 
         // avoid stack overflow
         let v = std::thread::Builder::new()
             .stack_size(n * 2048)
-            .spawn(move || rdp.build::<M>(&|v, _| (v.0 + 1, v.1 + 1), &|v, _| v))
+            .spawn(move || rerooting_dp::<M>(&tree, &mut |v, _| (v.0 + 1, v.1 + 1), &mut |v, _| v))
             .unwrap()
             .join()
             .unwrap();

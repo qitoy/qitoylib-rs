@@ -4,6 +4,7 @@ members = [
     "algorithm/*",
     "automaton",
     "data_structure/*",
+    "graph/*",
     "math/*",
     "prelude",
     "prime/*",
