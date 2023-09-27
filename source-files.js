@@ -15,6 +15,7 @@ var sourcesIndex = JSON.parse('{\
 "qitoy_prime_sieve":["",[],["lib.rs"]],\
 "qitoy_rerooting_dp":["",[],["lib.rs"]],\
 "qitoy_string_rolling_hash":["",[],["lib.rs"]],\
+"qitoy_tree":["",[],["lib.rs"]],\
 "qitoy_utils_bound":["",[],["lib.rs"]],\
 "qitoy_utils_float2uint":["",[],["lib.rs"]],\
 "verify":["",[],["lib.rs"]],\

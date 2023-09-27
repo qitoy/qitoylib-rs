@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"qitoy_dfa":[["impl&lt;A&gt; <a class=\"trait\" href=\"https://doc.rust-lang.org/1.72.0/core/default/trait.Default.html\" title=\"trait core::default::Default\">Default</a> for <a class=\"struct\" href=\"qitoy_dfa/struct.Unit.html\" title=\"struct qitoy_dfa::Unit\">Unit</a>&lt;A&gt;"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.72.0/core/default/trait.Default.html\" title=\"trait core::default::Default\">Default</a> for <a class=\"struct\" href=\"qitoy_dfa/struct.NonZero.html\" title=\"struct qitoy_dfa::NonZero\">NonZero</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

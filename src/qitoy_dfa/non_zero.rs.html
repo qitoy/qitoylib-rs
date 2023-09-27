@@ -62,14 +62,12 @@
 <a href="#27" id="27">27</a>
 <a href="#28" id="28">28</a>
 <a href="#29" id="29">29</a>
-<a href="#30" id="30">30</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Dfa;
 
 <span class="kw">pub struct </span>NonZero;
 
-<span class="attr">#[allow(clippy::new_without_default)]
-</span><span class="kw">impl </span>NonZero {
-    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+<span class="kw">impl </span>Default <span class="kw">for </span>NonZero {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
         <span class="self">Self
     </span>}
 }

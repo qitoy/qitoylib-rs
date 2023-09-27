@@ -123,6 +123,13 @@
 <a href="#88" id="88">88</a>
 <a href="#89" id="89">89</a>
 <a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
 </pre></div><pre class="rust"><code><span class="kw">extern crate </span>ac_library;
 
 <span class="kw">mod </span>dfa;
@@ -151,6 +158,10 @@
 
 <span class="kw">mod </span>unit;
 <span class="kw">pub use </span>unit::Unit;
+
+<span class="kw">pub fn </span>dfa_new&lt;T&gt;() -&gt; Unit&lt;T&gt; {
+    Unit::&lt;T&gt;::default()
+}
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
@@ -186,20 +197,23 @@
             .map(|b| b - <span class="string">b&#39;0&#39;</span>)
             .collect();
         <span class="macro">assert_eq!</span>(
-            MultipleOf::new(<span class="number">2</span>, <span class="number">3</span>)
-                .and(Less::new(<span class="kw-2">&amp;</span>n))
-                .and(NonZero::new())
+            dfa_new()
+                .multiple_of(<span class="number">2</span>, <span class="number">3</span>)
+                .less(<span class="kw-2">&amp;</span>n)
+                .non_zero()
                 .alpha_trans(|v: <span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)| v.<span class="number">0</span>)
                 .and(
-                    MultipleOf::new(<span class="number">2</span>, <span class="number">8</span>)
-                        .and(Less::new(<span class="kw-2">&amp;</span>n))
-                        .and(NonZero::new())
+                    dfa_new()
+                        .multiple_of(<span class="number">2</span>, <span class="number">8</span>)
+                        .less(<span class="kw-2">&amp;</span>n)
+                        .non_zero()
                         .alpha_trans(|v: <span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)| v.<span class="number">1</span>)
                 )
                 .and(
-                    MultipleOf::new(<span class="number">2</span>, <span class="number">4</span>)
-                        .and(Less::new(<span class="kw-2">&amp;</span>n))
-                        .and(NonZero::new())
+                    dfa_new()
+                        .multiple_of(<span class="number">2</span>, <span class="number">4</span>)
+                        .less(<span class="kw-2">&amp;</span>n)
+                        .non_zero()
                         .alpha_trans(|v: <span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)| v.<span class="number">2</span>)
                 )
                 .calc::&lt;M&gt;(

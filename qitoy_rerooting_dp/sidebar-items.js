@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["RerootingDP"]};
+window.SIDEBAR_ITEMS = {"fn":["rerooting_dp","rerooting_dp_subtree"],"struct":["Edge","Tree"]};
