@@ -1,6 +1,6 @@
 use std::ops::{Deref, DerefMut};
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Edge {
     pub index: usize,
     pub from: usize,
@@ -47,6 +47,13 @@ impl From<&Vec<(usize, usize)>> for Tree {
             tree.add_egde(v, u);
         }
         tree
+    }
+}
+
+impl FromIterator<(usize, usize)> for Tree {
+    fn from_iter<T: IntoIterator<Item = (usize, usize)>>(iter: T) -> Self {
+        let edges = iter.into_iter().collect();
+        Tree::from(&edges)
     }
 }
 
