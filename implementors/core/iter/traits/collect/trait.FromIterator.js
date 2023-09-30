@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"qitoy_tree":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.72.1/core/iter/traits/collect/trait.FromIterator.html\" title=\"trait core::iter::traits::collect::FromIterator\">FromIterator</a>&lt;(<a class=\"primitive\" href=\"https://doc.rust-lang.org/1.72.1/std/primitive.usize.html\">usize</a>, <a class=\"primitive\" href=\"https://doc.rust-lang.org/1.72.1/std/primitive.usize.html\">usize</a>)&gt; for <a class=\"struct\" href=\"qitoy_tree/struct.Tree.html\" title=\"struct qitoy_tree::Tree\">Tree</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
