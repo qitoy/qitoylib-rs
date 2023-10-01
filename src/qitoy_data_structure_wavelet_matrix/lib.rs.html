@@ -130,7 +130,7 @@
             <span class="kw">if </span>bitvec.at(n) {
                 <span class="kw">let </span>zeros = bitvec.rank0(bitvec.len());
                 n = (zeros + bitvec.rank1(n)) <span class="kw">as </span>usize;
-                ret |= <span class="number">1 </span>&lt;&lt; <span class="number">63</span>-i;
+                ret |= <span class="number">1 </span>&lt;&lt; (<span class="number">63 </span>- i);
             } <span class="kw">else </span>{
                 n = bitvec.rank0(n) <span class="kw">as </span>usize;
             }
@@ -143,7 +143,7 @@
     <span class="kw">fn </span>rank_pos(<span class="kw-2">&amp;</span><span class="self">self</span>, val: u64, <span class="kw-2">mut </span>n: usize) -&gt; usize {
         <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">64 </span>{
             <span class="kw">let </span>bitvec = <span class="kw-2">&amp;</span><span class="self">self</span>.matrix[i];
-            <span class="kw">if </span>val &gt;&gt; <span class="number">63</span>-i &amp; <span class="number">1 </span>== <span class="number">1 </span>{
+            <span class="kw">if </span>val &gt;&gt; (<span class="number">63 </span>- i) &amp; <span class="number">1 </span>== <span class="number">1 </span>{
                 <span class="kw">let </span>zeros = bitvec.rank0(bitvec.len());
                 n = (zeros + bitvec.rank1(n)) <span class="kw">as </span>usize;
             } <span class="kw">else </span>{
@@ -164,11 +164,11 @@
         <span class="kw">let </span>wm = WaveletMatrix::from(vec.to_vec());
         <span class="comment">// 4cf, 409, 5eb
         // println!(&quot;{:?}&quot;, wm);
-        </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..vec.len() {
-            <span class="macro">assert_eq!</span>(vec[i], wm.access(i));
+        </span><span class="kw">for </span>(i, <span class="kw-2">&amp;</span>v) <span class="kw">in </span>vec.iter().enumerate() {
+            <span class="macro">assert_eq!</span>(v, wm.access(i));
         }
-        <span class="macro">assert_eq!</span>(wm.rank(<span class="number">5</span>,<span class="number">9</span>), <span class="number">4</span>);
-        <span class="macro">assert_eq!</span>(wm.rank(<span class="number">1</span>,<span class="number">8</span>), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(wm.rank(<span class="number">5</span>, <span class="number">9</span>), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(wm.rank(<span class="number">1</span>, <span class="number">8</span>), <span class="number">1</span>);
     }
 }
 </code></pre></div></section></main></body></html>
