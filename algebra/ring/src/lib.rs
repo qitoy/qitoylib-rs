@@ -4,7 +4,7 @@ use std::{
     ops::{Add, Mul, Neg},
 };
 
-pub trait Ring: Clone {
+pub trait Ring {
     type S: Clone;
     fn add(a: &Self::S, b: &Self::S) -> Self::S;
     fn neg(a: &Self::S) -> Self::S;

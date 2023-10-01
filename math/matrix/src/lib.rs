@@ -3,7 +3,7 @@ use std::ops::{Add, AddAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAss
 extern crate qitoy_ring;
 use qitoy_ring::Ring;
 
-#[derive(Clone, Debug)]
+#[derive(Debug)]
 pub struct Matrix<T: Ring>
 {
     row: usize,
@@ -43,6 +43,16 @@ impl<T: Ring> Matrix<T> {
             rhs >>= 1;
         }
         ret
+    }
+}
+
+impl<T: Ring> Clone for Matrix<T> {
+    fn clone(&self) -> Self {
+        Self {
+            row: self.row,
+            column: self.column,
+            mat: self.mat.clone(),
+        }
     }
 }
 
