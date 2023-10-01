@@ -26,7 +26,7 @@ impl WaveletMatrix {
             if bitvec.at(n) {
                 let zeros = bitvec.rank0(bitvec.len());
                 n = (zeros + bitvec.rank1(n)) as usize;
-                ret |= 1 << 63-i;
+                ret |= 1 << (63 - i);
             } else {
                 n = bitvec.rank0(n) as usize;
             }
@@ -39,7 +39,7 @@ impl WaveletMatrix {
     fn rank_pos(&self, val: u64, mut n: usize) -> usize {
         for i in 0..64 {
             let bitvec = &self.matrix[i];
-            if val >> 63-i & 1 == 1 {
+            if val >> (63 - i) & 1 == 1 {
                 let zeros = bitvec.rank0(bitvec.len());
                 n = (zeros + bitvec.rank1(n)) as usize;
             } else {
@@ -60,10 +60,10 @@ mod tests {
         let wm = WaveletMatrix::from(vec.to_vec());
         // 4cf, 409, 5eb
         // println!("{:?}", wm);
-        for i in 0..vec.len() {
-            assert_eq!(vec[i], wm.access(i));
+        for (i, &v) in vec.iter().enumerate() {
+            assert_eq!(v, wm.access(i));
         }
-        assert_eq!(wm.rank(5,9), 4);
-        assert_eq!(wm.rank(1,8), 1);
+        assert_eq!(wm.rank(5, 9), 4);
+        assert_eq!(wm.rank(1, 8), 1);
     }
 }
