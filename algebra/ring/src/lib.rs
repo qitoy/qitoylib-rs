@@ -1,69 +1,61 @@
-use std::ops::{Add, Mul, Neg};
+use std::{
+    convert::Infallible,
+    marker::PhantomData,
+    ops::{Add, Mul, Neg},
+};
 
-pub trait Ring: Clone + Add<Output = Self> + Neg<Output = Self> + Mul<Output = Self> {
-    fn zero() -> Self;
-    fn one() -> Self;
+pub trait Ring: Clone {
+    type S: Clone;
+    fn add(a: &Self::S, b: &Self::S) -> Self::S;
+    fn neg(a: &Self::S) -> Self::S;
+    fn mul(a: &Self::S, b: &Self::S) -> Self::S;
+    fn zero() -> Self::S;
+    fn one() -> Self::S;
 }
-
-macro_rules! impl_ring_int {
-    ($( $ty:ty ),*) => {
-        $(
-            impl Ring for $ty {
-                fn one() -> Self { 1 }
-                fn zero() -> Self { 0 }
-            }
-        )*
-    }
-}
-
-impl_ring_int!(i32, i64);
-
-macro_rules! impl_ring_mint {
-    ($( $ty:ty ),*) => {
-        $(
-            impl Ring for $ty {
-                fn one() -> Self { Self::raw(1) }
-                fn zero() -> Self { Self::raw(0) }
-            }
-        )*
-    }
-}
-
-extern crate ac_library;
-use ac_library::modint::{ModInt, ModInt1000000007, ModInt998244353};
-impl_ring_mint!(ModInt, ModInt998244353, ModInt1000000007);
 
 #[derive(Clone)]
-struct XorAnd(u64);
+pub struct AddMul<T>(Infallible, PhantomData<fn() -> T>);
 
-#[allow(clippy::suspicious_arithmetic_impl)]
-impl Add<Self> for XorAnd {
-    type Output = Self;
-    fn add(self, rhs: Self) -> Self::Output {
-        Self(self.0 ^ rhs.0)
+impl<T> Ring for AddMul<T>
+where
+    T: Clone + From<u8> + Add<Output = T> + Neg<Output = T> + Mul<Output = T>,
+{
+    type S = T;
+    fn add(a: &Self::S, b: &Self::S) -> Self::S {
+        a.clone() + b.clone()
+    }
+    fn neg(a: &Self::S) -> Self::S {
+        -a.clone()
+    }
+    fn mul(a: &Self::S, b: &Self::S) -> Self::S {
+        a.clone() * b.clone()
+    }
+    fn zero() -> Self::S {
+        0.into()
+    }
+    fn one() -> Self::S {
+        1.into()
     }
 }
 
-impl Neg for XorAnd {
-    type Output = Self;
-    fn neg(self) -> Self::Output {
-        self
-    }
-}
+#[derive(Clone)]
+pub struct XorAnd<T>(Infallible, PhantomData<fn() -> T>);
 
-#[allow(clippy::suspicious_arithmetic_impl)]
-impl Mul<Self> for XorAnd {
-    type Output = Self;
-    fn mul(self, rhs: Self) -> Self::Output {
-        Self(self.0 & rhs.0)
+impl Ring for XorAnd<u64> {
+    type S = u64;
+    fn add(a: &Self::S, b: &Self::S) -> Self::S {
+        a ^ b
     }
-}
-
-impl Ring for XorAnd {
-    fn one() -> Self {
-        Self(u64::MAX)
+    fn neg(a: &Self::S) -> Self::S {
+        *a
     }
-    fn zero() -> Self {
-        Self(0)
+    fn mul(a: &Self::S, b: &Self::S) -> Self::S {
+        a * b
+    }
+    fn zero() -> Self::S {
+        0
+    }
+    fn one() -> Self::S {
+        u64::MAX
     }
 }

@@ -1,6 +1,3 @@
 [package]
-name = "qitoy-algorithm-mo"
+name = "qitoy-mo"
 version = "0.1.0"
-
-[lib]
-name = "qitoy_mo"

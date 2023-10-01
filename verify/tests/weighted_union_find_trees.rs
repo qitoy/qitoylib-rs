@@ -6,14 +6,15 @@ struct V;
 impl Verify for V {
     fn solve(input: &str, stdout: &mut String) {
         use proconio::input;
-        use weighted_dsu::WeightedDsu;
+        use qitoy_weighted_dsu::WeightedDsu;
+        use ac_library::Additive;
 
         let mut source = proconio::source::once::OnceSource::from(input);
         input! {
             from &mut source,
             n: usize, q: usize,
         }
-        let mut wdsu = WeightedDsu::<i64>::new(n);
+        let mut wdsu = WeightedDsu::<Additive<i64>>::new(n);
         for _ in 0..q {
             input! {
                 from &mut source,

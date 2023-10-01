@@ -1,13 +1,14 @@
 use std::ops::{Add, AddAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign};
 
-extern crate qitoy_algebra_ring;
-use qitoy_algebra_ring::Ring;
+extern crate qitoy_ring;
+use qitoy_ring::Ring;
 
 #[derive(Clone, Debug)]
-pub struct Matrix<T: Ring> {
+pub struct Matrix<T: Ring>
+{
     row: usize,
     column: usize,
-    mat: Vec<Vec<T>>,
+    mat: Vec<Vec<T::S>>,
 }
 
 impl<T: Ring> Matrix<T> {
@@ -45,8 +46,8 @@ impl<T: Ring> Matrix<T> {
     }
 }
 
-impl<T: Ring> From<Vec<Vec<T>>> for Matrix<T> {
-    fn from(value: Vec<Vec<T>>) -> Self {
+impl<T: Ring> From<Vec<Vec<T::S>>> for Matrix<T> {
+    fn from(value: Vec<Vec<T::S>>) -> Self {
         let row = value.len();
         if row == 0 {
             return Self {
@@ -66,7 +67,7 @@ impl<T: Ring> From<Vec<Vec<T>>> for Matrix<T> {
 }
 
 impl<T: Ring> Index<(usize, usize)> for Matrix<T> {
-    type Output = T;
+    type Output = T::S;
     fn index(&self, index: (usize, usize)) -> &Self::Output {
         &self.mat[index.0][index.1]
     }
@@ -85,7 +86,7 @@ impl<T: Ring> Add for Matrix<T> {
         assert_eq!(self.column, rhs.column);
         for i in 0..self.row {
             for j in 0..self.column {
-                self[(i, j)] = self[(i, j)].clone() + rhs[(i, j)].clone();
+                self[(i, j)] = T::add(&self[(i, j)], &rhs[(i, j)]);
             }
         }
         self
@@ -97,7 +98,7 @@ impl<T: Ring> Neg for Matrix<T> {
     fn neg(mut self) -> Self::Output {
         for i in 0..self.row {
             for j in 0..self.column {
-                self[(i, j)] = -self[(i, j)].clone();
+                self[(i, j)] = T::neg(&self[(i, j)]);
             }
         }
         self
@@ -123,7 +124,7 @@ impl<T: Ring> Mul for Matrix<T> {
         for i in 0..self.row {
             for k in 0..self.column {
                 for j in 0..rhs.column {
-                    ret[(i, j)] = ret[(i, j)].clone() + self[(i, k)].clone() * rhs[(k, j)].clone();
+                    ret[(i, j)] = T::add(&ret[(i, j)], &T::mul(&self[(i, k)], &rhs[(k, j)]));
                 }
             }
         }

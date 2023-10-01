@@ -1,5 +1,5 @@
 [package]
-name = "qitoy-algebra-ring"
+name = "qitoy-ring"
 version = "0.1.0"
 
 [dependencies]

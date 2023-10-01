@@ -6,4 +6,4 @@ version = "0.1.0"
 name = "qitoy_matrix"
 
 [dependencies]
-qitoy-algebra-ring = { path = "../../algebra/ring" }
+qitoy-ring = { path = "../../algebra/ring" }
