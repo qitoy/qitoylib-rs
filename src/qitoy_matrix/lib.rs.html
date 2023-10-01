@@ -184,12 +184,22 @@
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
 <a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
+<a href="#161" id="161">161</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::ops::{Add, AddAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign};
 
 <span class="kw">extern crate </span>qitoy_ring;
 <span class="kw">use </span>qitoy_ring::Ring;
 
-<span class="attr">#[derive(Clone, Debug)]
+<span class="attr">#[derive(Debug)]
 </span><span class="kw">pub struct </span>Matrix&lt;T: Ring&gt;
 {
     row: usize,
@@ -229,6 +239,16 @@
             rhs &gt;&gt;= <span class="number">1</span>;
         }
         ret
+    }
+}
+
+<span class="kw">impl</span>&lt;T: Ring&gt; Clone <span class="kw">for </span>Matrix&lt;T&gt; {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            row: <span class="self">self</span>.row,
+            column: <span class="self">self</span>.column,
+            mat: <span class="self">self</span>.mat.clone(),
+        }
     }
 }
 

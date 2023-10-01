@@ -100,7 +100,7 @@
     ops::{Add, Mul, Neg},
 };
 
-<span class="kw">pub trait </span>Ring: Clone {
+<span class="kw">pub trait </span>Ring {
     <span class="kw">type </span>S: Clone;
     <span class="kw">fn </span>add(a: <span class="kw-2">&amp;</span><span class="self">Self</span>::S, b: <span class="kw-2">&amp;</span><span class="self">Self</span>::S) -&gt; <span class="self">Self</span>::S;
     <span class="kw">fn </span>neg(a: <span class="kw-2">&amp;</span><span class="self">Self</span>::S) -&gt; <span class="self">Self</span>::S;
