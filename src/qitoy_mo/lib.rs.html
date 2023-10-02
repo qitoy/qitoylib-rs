@@ -99,74 +99,70 @@
 <a href="#64" id="64">64</a>
 <a href="#65" id="65">65</a>
 <a href="#66" id="66">66</a>
-<a href="#67" id="67">67</a>
-<a href="#68" id="68">68</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::convert::TryInto;
+</pre></div><pre class="rust"><code><span class="kw">pub trait </span>Mo {
+    <span class="kw">fn </span>push_left(<span class="kw-2">&amp;mut </span><span class="self">self</span>, l: usize);
+    <span class="kw">fn </span>pop_left(<span class="kw-2">&amp;mut </span><span class="self">self</span>, l: usize);
+    <span class="kw">fn </span>push_right(<span class="kw-2">&amp;mut </span><span class="self">self</span>, r: usize);
+    <span class="kw">fn </span>pop_right(<span class="kw-2">&amp;mut </span><span class="self">self</span>, r: usize);
+    <span class="kw">fn </span>assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, i: usize);
 
-<span class="kw">pub struct </span>Mo&lt;PushLeft, PopLeft, PushRight, PopRight, Assign&gt; {
-    <span class="kw">pub </span>push_left: PushLeft,
-    <span class="kw">pub </span>pop_left: PopLeft,
-    <span class="kw">pub </span>push_right: PushRight,
-    <span class="kw">pub </span>pop_right: PopRight,
-    <span class="kw">pub </span>assign: Assign,
-}
-
-<span class="kw">impl</span>&lt;PushLeft, PopLeft, PushRight, PopRight, Assign&gt;
-    Mo&lt;PushLeft, PopLeft, PushRight, PopRight, Assign&gt;
-{
-    <span class="kw">pub fn </span>solve&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, query: <span class="kw-2">&amp;</span>[(usize, usize)], init: T)
-    <span class="kw">where
-        </span>PushLeft: FnMut(<span class="kw-2">&amp;mut </span>T, usize),
-        PopLeft: FnMut(<span class="kw-2">&amp;mut </span>T, usize),
-        PushRight: FnMut(<span class="kw-2">&amp;mut </span>T, usize),
-        PopRight: FnMut(<span class="kw-2">&amp;mut </span>T, usize),
-        Assign: FnMut(<span class="kw-2">&amp;</span>T, usize),
-    {
-        <span class="kw">let </span>k = query.iter().map(|x| x.<span class="number">1</span>).max().unwrap();
-        <span class="kw">let </span>k: usize = (k.ilog2() + <span class="number">1</span>).try_into().unwrap();
-        <span class="kw">let </span><span class="kw-2">mut </span>query: Vec&lt;<span class="kw">_</span>&gt; = query.iter().zip(<span class="number">0</span>..).collect();
-        query.sort_by_cached_key(|x| {
-            <span class="kw">let </span>(l, r) = <span class="kw-2">*</span>x.<span class="number">0</span>;
-            hilbert_order(k, l, r)
-        });
-        <span class="kw">let </span><span class="kw-2">mut </span>val = init;
+    <span class="doccomment">/// * query - 区間クエリ（開区間）
+    </span><span class="kw">fn </span>run(<span class="kw-2">&amp;mut </span><span class="self">self</span>, query: <span class="kw-2">&amp;</span>[(usize, usize)]) {
         <span class="kw">let </span>(<span class="kw-2">mut </span>l, <span class="kw-2">mut </span>r) = (<span class="number">0</span>, <span class="number">0</span>);
-        <span class="kw">for </span>(<span class="kw-2">&amp;</span>(nl, nr), idx) <span class="kw">in </span>query.into_iter() {
+        <span class="kw">for </span>idx <span class="kw">in </span>noshi91_order(query) {
+            <span class="kw">let </span>(nl, nr) = query[idx];
             <span class="kw">while </span>r &lt; nr {
-                (<span class="self">self</span>.push_right)(<span class="kw-2">&amp;mut </span>val, r);
+                <span class="self">self</span>.push_right(r);
                 r += <span class="number">1</span>;
             }
             <span class="kw">while </span>nl &lt; l {
                 l -= <span class="number">1</span>;
-                (<span class="self">self</span>.push_left)(<span class="kw-2">&amp;mut </span>val, l);
+                <span class="self">self</span>.push_left(l);
             }
             <span class="kw">while </span>nr &lt; r {
                 r -= <span class="number">1</span>;
-                (<span class="self">self</span>.pop_right)(<span class="kw-2">&amp;mut </span>val, r);
+                <span class="self">self</span>.pop_right(r);
             }
             <span class="kw">while </span>l &lt; nl {
-                (<span class="self">self</span>.pop_left)(<span class="kw-2">&amp;mut </span>val, l);
+                <span class="self">self</span>.pop_left(l);
                 l += <span class="number">1</span>;
             }
-            (<span class="self">self</span>.assign)(<span class="kw-2">&amp;</span>val, idx);
+            <span class="self">self</span>.assign(idx);
         }
     }
 }
 
-<span class="kw">fn </span>hilbert_order(k: usize, x: usize, y: usize) -&gt; u64 {
-    <span class="kw">let </span>(<span class="kw-2">mut </span>x, <span class="kw-2">mut </span>y): (u64, u64) = (x.try_into().unwrap(), y.try_into().unwrap());
-    <span class="kw">let </span><span class="kw-2">mut </span>d = <span class="number">0</span>;
-    <span class="kw">for </span>i <span class="kw">in </span>(<span class="number">0</span>..k).rev() {
-        <span class="kw">let </span>(rx, ry) = (x &gt;&gt; i &amp; <span class="number">1</span>, y &gt;&gt; i &amp; <span class="number">1</span>);
-        d += (<span class="number">1 </span>&lt;&lt; (<span class="number">2 </span>* i)) * ((<span class="number">3 </span>* rx) ^ ry);
-        <span class="kw">if </span>ry == <span class="number">0 </span>{
-            <span class="kw">if </span>rx == <span class="number">1 </span>{
-                x = (<span class="number">1 </span>&lt;&lt; k) - <span class="number">1 </span>- x;
-                y = (<span class="number">1 </span>&lt;&lt; k) - <span class="number">1 </span>- y;
-            }
-            (x, y) = (y, x);
-        }
+<span class="kw">fn </span>noshi91_order(query: <span class="kw-2">&amp;</span>[(usize, usize)]) -&gt; Vec&lt;usize&gt; {
+    <span class="kw">let </span>q = query.len();
+    <span class="kw">let </span>n = query.iter().map(|x| x.<span class="number">1</span>).max().unwrap();
+    <span class="kw">let </span>b = (n <span class="kw">as </span>f64 / (q <span class="kw">as </span>f64).sqrt()).max(<span class="number">1.</span>) <span class="kw">as </span>usize;
+    <span class="kw">let </span><span class="kw-2">mut </span>ret1: Vec&lt;<span class="kw">_</span>&gt; = (<span class="number">0</span>..q).collect();
+    <span class="kw">let </span><span class="kw-2">mut </span>ret2: Vec&lt;<span class="kw">_</span>&gt; = (<span class="number">0</span>..q).collect();
+    ret1.sort_by_cached_key(|<span class="kw-2">&amp;</span>i| {
+        <span class="kw">let </span>(l, r) = query[i];
+        <span class="kw">let </span>x = l / b;
+        <span class="kw">let </span>y = <span class="kw">if </span>x % <span class="number">2 </span>== <span class="number">0 </span>{ r } <span class="kw">else </span>{ n - r };
+        (x, y)
+    });
+    ret2.sort_by_cached_key(|<span class="kw-2">&amp;</span>i| {
+        <span class="kw">let </span>(l, r) = query[i];
+        <span class="kw">let </span>x = (l + b / <span class="number">2</span>) / b;
+        <span class="kw">let </span>y = <span class="kw">if </span>x % <span class="number">2 </span>== <span class="number">0 </span>{ r } <span class="kw">else </span>{ n - r };
+        (x, y)
+    });
+    <span class="kw">if </span>dist(query, <span class="kw-2">&amp;</span>ret1) &lt; dist(query, <span class="kw-2">&amp;</span>ret2) {
+        ret1
+    } <span class="kw">else </span>{
+        ret2
     }
-    d
+}
+
+<span class="kw">fn </span>dist(query: <span class="kw-2">&amp;</span>[(usize, usize)], perm: <span class="kw-2">&amp;</span>[usize]) -&gt; usize {
+    <span class="kw">let </span>(l, r) = query[perm[<span class="number">0</span>]];
+    perm.windows(<span class="number">2</span>).fold(l + r, |acc, w| {
+        <span class="kw">let </span>(l1, r1) = query[w[<span class="number">0</span>]];
+        <span class="kw">let </span>(l2, r2) = query[w[<span class="number">1</span>]];
+        acc + l1.abs_diff(l2) + r1.abs_diff(r2)
+    })
 }
 </code></pre></div></section></main></body></html>

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["Mo"]};
+window.SIDEBAR_ITEMS = {"trait":["Mo"]};
