@@ -7,6 +7,8 @@ edition = "2021"
 ac-library-rs = { workspace = true }
 anyhow = "1.0.75"
 proconio = "0.4.5"
+qitoy-mo = { path = "../algorithm/mo" }
+qitoy-prelude = { path = "../prelude" }
 qitoy-rerooting_dp = { path = "../algorithm/rerooting_dp" }
 qitoy-group = { path = "../algebra/group" }
 qitoy-weighted_dsu = { path = "../data_structure/weighted_dsu" }

@@ -1,68 +1,66 @@
-use std::convert::TryInto;
+pub trait Mo {
+    fn push_left(&mut self, l: usize);
+    fn pop_left(&mut self, l: usize);
+    fn push_right(&mut self, r: usize);
+    fn pop_right(&mut self, r: usize);
+    fn assign(&mut self, i: usize);
 
-pub struct Mo<PushLeft, PopLeft, PushRight, PopRight, Assign> {
-    pub push_left: PushLeft,
-    pub pop_left: PopLeft,
-    pub push_right: PushRight,
-    pub pop_right: PopRight,
-    pub assign: Assign,
-}
-
-impl<PushLeft, PopLeft, PushRight, PopRight, Assign>
-    Mo<PushLeft, PopLeft, PushRight, PopRight, Assign>
-{
-    pub fn solve<T>(&mut self, query: &[(usize, usize)], init: T)
-    where
-        PushLeft: FnMut(&mut T, usize),
-        PopLeft: FnMut(&mut T, usize),
-        PushRight: FnMut(&mut T, usize),
-        PopRight: FnMut(&mut T, usize),
-        Assign: FnMut(&T, usize),
-    {
-        let k = query.iter().map(|x| x.1).max().unwrap();
-        let k: usize = (k.ilog2() + 1).try_into().unwrap();
-        let mut query: Vec<_> = query.iter().zip(0..).collect();
-        query.sort_by_cached_key(|x| {
-            let (l, r) = *x.0;
-            hilbert_order(k, l, r)
-        });
-        let mut val = init;
+    /// * query - 区間クエリ（開区間）
+    fn run(&mut self, query: &[(usize, usize)]) {
         let (mut l, mut r) = (0, 0);
-        for (&(nl, nr), idx) in query.into_iter() {
+        for idx in noshi91_order(query) {
+            let (nl, nr) = query[idx];
             while r < nr {
-                (self.push_right)(&mut val, r);
+                self.push_right(r);
                 r += 1;
             }
             while nl < l {
                 l -= 1;
-                (self.push_left)(&mut val, l);
+                self.push_left(l);
             }
             while nr < r {
                 r -= 1;
-                (self.pop_right)(&mut val, r);
+                self.pop_right(r);
             }
             while l < nl {
-                (self.pop_left)(&mut val, l);
+                self.pop_left(l);
                 l += 1;
             }
-            (self.assign)(&val, idx);
+            self.assign(idx);
         }
     }
 }
 
-fn hilbert_order(k: usize, x: usize, y: usize) -> u64 {
-    let (mut x, mut y): (u64, u64) = (x.try_into().unwrap(), y.try_into().unwrap());
-    let mut d = 0;
-    for i in (0..k).rev() {
-        let (rx, ry) = (x >> i & 1, y >> i & 1);
-        d += (1 << (2 * i)) * ((3 * rx) ^ ry);
-        if ry == 0 {
-            if rx == 1 {
-                x = (1 << k) - 1 - x;
-                y = (1 << k) - 1 - y;
-            }
-            (x, y) = (y, x);
-        }
+fn noshi91_order(query: &[(usize, usize)]) -> Vec<usize> {
+    let q = query.len();
+    let n = query.iter().map(|x| x.1).max().unwrap();
+    let b = (n as f64 / (q as f64).sqrt()).max(1.) as usize;
+    let mut ret1: Vec<_> = (0..q).collect();
+    let mut ret2: Vec<_> = (0..q).collect();
+    ret1.sort_by_cached_key(|&i| {
+        let (l, r) = query[i];
+        let x = l / b;
+        let y = if x % 2 == 0 { r } else { n - r };
+        (x, y)
+    });
+    ret2.sort_by_cached_key(|&i| {
+        let (l, r) = query[i];
+        let x = (l + b / 2) / b;
+        let y = if x % 2 == 0 { r } else { n - r };
+        (x, y)
+    });
+    if dist(query, &ret1) < dist(query, &ret2) {
+        ret1
+    } else {
+        ret2
     }
-    d
+}
+
+fn dist(query: &[(usize, usize)], perm: &[usize]) -> usize {
+    let (l, r) = query[perm[0]];
+    perm.windows(2).fold(l + r, |acc, w| {
+        let (l1, r1) = query[w[0]];
+        let (l2, r2) = query[w[1]];
+        acc + l1.abs_diff(l2) + r1.abs_diff(r2)
+    })
 }
