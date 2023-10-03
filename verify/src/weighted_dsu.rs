@@ -1,9 +1,8 @@
-use verify::*;
+use super::{Verify, verify};
 
-struct V;
+struct WeightedDsu;
 
-#[verify("aoj/DSL_1_B")]
-impl Verify for V {
+impl Verify for WeightedDsu {
     fn solve(input: &str, stdout: &mut String) {
         use proconio::input;
         use qitoy_weighted_dsu::WeightedDsu;
@@ -40,4 +39,8 @@ impl Verify for V {
             }
         }
     }
+}
+
+verify! {
+    WeightedDsu("aoj/DSL_1_B")
 }

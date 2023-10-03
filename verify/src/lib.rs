@@ -1,6 +1,7 @@
 pub trait Verify {
     fn solve(input: &str, stdout: &mut String);
-    fn check(_input: &str, output: &str, stdout: &str) -> bool {
+    fn check(input: &str, output: &str, stdout: &str) -> bool {
+        let _ = input;
         output == stdout
     }
     fn verify(path: std::path::PathBuf) -> anyhow::Result<()> {
@@ -24,3 +25,9 @@ pub trait Verify {
 }
 
 pub use verify_proc::verify;
+
+mod example;
+mod mo_algorithm;
+mod prime;
+mod rerooting_dp;
+mod weighted_dsu;

@@ -1,12 +1,15 @@
 pub trait Mo {
+    type T;
     fn push_left(&mut self, l: usize);
     fn pop_left(&mut self, l: usize);
     fn push_right(&mut self, r: usize);
     fn pop_right(&mut self, r: usize);
-    fn assign(&mut self, i: usize);
+    fn assign(&mut self) -> Self::T;
 
     /// * query - 区間クエリ（開区間）
-    fn run(&mut self, query: &[(usize, usize)]) {
+    fn run(&mut self, query: &[(usize, usize)]) -> Vec<Self::T> {
+        let mut ans = Vec::with_capacity(query.len());
+        ans.resize_with(query.len(), Option::default);
         let (mut l, mut r) = (0, 0);
         for idx in noshi91_order(query) {
             let (nl, nr) = query[idx];
@@ -26,8 +29,9 @@ pub trait Mo {
                 self.pop_left(l);
                 l += 1;
             }
-            self.assign(idx);
+            ans[idx].replace(self.assign());
         }
+        ans.into_iter().map(Option::unwrap).collect()
     }
 }
 

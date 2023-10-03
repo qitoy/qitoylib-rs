@@ -1,10 +1,9 @@
 use ac_library::Max;
-use verify::{verify, Verify};
+use super::{verify, Verify};
 
-struct V;
+struct RerootingDp;
 
-#[verify("aoj/1595")]
-impl Verify for V {
+impl Verify for RerootingDp {
     fn solve(input: &str, stdout: &mut String) {
         use proconio::{input, marker::Usize1, source::once::OnceSource};
         use qitoy_rerooting_dp::{rerooting_dp, Tree};
@@ -31,4 +30,8 @@ impl Verify for V {
             stdout.push_str(&format!("{}\n", 2 * n - 2 - v));
         }
     }
+}
+
+verify! {
+    RerootingDp("aoj/1595")
 }

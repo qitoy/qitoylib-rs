@@ -1,9 +1,8 @@
-use verify::{verify, Verify};
+use super::{verify, Verify};
 
-struct V;
+struct MoAlgorithm;
 
-#[verify("library_checker/static_range_inversions_query")]
-impl Verify for V {
+impl Verify for MoAlgorithm {
     fn solve(input: &str, stdout: &mut String) {
         use ac_library::FenwickTree;
         use itertools::Itertools;
@@ -28,10 +27,10 @@ impl Verify for V {
             a: Vec<usize>,
             bit: FenwickTree<i64>,
             inv: i64,
-            ans: Vec<i64>,
         }
 
         impl Mo for A {
+            type T = i64;
             fn push_left(&mut self, l: usize) {
                 let a = self.a[l];
                 self.inv += self.bit.sum(..a);
@@ -52,18 +51,21 @@ impl Verify for V {
                 self.inv -= self.bit.sum(a + 1..);
                 self.bit.add(a, -1);
             }
-            fn assign(&mut self, i: usize) {
-                self.ans[i] = self.inv;
+            fn assign(&mut self) -> Self::T {
+                self.inv
             }
         }
 
-        let mut a = A {
+        let a = A {
             bit: FenwickTree::new(a.len(), 0),
             a,
             inv: 0,
-            ans: vec![0; q.len()],
-        };
-        a.run(&q);
-        writeln!(stdout, "{}", a.ans.iter().join("\n")).unwrap();
+        }
+        .run(&q);
+        writeln!(stdout, "{}", a.iter().join("\n")).unwrap();
     }
+}
+
+verify! {
+    MoAlgorithm("library_checker/static_range_inversions_query")
 }
