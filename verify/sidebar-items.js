@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"attr":["verify"],"trait":["Verify"]};
+window.SIDEBAR_ITEMS = {"macro":["verify"],"trait":["Verify"]};

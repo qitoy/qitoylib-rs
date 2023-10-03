@@ -99,15 +99,22 @@
 <a href="#64" id="64">64</a>
 <a href="#65" id="65">65</a>
 <a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
+<a href="#70" id="70">70</a>
 </pre></div><pre class="rust"><code><span class="kw">pub trait </span>Mo {
+    <span class="kw">type </span>T;
     <span class="kw">fn </span>push_left(<span class="kw-2">&amp;mut </span><span class="self">self</span>, l: usize);
     <span class="kw">fn </span>pop_left(<span class="kw-2">&amp;mut </span><span class="self">self</span>, l: usize);
     <span class="kw">fn </span>push_right(<span class="kw-2">&amp;mut </span><span class="self">self</span>, r: usize);
     <span class="kw">fn </span>pop_right(<span class="kw-2">&amp;mut </span><span class="self">self</span>, r: usize);
-    <span class="kw">fn </span>assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, i: usize);
+    <span class="kw">fn </span>assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="self">Self</span>::T;
 
     <span class="doccomment">/// * query - 区間クエリ（開区間）
-    </span><span class="kw">fn </span>run(<span class="kw-2">&amp;mut </span><span class="self">self</span>, query: <span class="kw-2">&amp;</span>[(usize, usize)]) {
+    </span><span class="kw">fn </span>run(<span class="kw-2">&amp;mut </span><span class="self">self</span>, query: <span class="kw-2">&amp;</span>[(usize, usize)]) -&gt; Vec&lt;<span class="self">Self</span>::T&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>ans = Vec::with_capacity(query.len());
+        ans.resize_with(query.len(), Option::default);
         <span class="kw">let </span>(<span class="kw-2">mut </span>l, <span class="kw-2">mut </span>r) = (<span class="number">0</span>, <span class="number">0</span>);
         <span class="kw">for </span>idx <span class="kw">in </span>noshi91_order(query) {
             <span class="kw">let </span>(nl, nr) = query[idx];
@@ -127,8 +134,9 @@
                 <span class="self">self</span>.pop_left(l);
                 l += <span class="number">1</span>;
             }
-            <span class="self">self</span>.assign(idx);
+            ans[idx].replace(<span class="self">self</span>.assign());
         }
+        ans.into_iter().map(Option::unwrap).collect()
     }
 }
 

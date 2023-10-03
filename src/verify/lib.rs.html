@@ -59,9 +59,17 @@
 <a href="#24" id="24">24</a>
 <a href="#25" id="25">25</a>
 <a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
 </pre></div><pre class="rust"><code><span class="kw">pub trait </span>Verify {
     <span class="kw">fn </span>solve(input: <span class="kw-2">&amp;</span>str, stdout: <span class="kw-2">&amp;mut </span>String);
-    <span class="kw">fn </span>check(_input: <span class="kw-2">&amp;</span>str, output: <span class="kw-2">&amp;</span>str, stdout: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    <span class="kw">fn </span>check(input: <span class="kw-2">&amp;</span>str, output: <span class="kw-2">&amp;</span>str, stdout: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="kw">let _ </span>= input;
         output == stdout
     }
     <span class="kw">fn </span>verify(path: std::path::PathBuf) -&gt; anyhow::Result&lt;()&gt; {
@@ -85,4 +93,10 @@
 }
 
 <span class="kw">pub use </span>verify_proc::verify;
+
+<span class="kw">mod </span>example;
+<span class="kw">mod </span>mo_algorithm;
+<span class="kw">mod </span>prime;
+<span class="kw">mod </span>rerooting_dp;
+<span class="kw">mod </span>weighted_dsu;
 </code></pre></div></section></main></body></html>
