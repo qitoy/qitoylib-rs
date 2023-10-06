@@ -148,7 +148,7 @@
     }
 }
 
-<span class="doccomment">/// verify!{}
+<span class="doccomment">/// verify! {}
 </span><span class="attr">#[proc_macro]
 </span><span class="kw">pub fn </span>verify(item: TokenStream) -&gt; TokenStream {
     <span class="kw">let </span>item = <span class="macro">parse_macro_input!</span>(item <span class="kw">as </span>VerifyItem);
