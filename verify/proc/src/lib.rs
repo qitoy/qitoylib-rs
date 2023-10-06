@@ -37,31 +37,6 @@ impl Parse for Verify {
 }
 
 /// verify! {}
-///
-/// # Example
-///
-/// ```
-/// use verify::Verify;
-///
-/// struct Example;
-///
-/// impl Verify for Example {
-///     fn solve(input: &str, stdout: &mut String) {
-///         use proconio::{input, source::once::OnceSource};
-///         use std::fmt::Write;
-///         let input = OnceSource::from(input);
-///         input! {
-///             from input,
-///             s: i32,
-///         }
-///         writeln!(stdout, "{}:{}:{}", s / 3600, s / 60 % 60, s % 60).unwrap();
-///     }
-/// }
-///
-/// verify! {
-///     Example("aoj/ITP1_1_D"),
-/// }
-/// ```
 #[proc_macro]
 pub fn verify(item: TokenStream) -> TokenStream {
     let item = parse_macro_input!(item as VerifyItem);
