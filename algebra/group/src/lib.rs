@@ -15,5 +15,5 @@ where
     }
 }
 
-trait Abelian: Group {}
+pub trait Abelian: Group {}
 
