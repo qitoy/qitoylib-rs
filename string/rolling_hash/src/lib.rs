@@ -2,6 +2,7 @@
 
 extern crate once_cell;
 extern crate rand;
+use ac_library::Monoid;
 use once_cell::sync::Lazy;
 use rand::{
     distributions::{Distribution, Uniform},
@@ -9,94 +10,142 @@ use rand::{
     SeedableRng,
 };
 
-const MOD: u64 = (1 << 61) - 1;
-
-static BASES: Lazy<(u64, u64)> = Lazy::new(|| {
-    let mut rng = SmallRng::from_entropy();
-    let range = Uniform::from(129..MOD - 1);
-    (range.sample(&mut rng), range.sample(&mut rng))
-});
-
-pub struct RollingHash {
-    bases: Vec<(u64, u64)>,
-    hashes: Vec<(u64, u64)>,
-}
+/// ロリハ
+/// [`Monoid`](ac_library::Monoid)として使う。
+pub struct RollingHash;
 
 impl RollingHash {
-    /// `[u8]`からハッシュを前計算します。文字列型に対しては`RollingHash::from()`を使用します。
-    pub fn new(str: &[u8]) -> Self {
-        let n = str.len();
-        let mut bases = vec![(1, 1); n + 1];
-        let mut hashes = vec![(0, 0); n + 1];
-        for i in 0..n {
-            bases[i + 1] = bases[i].rhmul(*BASES);
-            hashes[i + 1] = hashes[i]
-                .rhmul(*BASES)
-                .rhadd((str[i] as u64, str[i] as u64));
-        }
-        Self { bases, hashes }
+    const MOD: u64 = (1 << 61) - 1;
+    const ROOT: u64 = 37;
+    const CHARSIZE: u64 = 256;
+
+    /// 文字`c`からロリハを生成する。
+    pub fn new(c: char) -> <Self as Monoid>::S {
+        let (b1, b2) = Self::bases();
+        (b1, b2, c as u64, c as u64)
     }
 
-    /// `str[l..r]`のハッシュを返します。
-    pub fn get_hash(&self, l: usize, r: usize) -> (u64, u64) {
-        self.hashes[r].rhsub(self.hashes[l].rhmul(self.bases[r - l]))
+    /// https://trap.jp/post/1036/
+    fn bases() -> (u64, u64) {
+        static BASES: Lazy<(u64, u64)> = Lazy::new(|| {
+            let gcd = |mut x, mut y| {
+                while y > 0 {
+                    (x, y) = (y, x % y)
+                }
+                x
+            };
+            let mut rng = SmallRng::from_entropy();
+            let range = Uniform::from(0..RollingHash::MOD);
+            let mut base = |b| loop {
+                let k = range.sample(&mut rng);
+                if gcd(k, RollingHash::MOD - 1) != 1 {
+                    continue;
+                }
+                let r = RollingHash::pow(RollingHash::ROOT, k);
+                if r <= RollingHash::CHARSIZE || r == b {
+                    continue;
+                }
+                return r;
+            };
+            let b1 = base(0);
+            (b1, base(b1))
+        });
+        *BASES
     }
-}
 
-impl From<&str> for RollingHash {
-    fn from(value: &str) -> Self {
-        Self::new(value.as_bytes())
-    }
-}
-
-trait RHHsah {
-    fn rhadd(self, rhs: Self) -> Self;
-    fn rhsub(self, rhs: Self) -> Self;
-    fn rhmul(self, rhs: Self) -> Self;
-}
-
-impl RHHsah for u64 {
-    fn rhadd(self, rhs: Self) -> Self {
-        let r = self + rhs;
-        if r >= MOD {
-            r - MOD
+    fn add(a: u64, b: u64) -> u64 {
+        let c = a + b;
+        if c >= Self::MOD {
+            c - Self::MOD
         } else {
-            r
+            c
         }
     }
-    fn rhsub(self, rhs: Self) -> Self {
-        self.rhadd(MOD - rhs)
+
+    fn neg(a: u64) -> u64 {
+        if a == 0 {
+            0
+        } else {
+            Self::MOD - a
+        }
     }
-    fn rhmul(self, rhs: Self) -> Self {
-        let t = (self as u128) * (rhs as u128);
-        let m = MOD as u128;
-        let t = (t >> 61) + (t & m);
-        (if t >= m { t - m } else { t }) as u64
+
+    fn sub(a: u64, b: u64) -> u64 {
+        Self::add(a, Self::neg(b))
+    }
+
+    fn mul(a: u64, b: u64) -> u64 {
+        let c = (a as u128) * (b as u128);
+        let m = Self::MOD as u128;
+        let c = (c >> 61) + (c & m);
+        (if c >= m { c - m } else { c }) as u64
+    }
+
+    fn pow(mut a: u64, mut b: u64) -> u64 {
+        let mut c = 1;
+        while b > 0 {
+            if b % 2 == 1 {
+                c = Self::mul(c, a);
+            }
+            a = Self::mul(a, a);
+            b /= 2;
+        }
+        c
     }
 }
 
-impl RHHsah for (u64, u64) {
-    fn rhadd(self, rhs: Self) -> Self {
-        (self.0.rhadd(rhs.0), self.1.rhadd(rhs.1))
+impl Monoid for RollingHash {
+    /// (base1, base2, hash1, hash2)
+    type S = (u64, u64, u64, u64);
+    fn identity() -> Self::S {
+        (1, 1, 0, 0)
     }
-    fn rhsub(self, rhs: Self) -> Self {
-        (self.0.rhsub(rhs.0), self.1.rhsub(rhs.1))
-    }
-    fn rhmul(self, rhs: Self) -> Self {
-        (self.0.rhmul(rhs.0), self.1.rhmul(rhs.1))
+    fn binary_operation(a: &Self::S, b: &Self::S) -> Self::S {
+        (
+            Self::mul(a.0, b.0),
+            Self::mul(a.1, b.1),
+            Self::add(Self::mul(a.2, b.0), b.2),
+            Self::add(Self::mul(a.3, b.1), b.3),
+        )
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+/// ロリハによる文字列検索のための構造体。
+/// ```
+/// use qitoy_rolling_hash::RhVec;
+/// let s = "abracadabra";
+/// let h: RhVec = s.chars().collect();
+/// assert_eq!(h.get(0..4), h.get(7..11)); // "abra"
+/// assert_eq!(h.get(0..0), h.get(4..4)); // ""
+/// assert_ne!(h.get(0..4), h.get(4..8)); // "abra", "cada"
+/// ```
+pub struct RhVec {
+    data: Vec<<RollingHash as Monoid>::S>,
+}
 
-    #[test]
-    fn abracadabra() {
-        let s = "abracadabra";
-        let h = RollingHash::from(s);
-        assert_eq!(h.get_hash(0, 4), h.get_hash(7, 11)); // "abra"
-        assert_eq!(h.get_hash(0, 0), h.get_hash(4, 4)); // ""
-        assert_ne!(h.get_hash(0, 4), h.get_hash(4, 8)); // "abra", "cada"
+impl RhVec {
+    pub fn get(&self, range: std::ops::Range<usize>) -> <RollingHash as Monoid>::S {
+        let (l, r) = (range.start, range.end);
+        let b = self.data[r - l];
+        let (l, r) = (self.data[l], self.data[r]);
+        (
+            b.0,
+            b.1,
+            RollingHash::sub(r.2, RollingHash::mul(l.2, b.0)),
+            RollingHash::sub(r.3, RollingHash::mul(l.3, b.1)),
+        )
+    }
+}
+
+impl FromIterator<char> for RhVec {
+    fn from_iter<T: IntoIterator<Item = char>>(iter: T) -> Self {
+        let e = RollingHash::identity();
+        let data = std::iter::once(e)
+            .chain(iter.into_iter().scan(e, |state, x| {
+                *state = RollingHash::binary_operation(state, &RollingHash::new(x));
+                Some(*state)
+            }))
+            .collect();
+        Self { data }
     }
 }
