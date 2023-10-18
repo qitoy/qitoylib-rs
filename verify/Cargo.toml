@@ -14,6 +14,7 @@ qitoy-group = { path = "../algebra/group" }
 qitoy-weighted_dsu = { path = "../data_structure/weighted_dsu" }
 qitoy-prime-check = { path = "../prime/check" }
 qitoy-prime-factorize = { path = "../prime/factorize" }
+qitoy-red_black_tree = { path = "../data_structure/red_black_tree" }
 rstest = "0.18.2"
 verify_proc = { path = "./proc" }
 itertools = { workspace = true }

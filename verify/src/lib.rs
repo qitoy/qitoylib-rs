@@ -29,5 +29,6 @@ pub use verify_proc::verify;
 mod example;
 mod mo_algorithm;
 mod prime;
+mod red_black_tree;
 mod rerooting_dp;
 mod weighted_dsu;
