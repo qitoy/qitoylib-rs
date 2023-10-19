@@ -5,7 +5,7 @@ pub trait MAct {
     /// element type
     type S: Clone;
     /// map type
-    type F: Clone;
+    type F: Clone + PartialEq;
     /// identity element
     fn e() -> Self::S;
     /// binary operation
@@ -98,16 +98,19 @@ impl<M: MAct> Node<M> {
         Leaf { val }.into()
     }
 
+    #[inline]
     fn left(&self) -> Rc<Self> {
         let Tree { left, .. } = self else { unreachable!(); };
         left.clone()
     }
 
+    #[inline]
     fn right(&self) -> Rc<Self> {
         let Tree { right, .. } = self else { unreachable!(); };
         right.clone()
     }
 
+    #[inline]
     fn color(&self) -> Color {
         match self {
             Leaf { .. } => Black,
@@ -115,6 +118,7 @@ impl<M: MAct> Node<M> {
         }
     }
 
+    #[inline]
     fn rank(&self) -> usize {
         match self {
             Leaf { .. } => 0,
@@ -123,6 +127,7 @@ impl<M: MAct> Node<M> {
     }
 
     #[allow(clippy::len_without_is_empty)]
+    #[inline]
     fn len(&self) -> usize {
         match self {
             Leaf { .. } => 1,
@@ -130,6 +135,7 @@ impl<M: MAct> Node<M> {
         }
     }
 
+    #[inline]
     fn val(&self) -> &M::S {
         match self {
             Leaf { val } | Tree { val, .. } => val,
@@ -157,9 +163,16 @@ impl<M: MAct> Node<M> {
         }
     }
 
-    fn update(&self, lazy: &M::F, rev: bool) -> Rc<Self> {
-        let mut node = self.clone();
-        match &mut node {
+    fn update(self: &Rc<Self>, lazy: &M::F, rev: bool) -> Rc<Self> {
+        match (self.as_ref(), lazy, rev) {
+            (Leaf { .. }, id, _) | (Tree { .. }, id, false) if id == &M::id() => self.clone(),
+            _ => Node::clone(self).update_mut(lazy, rev),
+        }
+    }
+
+    #[inline]
+    fn update_mut(mut self, lazy: &M::F, rev: bool) -> Rc<Self> {
+        match &mut self {
             Leaf { val: v } => {
                 *v = M::map(lazy, v, 1);
             }
@@ -175,9 +188,10 @@ impl<M: MAct> Node<M> {
                 *v = M::map(lazy, v, *len);
             }
         }
-        node.into()
+        self.into()
     }
 
+    #[inline]
     fn to_black(self: &Rc<Self>) -> Rc<Self> {
         match self.color() {
             Red => {
@@ -188,6 +202,7 @@ impl<M: MAct> Node<M> {
         }
     }
 
+    #[inline]
     fn merge(self: &Rc<Self>, v: &Rc<Self>) -> Rc<Self> {
         Self::merge_sub(self, v).to_black()
     }
@@ -238,6 +253,17 @@ impl<M: MAct> Node<M> {
                 (left.to_black().merge(&l), r)
             }
             Equal => (left.to_black(), right.to_black()),
+        }
+    }
+
+    fn dump(self: &Rc<Self>, dump: &mut Vec<M::S>) {
+        let a = self.lazy_push();
+        match a.as_ref() {
+            Leaf { val } => dump.push(val.clone()),
+            Tree { left, right, .. } => {
+                left.dump(dump);
+                right.dump(dump);
+            }
         }
     }
 }
@@ -339,21 +365,27 @@ impl<M: MAct> RedBlackTree<M> {
     }
 
     pub fn dump(&self) -> Vec<M::S> {
-        let mut rbt = self.clone();
-        let mut vec = vec![];
-        while !rbt.is_empty() {
-            let (l, r) = rbt.split(1);
-            vec.push(l.prod(0..1));
-            rbt = r;
+        let mut dump = Vec::with_capacity(self.len());
+        if let Some(top) = &self.top {
+            top.dump(&mut dump);
         }
-        vec
+        dump
     }
 }
 
 impl<M: MAct> FromIterator<M::S> for RedBlackTree<M> {
     fn from_iter<T: IntoIterator<Item = M::S>>(iter: T) -> Self {
-        iter.into_iter()
-            .fold(Default::default(), |acc, x| acc.merge(&Self::new(x)))
+        let data: Vec<_> = iter.into_iter().collect();
+        merge_rec(&data)
+    }
+}
+
+fn merge_rec<M: MAct>(data: &[M::S]) -> RedBlackTree<M> {
+    let n = data.len();
+    if n == 1 {
+        RedBlackTree::new(data[0].clone())
+    } else {
+        merge_rec(&data[..n / 2]).merge(&merge_rec(&data[n / 2..]))
     }
 }
 
