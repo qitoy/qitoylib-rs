@@ -1,4 +1,4 @@
-var sourcesIndex = JSON.parse('{\
+var srcIndex = JSON.parse('{\
 "qitoy_combi":["",[],["lib.rs"]],\
 "qitoy_data_structure_bit_vec":["",[],["lib.rs"]],\
 "qitoy_data_structure_wavelet_matrix":["",[],["lib.rs"]],\
@@ -26,4 +26,4 @@ var sourcesIndex = JSON.parse('{\
 "verify":["",[],["example.rs","lib.rs","mo_algorithm.rs","prime.rs","red_black_tree.rs","rerooting_dp.rs","weighted_dsu.rs"]],\
 "verify_proc":["",[],["lib.rs"]]\
 }');
-createSourceSidebar();
+createSrcSidebar();

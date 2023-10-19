@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["RedBlackTree"]};
+window.SIDEBAR_ITEMS = {"struct":["RedBlackTree"],"trait":["MAct"]};
