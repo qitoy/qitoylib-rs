@@ -1,6 +1,25 @@
-use ac_library::{MapMonoid, Monoid};
 use std::ops::Range;
 use std::rc::Rc;
+
+pub trait MAct {
+    /// element type
+    type S: Clone;
+    /// map type
+    type F: Clone;
+    /// identity element
+    fn e() -> Self::S;
+    /// binary operation
+    fn op(a: &Self::S, b: &Self::S) -> Self::S;
+    /// identity map
+    fn id() -> Self::F;
+    /// composition
+    /// `|x| f(g(x))`
+    fn comp(f: &Self::F, g: &Self::F) -> Self::F;
+    /// mapping
+    /// `f(x)`
+    /// * `len` - subtree's len (where subtree's value is x)
+    fn map(f: &Self::F, x: &Self::S, len: usize) -> Self::S;
+}
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum Color {
@@ -8,9 +27,9 @@ enum Color {
     Black,
 }
 
-enum Node<M: MapMonoid> {
+enum Node<M: MAct> {
     Leaf {
-        val: <M::M as Monoid>::S,
+        val: M::S,
     },
     Tree {
         left: Rc<Node<M>>,
@@ -20,17 +39,20 @@ enum Node<M: MapMonoid> {
         rank: usize,
         /// 部分木の葉ノード数
         len: usize,
-        val: <M::M as Monoid>::S,
+        val: M::S,
         lazy: M::F,
         rev: bool,
     },
 }
 
-impl<M: MapMonoid> Clone for Node<M> {
+use Color::{Black, Red};
+use Node::{Leaf, Tree};
+
+impl<M: MAct> Clone for Node<M> {
     fn clone(&self) -> Self {
         match self {
-            Self::Leaf { val } => Self::Leaf { val: val.clone() },
-            Self::Tree {
+            Leaf { val } => Leaf { val: val.clone() },
+            Tree {
                 left,
                 right,
                 color,
@@ -39,7 +61,7 @@ impl<M: MapMonoid> Clone for Node<M> {
                 val,
                 lazy,
                 rev,
-            } => Self::Tree {
+            } => Tree {
                 left: left.clone(),
                 right: right.clone(),
                 color: *color,
@@ -53,71 +75,71 @@ impl<M: MapMonoid> Clone for Node<M> {
     }
 }
 
-impl<M: MapMonoid> Node<M> {
+impl<M: MAct> Node<M> {
     fn new(left: &Rc<Self>, right: &Rc<Self>, color: Color) -> Rc<Self> {
-        Self::Tree {
+        Tree {
             left: left.clone(),
             right: right.clone(),
             color,
             rank: left.rank()
                 + match left.color() {
-                    Color::Black => 1,
-                    Color::Red => 0,
+                    Black => 1,
+                    Red => 0,
                 },
             len: left.len() + right.len(),
-            val: M::binary_operation(left.val(), right.val()),
-            lazy: M::identity_map(),
+            val: M::op(left.val(), right.val()),
+            lazy: M::id(),
             rev: false,
         }
         .into()
     }
 
-    fn leaf(val: <M::M as Monoid>::S) -> Rc<Self> {
-        Self::Leaf { val }.into()
+    fn leaf(val: M::S) -> Rc<Self> {
+        Leaf { val }.into()
     }
 
     fn left(&self) -> Rc<Self> {
-        let Node::Tree { left, .. } = self else { unreachable!(); };
+        let Tree { left, .. } = self else { unreachable!(); };
         left.clone()
     }
 
     fn right(&self) -> Rc<Self> {
-        let Node::Tree { right, .. } = self else { unreachable!(); };
+        let Tree { right, .. } = self else { unreachable!(); };
         right.clone()
     }
 
     fn color(&self) -> Color {
         match self {
-            Self::Leaf { .. } => Color::Black,
-            Self::Tree { color, .. } => *color,
+            Leaf { .. } => Black,
+            Tree { color, .. } => *color,
         }
     }
 
     fn rank(&self) -> usize {
         match self {
-            Self::Leaf { .. } => 0,
-            Self::Tree { rank, .. } => *rank,
+            Leaf { .. } => 0,
+            Tree { rank, .. } => *rank,
         }
     }
 
     #[allow(clippy::len_without_is_empty)]
     fn len(&self) -> usize {
         match self {
-            Self::Leaf { .. } => 1,
-            Self::Tree { len, .. } => *len,
+            Leaf { .. } => 1,
+            Tree { len, .. } => *len,
         }
     }
 
-    fn val(&self) -> &<M::M as Monoid>::S {
+    fn val(&self) -> &M::S {
         match self {
-            Self::Leaf { val } | Self::Tree { val, .. } => val,
+            Leaf { val } | Tree { val, .. } => val,
         }
     }
 
     fn lazy_push(self: &Rc<Self>) -> Rc<Self> {
         match self.as_ref() {
-            Self::Leaf { .. } => self.clone(),
-            Self::Tree {
+            Leaf { .. } => self.clone(),
+            Tree {
                 left,
                 right,
                 color,
@@ -136,16 +158,21 @@ impl<M: MapMonoid> Node<M> {
     }
 
     fn update(&self, lazy: &M::F, rev: bool) -> Rc<Self> {
-        let (l, r) = (lazy, rev);
         let mut node = self.clone();
         match &mut node {
-            Self::Leaf { val } => {
-                *val = M::mapping(l, val);
+            Leaf { val: v } => {
+                *v = M::map(lazy, v, 1);
             }
-            Self::Tree { val, lazy, rev, .. } => {
-                *rev ^= r;
-                *lazy = M::composition(l, lazy);
-                *val = M::mapping(l, val);
+            Tree {
+                val: v,
+                lazy: l,
+                rev: r,
+                len,
+                ..
+            } => {
+                *r ^= rev;
+                *l = M::comp(lazy, l);
+                *v = M::map(lazy, v, *len);
             }
         }
         node.into()
@@ -153,8 +180,11 @@ impl<M: MapMonoid> Node<M> {
 
     fn to_black(self: &Rc<Self>) -> Rc<Self> {
         match self.color() {
-            Color::Red => Self::new(&self.left(), &self.right(), Color::Black),
-            Color::Black => self.clone(),
+            Red => {
+                let a = self.lazy_push();
+                Self::new(&a.left(), &a.right(), Black)
+            }
+            Black => self.clone(),
         }
     }
 
@@ -164,7 +194,6 @@ impl<M: MapMonoid> Node<M> {
 
     fn merge_sub(a: &Rc<Self>, b: &Rc<Self>) -> Rc<Self> {
         use std::cmp::Ordering::*;
-        use Color::*;
         let (a, b) = (a.lazy_push(), b.lazy_push());
         match Ord::cmp(&a.rank(), &b.rank()) {
             Less => {
@@ -198,7 +227,7 @@ impl<M: MapMonoid> Node<M> {
     fn split(self: &Rc<Self>, k: usize) -> (Rc<Self>, Rc<Self>) {
         use std::cmp::Ordering::*;
         let a = self.lazy_push();
-        let Self::Tree { left, right, .. } = a.as_ref() else { unreachable!(); };
+        let Tree { left, right, .. } = a.as_ref() else { unreachable!(); };
         match k.cmp(&left.len()) {
             Less => {
                 let (l, r) = left.split(k);
@@ -213,11 +242,11 @@ impl<M: MapMonoid> Node<M> {
     }
 }
 
-pub struct RedBlackTree<M: MapMonoid> {
+pub struct RedBlackTree<M: MAct> {
     top: Option<Rc<Node<M>>>,
 }
 
-impl<M: MapMonoid> Clone for RedBlackTree<M> {
+impl<M: MAct> Clone for RedBlackTree<M> {
     fn clone(&self) -> Self {
         Self {
             top: self.top.clone(),
@@ -225,7 +254,7 @@ impl<M: MapMonoid> Clone for RedBlackTree<M> {
     }
 }
 
-impl<M: MapMonoid> Default for RedBlackTree<M> {
+impl<M: MAct> Default for RedBlackTree<M> {
     fn default() -> Self {
         Self { top: None }
     }
@@ -233,7 +262,7 @@ impl<M: MapMonoid> Default for RedBlackTree<M> {
 
 impl<M, T> From<T> for RedBlackTree<M>
 where
-    M: MapMonoid,
+    M: MAct,
     T: Into<Option<Rc<Node<M>>>>,
 {
     fn from(value: T) -> Self {
@@ -241,8 +270,8 @@ where
     }
 }
 
-impl<M: MapMonoid> RedBlackTree<M> {
-    pub fn new(val: <M::M as Monoid>::S) -> Self {
+impl<M: MAct> RedBlackTree<M> {
+    pub fn new(val: M::S) -> Self {
         Node::<M>::leaf(val).into()
     }
 
@@ -281,7 +310,7 @@ impl<M: MapMonoid> RedBlackTree<M> {
         (l, m, r)
     }
 
-    pub fn insert(&self, p: usize, val: <M::M as Monoid>::S) -> Self {
+    pub fn insert(&self, p: usize, val: M::S) -> Self {
         let (l, r) = self.split(p);
         let m = Self::new(val);
         l.merge(&m).merge(&r)
@@ -292,11 +321,9 @@ impl<M: MapMonoid> RedBlackTree<M> {
         l.merge(&r)
     }
 
-    pub fn prod(&self, range: Range<usize>) -> <M::M as Monoid>::S {
+    pub fn prod(&self, range: Range<usize>) -> M::S {
         let (_, m, _) = self.split3(range);
-        m.top
-            .as_ref()
-            .map_or(M::identity_element(), |top| top.val().clone())
+        m.top.as_ref().map_or(M::e(), |top| top.val().clone())
     }
 
     pub fn apply(&self, range: Range<usize>, f: M::F) -> Self {
@@ -307,7 +334,97 @@ impl<M: MapMonoid> RedBlackTree<M> {
 
     pub fn reverse(&self, range: Range<usize>) -> Self {
         let (l, m, r) = self.split3(range);
-        let m = m.top.map(|top| top.update(&M::identity_map(), true)).into();
+        let m = m.top.map(|top| top.update(&M::id(), true)).into();
         l.merge(&m).merge(&r)
+    }
+
+    pub fn dump(&self) -> Vec<M::S> {
+        let mut rbt = self.clone();
+        let mut vec = vec![];
+        while !rbt.is_empty() {
+            let (l, r) = rbt.split(1);
+            vec.push(l.prod(0..1));
+            rbt = r;
+        }
+        vec
+    }
+}
+
+impl<M: MAct> FromIterator<M::S> for RedBlackTree<M> {
+    fn from_iter<T: IntoIterator<Item = M::S>>(iter: T) -> Self {
+        iter.into_iter()
+            .fold(Default::default(), |acc, x| acc.merge(&Self::new(x)))
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::{MAct, RedBlackTree};
+
+    struct MinAdd;
+    /// min - add
+    impl MAct for MinAdd {
+        type S = i32;
+        type F = i32;
+        fn e() -> Self::S {
+            i32::MAX
+        }
+        fn op(a: &Self::S, b: &Self::S) -> Self::S {
+            a + b
+        }
+        fn id() -> Self::F {
+            0
+        }
+        fn map(f: &Self::F, x: &Self::S, _: usize) -> Self::S {
+            f + x
+        }
+        fn comp(f: &Self::F, g: &Self::F) -> Self::F {
+            f + g
+        }
+    }
+
+    #[test]
+    fn test1() {
+        // 1, 1, 4, 5, 1, 4
+        let t1: RedBlackTree<MinAdd> = [1, 1, 4, 5, 1, 4].into_iter().collect();
+        assert_eq!(t1.dump(), vec![1, 1, 4, 5, 1, 4]);
+        // 1, 3, 6, 7, 1, 4
+        let t2 = t1.apply(1..4, 2);
+        assert_eq!(t2.dump(), vec![1, 3, 6, 7, 1, 4]);
+        // [1, 1], [4, 5, 1], [4]
+        let (l, _, r) = t1.split3(2..5);
+        // [1, 3, 6], [7, 1, 4]
+        let (_, m) = t2.split(3);
+        // 1, 1, 7, 1, 4, 4
+        let t3 = l.merge(&m).merge(&r);
+        assert_eq!(t3.dump(), vec![1, 1, 7, 1, 4, 4]);
+        // 1, 4, 1, 7, 1, 4
+        let t4 = t3.reverse(1..5);
+        assert_eq!(
+            t4.dump(),
+            vec![1, 4, 1, 7, 1, 4],
+            "{:?}.reverse(1..5)",
+            t3.dump()
+        );
+    }
+
+    #[test]
+    fn rev() {
+        let n = 10;
+        let t: RedBlackTree<MinAdd> = (0..n).collect();
+        let t = t.reverse(0..n as usize);
+        assert_eq!(t.dump(), (0..n).rev().collect::<Vec<_>>());
+    }
+
+    #[test]
+    fn rev2() {
+        let n = 5;
+        let t1: RedBlackTree<MinAdd> = (0..n).collect();
+        let t1 = t1.reverse(0..n as usize);
+        let t2: RedBlackTree<MinAdd> = (0..n).map(|i| i + n).collect();
+        let t2 = t2.reverse(0..n as usize);
+        let t = t2.merge(&t1);
+        let t = t.reverse(0..2 * n as usize);
+        assert_eq!(t.dump(), (0..2 * n).collect::<Vec<_>>());
     }
 }

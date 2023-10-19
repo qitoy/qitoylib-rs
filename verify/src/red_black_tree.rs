@@ -4,36 +4,38 @@ struct RedBlackTree;
 
 impl Verify for RedBlackTree {
     fn solve(input: &str, stdout: &mut String) {
-        use ac_library::{MapMonoid, ModInt998244353, Monoid};
         use proconio::input;
-        use qitoy_red_black_tree::RedBlackTree;
+        use qitoy_red_black_tree::{MAct, RedBlackTree};
         use std::fmt::Write;
 
-        struct M;
-        impl Monoid for M {
-            type S = ModInt998244353;
-            fn identity() -> Self::S {
-                0.into()
-            }
-            fn binary_operation(a: &Self::S, b: &Self::S) -> Self::S {
-                a + b
-            }
-        }
-
         struct F;
-        impl MapMonoid for F {
-            type M = M;
-            type F = (ModInt998244353, ModInt998244353);
-            fn identity_map() -> Self::F {
-                (1.into(), 0.into())
+        impl F {
+            const MOD: u64 = 998244353;
+        }
+        impl MAct for F {
+            type S = u64;
+            type F = (u64, u64);
+            fn e() -> Self::S {
+                0
             }
-            fn mapping(f: &Self::F, x: &<Self::M as Monoid>::S) -> <Self::M as Monoid>::S {
-                f.0 * x + f.1
+            fn op(a: &Self::S, b: &Self::S) -> Self::S {
+                let c = a + b;
+                if c > Self::MOD {
+                    c - Self::MOD
+                } else {
+                    c
+                }
             }
-            fn composition(f: &Self::F, g: &Self::F) -> Self::F {
+            fn id() -> Self::F {
+                (1, 0)
+            }
+            fn map(f: &Self::F, x: &Self::S, len: usize) -> Self::S {
+                (f.0 * x + f.1 * len as u64) % Self::MOD
+            }
+            fn comp(f: &Self::F, g: &Self::F) -> Self::F {
                 // f.0 * (g.0 * x + g.1) + f.1
                 // = (f.0 * g.0) * x + f.0 * g.1 + f.1
-                (f.0 * g.0, f.0 * g.1 + f.1)
+                (f.0 * g.0 % Self::MOD, (f.0 * g.1 + f.1) % Self::MOD)
             }
         }
 
@@ -41,12 +43,9 @@ impl Verify for RedBlackTree {
         input! {
             from &mut source,
             n: usize, q: usize,
-            a: [ModInt998244353; n],
+            a: [u64; n],
         }
-        let mut rbt = RedBlackTree::<F>::default();
-        for a in a {
-            rbt = rbt.insert(rbt.len(), a);
-        }
+        let mut rbt: RedBlackTree<F> = a.into_iter().collect();
         for _ in 0..q {
             input! {
                 from &mut source,
@@ -56,7 +55,7 @@ impl Verify for RedBlackTree {
                 0 => {
                     input! {
                         from &mut source,
-                        i: usize, x: ModInt998244353,
+                        i: usize, x: u64,
                     }
                     rbt = rbt.insert(i, x);
                 }
@@ -78,7 +77,7 @@ impl Verify for RedBlackTree {
                     input! {
                         from &mut source,
                         l: usize, r: usize,
-                        b: ModInt998244353, c: ModInt998244353,
+                        b: u64, c: u64,
                     }
                     rbt = rbt.apply(l..r, (b, c));
                 }
@@ -96,6 +95,5 @@ impl Verify for RedBlackTree {
 }
 
 verify! {
-    // now bug!!
-    // RedBlackTree("library_checker/dynamic_sequence_range_affine_range_sum"),
+    RedBlackTree("library_checker/dynamic_sequence_range_affine_range_sum"),
 }
