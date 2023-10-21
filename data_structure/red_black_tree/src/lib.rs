@@ -75,6 +75,12 @@ impl<M: MAct> Clone for Node<M> {
     }
 }
 
+impl<M: MAct> Default for Node<M> {
+    fn default() -> Self {
+        Leaf { val: M::e() }
+    }
+}
+
 impl<M: MAct> Node<M> {
     fn new(left: &Rc<Self>, right: &Rc<Self>, color: Color) -> Rc<Self> {
         Tree {
@@ -142,9 +148,12 @@ impl<M: MAct> Node<M> {
         }
     }
 
-    fn lazy_push(self: &Rc<Self>) -> Rc<Self> {
+    fn push_new(self: &Rc<Self>) -> Rc<Self> {
         match self.as_ref() {
             Leaf { .. } => self.clone(),
+            Tree {
+                lazy, rev: false, ..
+            } if lazy == &M::id() => self.clone(),
             Tree {
                 left,
                 right,
@@ -160,6 +169,27 @@ impl<M: MAct> Node<M> {
                     Self::new(&left, &right, *color)
                 }
             }
+        }
+    }
+
+    fn lazy_push(&self) -> Option<(Rc<Self>, Rc<Self>)> {
+        match self {
+            Leaf { .. } => None,
+            Tree {
+                left,
+                right,
+                lazy,
+                rev,
+                ..
+            } => {
+                let (left, right) = (left.update(lazy, *rev), right.update(lazy, *rev));
+                if *rev {
+                    (right, left)
+                } else {
+                    (left, right)
+                }
+            }
+            .into(),
         }
     }
 
@@ -195,8 +225,8 @@ impl<M: MAct> Node<M> {
     fn to_black(self: &Rc<Self>) -> Rc<Self> {
         match self.color() {
             Red => {
-                let a = self.lazy_push();
-                Self::new(&a.left(), &a.right(), Black)
+                let (left, right) = self.lazy_push().unwrap();
+                Self::new(&left, &right, Black)
             }
             Black => self.clone(),
         }
@@ -209,7 +239,7 @@ impl<M: MAct> Node<M> {
 
     fn merge_sub(a: &Rc<Self>, b: &Rc<Self>) -> Rc<Self> {
         use std::cmp::Ordering::*;
-        let (a, b) = (a.lazy_push(), b.lazy_push());
+        let (a, b) = (a.push_new(), b.push_new());
         match Ord::cmp(&a.rank(), &b.rank()) {
             Less => {
                 let c = Self::merge_sub(&a, &b.left());
@@ -241,8 +271,7 @@ impl<M: MAct> Node<M> {
 
     fn split(self: &Rc<Self>, k: usize) -> (Rc<Self>, Rc<Self>) {
         use std::cmp::Ordering::*;
-        let a = self.lazy_push();
-        let Tree { left, right, .. } = a.as_ref() else { unreachable!(); };
+        let (left, right) = self.lazy_push().unwrap();
         match k.cmp(&left.len()) {
             Less => {
                 let (l, r) = left.split(k);
@@ -257,10 +286,9 @@ impl<M: MAct> Node<M> {
     }
 
     fn dump(self: &Rc<Self>, dump: &mut Vec<M::S>) {
-        let a = self.lazy_push();
-        match a.as_ref() {
-            Leaf { val } => dump.push(val.clone()),
-            Tree { left, right, .. } => {
+        match self.lazy_push() {
+            None => dump.push(self.val().clone()),
+            Some((left, right)) => {
                 left.dump(dump);
                 right.dump(dump);
             }
@@ -353,6 +381,9 @@ impl<M: MAct> RedBlackTree<M> {
     }
 
     pub fn apply(&self, range: Range<usize>, f: M::F) -> Self {
+        if f == M::id() {
+            return self.clone();
+        }
         let (l, m, r) = self.split3(range);
         let m = m.top.map(|top| top.update(&f, false)).into();
         l.merge(&m).merge(&r)
