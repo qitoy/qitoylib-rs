@@ -495,6 +495,37 @@
 <a href="#460" id="460">460</a>
 <a href="#461" id="461">461</a>
 <a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
+<a href="#470" id="470">470</a>
+<a href="#471" id="471">471</a>
+<a href="#472" id="472">472</a>
+<a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
+<a href="#485" id="485">485</a>
+<a href="#486" id="486">486</a>
+<a href="#487" id="487">487</a>
+<a href="#488" id="488">488</a>
+<a href="#489" id="489">489</a>
+<a href="#490" id="490">490</a>
+<a href="#491" id="491">491</a>
+<a href="#492" id="492">492</a>
+<a href="#493" id="493">493</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::ops::Range;
 <span class="kw">use </span>std::rc::Rc;
 
@@ -572,6 +603,12 @@
     }
 }
 
+<span class="kw">impl</span>&lt;M: MAct&gt; Default <span class="kw">for </span>Node&lt;M&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        Leaf { val: M::e() }
+    }
+}
+
 <span class="kw">impl</span>&lt;M: MAct&gt; Node&lt;M&gt; {
     <span class="kw">fn </span>new(left: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;, right: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;, color: Color) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
         Tree {
@@ -639,9 +676,12 @@
         }
     }
 
-    <span class="kw">fn </span>lazy_push(<span class="self">self</span>: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
+    <span class="kw">fn </span>push_new(<span class="self">self</span>: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
         <span class="kw">match </span><span class="self">self</span>.as_ref() {
             Leaf { .. } =&gt; <span class="self">self</span>.clone(),
+            Tree {
+                lazy, rev: <span class="bool-val">false</span>, ..
+            } <span class="kw">if </span>lazy == <span class="kw-2">&amp;</span>M::id() =&gt; <span class="self">self</span>.clone(),
             Tree {
                 left,
                 right,
@@ -657,6 +697,27 @@
                     <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right, <span class="kw-2">*</span>color)
                 }
             }
+        }
+    }
+
+    <span class="kw">fn </span>lazy_push(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(Rc&lt;<span class="self">Self</span>&gt;, Rc&lt;<span class="self">Self</span>&gt;)&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Leaf { .. } =&gt; <span class="prelude-val">None</span>,
+            Tree {
+                left,
+                right,
+                lazy,
+                rev,
+                ..
+            } =&gt; {
+                <span class="kw">let </span>(left, right) = (left.update(lazy, <span class="kw-2">*</span>rev), right.update(lazy, <span class="kw-2">*</span>rev));
+                <span class="kw">if </span><span class="kw-2">*</span>rev {
+                    (right, left)
+                } <span class="kw">else </span>{
+                    (left, right)
+                }
+            }
+            .into(),
         }
     }
 
@@ -692,8 +753,8 @@
     </span><span class="kw">fn </span>to_black(<span class="self">self</span>: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
         <span class="kw">match </span><span class="self">self</span>.color() {
             Red =&gt; {
-                <span class="kw">let </span>a = <span class="self">self</span>.lazy_push();
-                <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>a.left(), <span class="kw-2">&amp;</span>a.right(), Black)
+                <span class="kw">let </span>(left, right) = <span class="self">self</span>.lazy_push().unwrap();
+                <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right, Black)
             }
             Black =&gt; <span class="self">self</span>.clone(),
         }
@@ -706,7 +767,7 @@
 
     <span class="kw">fn </span>merge_sub(a: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;, b: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
         <span class="kw">use </span>std::cmp::Ordering::<span class="kw-2">*</span>;
-        <span class="kw">let </span>(a, b) = (a.lazy_push(), b.lazy_push());
+        <span class="kw">let </span>(a, b) = (a.push_new(), b.push_new());
         <span class="kw">match </span>Ord::cmp(<span class="kw-2">&amp;</span>a.rank(), <span class="kw-2">&amp;</span>b.rank()) {
             Less =&gt; {
                 <span class="kw">let </span>c = <span class="self">Self</span>::merge_sub(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b.left());
@@ -738,8 +799,7 @@
 
     <span class="kw">fn </span>split(<span class="self">self</span>: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;, k: usize) -&gt; (Rc&lt;<span class="self">Self</span>&gt;, Rc&lt;<span class="self">Self</span>&gt;) {
         <span class="kw">use </span>std::cmp::Ordering::<span class="kw-2">*</span>;
-        <span class="kw">let </span>a = <span class="self">self</span>.lazy_push();
-        <span class="kw">let </span>Tree { left, right, .. } = a.as_ref() <span class="kw">else </span>{ <span class="macro">unreachable!</span>(); };
+        <span class="kw">let </span>(left, right) = <span class="self">self</span>.lazy_push().unwrap();
         <span class="kw">match </span>k.cmp(<span class="kw-2">&amp;</span>left.len()) {
             Less =&gt; {
                 <span class="kw">let </span>(l, r) = left.split(k);
@@ -754,10 +814,9 @@
     }
 
     <span class="kw">fn </span>dump(<span class="self">self</span>: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;, dump: <span class="kw-2">&amp;mut </span>Vec&lt;M::S&gt;) {
-        <span class="kw">let </span>a = <span class="self">self</span>.lazy_push();
-        <span class="kw">match </span>a.as_ref() {
-            Leaf { val } =&gt; dump.push(val.clone()),
-            Tree { left, right, .. } =&gt; {
+        <span class="kw">match </span><span class="self">self</span>.lazy_push() {
+            <span class="prelude-val">None </span>=&gt; dump.push(<span class="self">self</span>.val().clone()),
+            <span class="prelude-val">Some</span>((left, right)) =&gt; {
                 left.dump(dump);
                 right.dump(dump);
             }
@@ -850,6 +909,9 @@
     }
 
     <span class="kw">pub fn </span>apply(<span class="kw-2">&amp;</span><span class="self">self</span>, range: Range&lt;usize&gt;, f: M::F) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>f == M::id() {
+            <span class="kw">return </span><span class="self">self</span>.clone();
+        }
         <span class="kw">let </span>(l, m, r) = <span class="self">self</span>.split3(range);
         <span class="kw">let </span>m = m.top.map(|top| top.update(<span class="kw-2">&amp;</span>f, <span class="bool-val">false</span>)).into();
         l.merge(<span class="kw-2">&amp;</span>m).merge(<span class="kw-2">&amp;</span>r)
