@@ -272,16 +272,47 @@ impl<M: MAct> Node<M> {
     fn split(self: &Rc<Self>, k: usize) -> (Rc<Self>, Rc<Self>) {
         use std::cmp::Ordering::*;
         let (left, right) = self.lazy_push().unwrap();
-        match k.cmp(&left.len()) {
+        let len = left.len();
+        match k.cmp(&len) {
             Less => {
                 let (l, r) = left.split(k);
                 (l, r.merge(&right.to_black()))
             }
             Greater => {
-                let (l, r) = right.split(k - left.len());
+                let (l, r) = right.split(k - len);
                 (left.to_black().merge(&l), r)
             }
             Equal => (left.to_black(), right.to_black()),
+        }
+    }
+
+    /// 0 < l < r < n
+    fn split3(self: &Rc<Self>, kl: usize, kr: usize) -> (Rc<Self>, Rc<Self>, Rc<Self>) {
+        use std::cmp::Ordering::*;
+        let (left, right) = self.lazy_push().unwrap();
+        let len = left.len();
+        match (kl.cmp(&len), kr.cmp(&len)) {
+            (_, Less) => {
+                let (l, m, r) = left.split3(kl, kr);
+                (l, m, r.merge(&right.to_black()))
+            }
+            (_, Equal) => {
+                let (l, m) = left.split(kl);
+                (l, m, right.to_black())
+            }
+            (Less, Greater) => {
+                let (l, ml) = left.split(kl);
+                let (mr, r) = right.split(kr - len);
+                (l, ml.merge(&mr), r)
+            }
+            (Equal, _) => {
+                let (m, r) = right.split(kr - len);
+                (left.to_black(), m, r)
+            }
+            (Greater, _) => {
+                let (l, m, r) = right.split3(kl - len, kr - len);
+                (left.to_black().merge(&l), m, r)
+            }
         }
     }
 
@@ -329,6 +360,10 @@ impl<M: MAct> RedBlackTree<M> {
         Node::<M>::leaf(val).into()
     }
 
+    pub fn rank(&self) -> Option<usize> {
+        self.top.as_ref().map(|top| top.rank())
+    }
+
     pub fn len(&self) -> usize {
         self.top.as_ref().map_or(0, |top| top.len())
     }
@@ -342,6 +377,14 @@ impl<M: MAct> RedBlackTree<M> {
             (None, b) => b.clone().into(),
             (a, None) => a.clone().into(),
             (Some(a), Some(b)) => a.merge(b).into(),
+        }
+    }
+
+    pub fn merge3(&self, m: &Self, r: &Self) -> Self {
+        if self.rank() < r.rank() {
+            self.merge(m).merge(r)
+        } else {
+            self.merge(&m.merge(r))
         }
     }
 
@@ -359,15 +402,27 @@ impl<M: MAct> RedBlackTree<M> {
 
     pub fn split3(&self, range: Range<usize>) -> (Self, Self, Self) {
         let (l, r) = (range.start, range.end);
-        let (m, r) = self.split(r);
-        let (l, m) = m.split(l);
-        (l, m, r)
+        assert!(r <= self.len());
+        if l == 0 {
+            let (m, r) = self.split(r);
+            return (Self::default(), m, r)
+        }
+        if r == self.len() {
+            let (l, m) = self.split(l);
+            return (l, m, Self::default())
+        }
+        if l == r {
+            let (l, r) = self.split(l);
+            return (l, Self::default(), r)
+        }
+        let (l, m, r) = self.top.as_ref().unwrap().split3(l, r);
+        (l.into(), m.into(), r.into())
     }
 
     pub fn insert(&self, p: usize, val: M::S) -> Self {
         let (l, r) = self.split(p);
         let m = Self::new(val);
-        l.merge(&m).merge(&r)
+        l.merge3(&m, &r)
     }
 
     pub fn erase(&self, p: usize) -> Self {
@@ -386,13 +441,13 @@ impl<M: MAct> RedBlackTree<M> {
         }
         let (l, m, r) = self.split3(range);
         let m = m.top.map(|top| top.update(&f, false)).into();
-        l.merge(&m).merge(&r)
+        l.merge3(&m, &r)
     }
 
     pub fn reverse(&self, range: Range<usize>) -> Self {
         let (l, m, r) = self.split3(range);
         let m = m.top.map(|top| top.update(&M::id(), true)).into();
-        l.merge(&m).merge(&r)
+        l.merge3(&m, &r)
     }
 
     pub fn dump(&self) -> Vec<M::S> {
@@ -459,7 +514,7 @@ mod test {
         // [1, 3, 6], [7, 1, 4]
         let (_, m) = t2.split(3);
         // 1, 1, 7, 1, 4, 4
-        let t3 = l.merge(&m).merge(&r);
+        let t3 = l.merge3(&m, &r);
         assert_eq!(t3.dump(), vec![1, 1, 7, 1, 4, 4]);
         // 1, 4, 1, 7, 1, 4
         let t4 = t3.reverse(1..5);
