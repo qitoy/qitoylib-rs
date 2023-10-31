@@ -118,20 +118,6 @@
 <a href="#83" id="83">83</a>
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
 </pre></div><pre class="rust"><code><span class="kw">use super</span>::{verify, Verify};
 
 <span class="kw">struct </span>RedBlackTree;
@@ -139,6 +125,7 @@
 <span class="kw">impl </span>Verify <span class="kw">for </span>RedBlackTree {
     <span class="kw">fn </span>solve(input: <span class="kw-2">&amp;</span>str, stdout: <span class="kw-2">&amp;mut </span>String) {
         <span class="kw">use </span>proconio::input;
+        <span class="kw">use </span>qitoy_derive::query_readable;
         <span class="kw">use </span>qitoy_red_black_tree::{MAct, RedBlackTree};
         <span class="kw">use </span>std::fmt::Write;
 
@@ -173,56 +160,41 @@
             }
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>source = proconio::source::once::OnceSource::from(input);
+        <span class="macro">query_readable! </span>{
+            Query {
+                { i: usize, x: u64 },
+                { i: usize },
+                { l: usize, r: usize },
+                { l: usize, r: usize, b: u64, c: u64 },
+                { l: usize, r: usize },
+            }
+        }
+
+        <span class="kw">let </span>source = proconio::source::once::OnceSource::from(input);
         <span class="macro">input! </span>{
-            from <span class="kw-2">&amp;mut </span>source,
+            from source,
             n: usize, q: usize,
             a: [u64; n],
+            q: [Query; q],
         }
         <span class="kw">let </span><span class="kw-2">mut </span>rbt: RedBlackTree&lt;F&gt; = a.into_iter().collect();
-        <span class="kw">for _ in </span><span class="number">0</span>..q {
-            <span class="macro">input! </span>{
-                from <span class="kw-2">&amp;mut </span>source,
-                q: usize,
-            }
+        <span class="kw">for </span>q <span class="kw">in </span>q {
             <span class="kw">match </span>q {
-                <span class="number">0 </span>=&gt; {
-                    <span class="macro">input! </span>{
-                        from <span class="kw-2">&amp;mut </span>source,
-                        i: usize, x: u64,
-                    }
+                Query::Query0 { i, x } =&gt; {
                     rbt = rbt.insert(i, x);
                 }
-                <span class="number">1 </span>=&gt; {
-                    <span class="macro">input! </span>{
-                        from <span class="kw-2">&amp;mut </span>source,
-                        i: usize,
-                    }
+                Query::Query1 { i } =&gt; {
                     rbt = rbt.erase(i);
                 }
-                <span class="number">2 </span>=&gt; {
-                    <span class="macro">input! </span>{
-                        from <span class="kw-2">&amp;mut </span>source,
-                        l: usize, r: usize,
-                    }
+                Query::Query2 { l, r } =&gt; {
                     rbt = rbt.reverse(l..r);
                 }
-                <span class="number">3 </span>=&gt; {
-                    <span class="macro">input! </span>{
-                        from <span class="kw-2">&amp;mut </span>source,
-                        l: usize, r: usize,
-                        b: u64, c: u64,
-                    }
+                Query::Query3 { l, r, b, c } =&gt; {
                     rbt = rbt.apply(l..r, (b, c));
                 }
-                <span class="number">4 </span>=&gt; {
-                    <span class="macro">input! </span>{
-                        from <span class="kw-2">&amp;mut </span>source,
-                        l: usize, r: usize,
-                    }
+                Query::Query4 { l, r } =&gt; {
                     <span class="macro">writeln!</span>(stdout, <span class="string">&quot;{}&quot;</span>, rbt.prod(l..r)).unwrap();
                 }
-                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
             }
         }
     }
