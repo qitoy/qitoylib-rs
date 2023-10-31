@@ -5,6 +5,7 @@ struct RedBlackTree;
 impl Verify for RedBlackTree {
     fn solve(input: &str, stdout: &mut String) {
         use proconio::input;
+        use qitoy_derive::query_readable;
         use qitoy_red_black_tree::{MAct, RedBlackTree};
         use std::fmt::Write;
 
@@ -39,56 +40,41 @@ impl Verify for RedBlackTree {
             }
         }
 
-        let mut source = proconio::source::once::OnceSource::from(input);
+        query_readable! {
+            Query {
+                { i: usize, x: u64 },
+                { i: usize },
+                { l: usize, r: usize },
+                { l: usize, r: usize, b: u64, c: u64 },
+                { l: usize, r: usize },
+            }
+        }
+
+        let source = proconio::source::once::OnceSource::from(input);
         input! {
-            from &mut source,
+            from source,
             n: usize, q: usize,
             a: [u64; n],
+            q: [Query; q],
         }
         let mut rbt: RedBlackTree<F> = a.into_iter().collect();
-        for _ in 0..q {
-            input! {
-                from &mut source,
-                q: usize,
-            }
+        for q in q {
             match q {
-                0 => {
-                    input! {
-                        from &mut source,
-                        i: usize, x: u64,
-                    }
+                Query::Query0 { i, x } => {
                     rbt = rbt.insert(i, x);
                 }
-                1 => {
-                    input! {
-                        from &mut source,
-                        i: usize,
-                    }
+                Query::Query1 { i } => {
                     rbt = rbt.erase(i);
                 }
-                2 => {
-                    input! {
-                        from &mut source,
-                        l: usize, r: usize,
-                    }
+                Query::Query2 { l, r } => {
                     rbt = rbt.reverse(l..r);
                 }
-                3 => {
-                    input! {
-                        from &mut source,
-                        l: usize, r: usize,
-                        b: u64, c: u64,
-                    }
+                Query::Query3 { l, r, b, c } => {
                     rbt = rbt.apply(l..r, (b, c));
                 }
-                4 => {
-                    input! {
-                        from &mut source,
-                        l: usize, r: usize,
-                    }
+                Query::Query4 { l, r } => {
                     writeln!(stdout, "{}", rbt.prod(l..r)).unwrap();
                 }
-                _ => unreachable!(),
             }
         }
     }

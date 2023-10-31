@@ -6,7 +6,8 @@ edition = "2021"
 [dependencies]
 ac-library-rs = { workspace = true }
 anyhow = "1.0.75"
-proconio = "0.4.5"
+proconio = { workspace = true }
+qitoy-derive = { path = "../proc/derive" }
 qitoy-mo = { path = "../algorithm/mo" }
 qitoy-prelude = { path = "../prelude" }
 qitoy-rerooting_dp = { path = "../algorithm/rerooting_dp" }
