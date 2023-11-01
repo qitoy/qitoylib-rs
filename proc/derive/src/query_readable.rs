@@ -74,7 +74,7 @@ fn make_enum(item: &QueryEnum) -> TokenStream {
                 .values
                 .iter()
                 .map(|Value { ident, ty, .. }| {
-                    quote! { #ident: <#ty as ::proconio::source::Readable>::Output, }
+                    quote! { #ident: <#ty as proconio::source::Readable>::Output, }
                 })
                 .collect();
             quote! {
@@ -110,9 +110,9 @@ fn make_impl(item: &QueryEnum) -> TokenStream {
         })
         .collect();
     quote! {
-        impl ::proconio::source::Readable for #ident {
+        impl proconio::source::Readable for #ident {
             type Output = Self;
-            fn read<R: ::std::io::BufRead, S: ::proconio::source::Source<R>>(
+            fn read<R: std::io::BufRead, S: proconio::source::Source<R>>(
                 source: &mut S
             ) -> Self::Output {
                 match usize::read(source) {
@@ -147,18 +147,18 @@ mod test {
                 enum Query {
                     Query0 {},
                     Query1 {
-                        a: <Usize1 as ::proconio::source::Readable>::Output,
-                        b: <usize as ::proconio::source::Readable>::Output,
+                        a: <Usize1 as proconio::source::Readable>::Output,
+                        b: <usize as proconio::source::Readable>::Output,
                     },
                     Query2 {
-                        hoge: <i32 as ::proconio::source::Readable>::Output,
-                        fuga: <Chars as ::proconio::source::Readable>::Output,
+                        hoge: <i32 as proconio::source::Readable>::Output,
+                        fuga: <Chars as proconio::source::Readable>::Output,
                     },
                 }
 
-                impl ::proconio::source::Readable for Query {
+                impl proconio::source::Readable for Query {
                     type Output = Self;
-                    fn read<R: ::std::io::BufRead, S: ::proconio::source::Source<R>>(
+                    fn read<R: std::io::BufRead, S: proconio::source::Source<R>>(
                         source: &mut S
                     ) -> Self::Output {
                         match usize::read(source) {
