@@ -315,6 +315,21 @@ impl<M: MAct> Node<M> {
         }
     }
 
+    fn set(self: &Rc<Self>, p: usize, val: M::S) -> Rc<Self> {
+        match self.lazy_push() {
+            None => Self::leaf(val),
+            Some((left, right)) => {
+                let len = left.len();
+                let (left, right) = if p < len {
+                    (left.set(p, val), right)
+                } else {
+                    (left, right.set(p - len, val))
+                };
+                Self::new(&left, &right, self.color())
+            }
+        }
+    }
+
     fn prod(self: &Rc<Self>, l: usize, r: usize, lazy: &M::F, rev: bool) -> M::S {
         if l == r {
             return M::e();
@@ -502,8 +517,7 @@ impl<M: MAct> RedBlackTree<M> {
     }
 
     pub fn set(&self, p: usize, val: M::S) -> Self {
-        let (l, _, r) = self.split3(p..p + 1);
-        l.merge3(&Self::new(val), &r)
+        self.top.as_ref().map(|top| top.set(p, val)).into()
     }
 
     pub fn prod(&self, range: Range<usize>) -> M::S {

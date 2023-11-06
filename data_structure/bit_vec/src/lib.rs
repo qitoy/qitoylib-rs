@@ -1,164 +1,117 @@
-extern crate amplify;
-use amplify::num::u1024;
+use qitoy_bit_util::BitUtil;
 
-#[derive(Debug)]
+/// コンパクト辞書
 pub struct BitVec {
     len: usize,
-    data: Vec<u1024>,
-    large: Vec<u32>,
-    small: Vec<u16>,
+    data: Vec<u64>,
+    block: Vec<u32>,
 }
 
-trait PopCount {
-    fn popcount(&self) -> u32;
-}
-
-impl PopCount for u1024 {
-    fn popcount(&self) -> u32 {
-        self.as_inner()
+impl std::fmt::Debug for BitVec {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let data: String = self
+            .data
             .iter()
-            .fold(0, |acc, x| acc + x.count_ones())
-    }
-}
-
-impl<T: Into<u1024> + Copy> From<Vec<T>> for BitVec {
-    fn from(value: Vec<T>) -> Self {
-        let len = (value.len() >> 10) + 1;
-        let mut data = vec![u1024::ZERO; len];
-        for i in 0..value.len() {
-            data[i >> 10] |= value[i].into() << (i & 1023);
-        }
-        let data = data;
-        let large = std::iter::once(&u1024::ZERO)
-            .chain(data.iter())
-            .scan(0, |state, &x| {
-                *state += x.popcount();
-                Some(*state)
+            .enumerate()
+            .flat_map(|(i, d)| {
+                format!("{d:064b}")
+                    .chars()
+                    .rev()
+                    .take(self.len - i * 64)
+                    .chain([' '])
+                    .collect::<Vec<_>>()
             })
-            .take(len)
             .collect();
-        let mut small = vec![0; len << 6];
-        for (i, &data) in data.iter().enumerate() {
-            for j in 0..63 {
-                let idx = i << 6 | j;
-                let mask: u1024 = u16::MAX.into();
-                small[idx + 1] = small[idx] + (data >> (16 * j) & mask).popcount() as u16;
-            }
-        }
-        Self {
-            len: value.len(),
-            data,
-            large,
-            small,
-        }
+        f.debug_struct("BitVec")
+            .field("len", &self.len)
+            .field("data", &data)
+            .field("block", &self.block)
+            .finish()
     }
 }
 
-fn lower_bound<T: Ord>(arr: &[T], val: T) -> usize {
-    let (mut left, mut right) = (0, arr.len());
-    while left != right {
-        let mid = (left + right) / 2;
-        if arr[mid] >= val {
-            right = mid;
-        } else {
-            left = mid + 1;
+impl<I: Into<u64>> FromIterator<I> for BitVec {
+    fn from_iter<T: IntoIterator<Item = I>>(iter: T) -> Self {
+        let v: Vec<u64> = iter.into_iter().map(|i| i.into()).collect();
+        let len = v.len();
+        let mut data = vec![0u64; (len + 63) / 64];
+        let mut block = vec![0; (len + 63) / 64];
+        for i in v
+            .into_iter()
+            .enumerate()
+            .filter_map(|(i, v)| if v == 1 { Some(i) } else { None })
+        {
+            data[i / 64].bit_set(i % 64);
         }
+        for (i, &d) in data.iter().enumerate().take(data.len() - 1) {
+            block[i + 1] = block[i] + d.count_ones();
+        }
+        Self { len, data, block }
     }
-    left
 }
 
 impl BitVec {
     pub fn len(&self) -> usize {
         self.len
     }
+
     pub fn is_empty(&self) -> bool {
         self.len == 0
     }
-    pub fn at(&self, n: usize) -> bool {
-        self.data[n >> 10].bit(n & 1023)
+
+    pub fn at(&self, p: usize) -> bool {
+        self.data[p / 64].bit_get(p % 64)
     }
-    pub fn rank1(&self, n: usize) -> u32 {
-        assert!(n <= self.len);
-        let m = n & 1023;
-        let mask = (u1024::ONE << m) - (u1024::ONE << (m >> 4 << 4));
-        self.large[n >> 10] + self.small[n >> 4] as u32 + (self.data[n >> 10] & mask).popcount()
+
+    pub fn rank1(&self, p: usize) -> usize {
+        (self.block[p / 64] + masked(self.data[p / 64], p % 64).count_ones()) as usize
     }
-    pub fn rank0(&self, n: usize) -> u32 {
-        n as u32 - self.rank1(n)
+
+    pub fn rank0(&self, p: usize) -> usize {
+        p - self.rank1(p)
     }
-    pub fn select1(&self, n: u32) -> Option<usize> {
+
+    pub fn select1(&self, n: usize) -> Option<usize> {
         if n == 0 {
             return Some(0);
         }
-        let i = lower_bound(&self.large, n) - 1;
-        let n = (n - self.large[i]) as u16;
-        let j = lower_bound(&self.small[i << 6..(i + 1) << 6], n) - 1;
-        let mut n = n - self.small[i << 6 | j];
-        for k in 0..16 {
-            let k = i << 10 | j << 4 | k;
-            if n == 0 {
-                return Some(k);
-            }
-            if self.at(k) {
-                n -= 1;
-            }
-        }
-        if n == 0 {
-            Some((i << 10 | j << 4) + 16)
-        } else {
-            None
-        }
+        let n = n as u32;
+        let idx = self.block.partition_point(|&b| b < n) - 1;
+        let n = n - self.block[idx];
+        (0..64)
+            .filter(|i| self.data[idx].bit_get(i))
+            .nth(n as usize - 1)
+            .map(|i| idx * 64 + i)
     }
-    pub fn select0(&self, n: u32) -> Option<usize> {
-        self._select0(n).filter(|&r| r <= self.len)
-    }
-    fn _select0(&self, n: u32) -> Option<usize> {
+
+    pub fn select0(&self, n: usize) -> Option<usize> {
         if n == 0 {
             return Some(0);
         }
-        let i = {
-            let arr = &self.large;
-            let (mut left, mut right) = (0, arr.len());
-            while left != right {
-                let mid = (left + right) / 2;
-                if ((mid as u32) << 10) - arr[mid] >= n {
-                    right = mid;
+        let n = n as u32;
+        let idx = {
+            let (mut l, mut r) = (0, self.block.len());
+            while r - l > 1 {
+                let mid = (l + r) / 2;
+                if mid as u32 * 64 - self.block[mid] < n {
+                    l = mid;
                 } else {
-                    left = mid + 1;
+                    r = mid;
                 }
             }
-            left
-        } - 1;
-        let n = (n + self.large[i] - ((i as u32) << 10)) as u16;
-        let j = {
-            let arr = &self.small[i << 6..(i + 1) << 6];
-            let (mut left, mut right) = (0, arr.len());
-            while left != right {
-                let mid = (left + right) / 2;
-                if ((mid as u16) << 4) - arr[mid] >= n {
-                    right = mid;
-                } else {
-                    left = mid + 1;
-                }
-            }
-            left
-        } - 1;
-        let mut n = n + self.small[i << 6 | j] - ((j as u16) << 4);
-        for k in 0..16 {
-            let k = i << 10 | j << 4 | k;
-            if n == 0 {
-                return Some(k);
-            }
-            if !self.at(k) {
-                n -= 1;
-            }
-        }
-        if n == 0 {
-            Some((i << 10 | j << 4) + 16)
-        } else {
-            None
-        }
+            l
+        };
+        let n = n - (idx as u32 * 64 - self.block[idx]);
+        (0..64)
+            .filter(|i| !self.data[idx].bit_get(i))
+            .nth(n as usize - 1)
+            .map(|i| idx * 64 + i)
+            .filter(|&i| i < self.len)
     }
+}
+
+fn masked(bit: u64, len: usize) -> u64 {
+    bit & ((1 << len) - 1)
 }
 
 #[cfg(test)]
@@ -172,7 +125,7 @@ mod tests {
 
     #[test]
     fn print() {
-        let bv = BitVec::from(vec![1u32; 1030]);
+        let bv: BitVec = std::iter::repeat(1u32).take(1030).collect();
         eprintln!("{:?}", bv);
         eprintln!("{}", bv.rank1(1030));
         eprintln!("{:?}", bv.select1(100));
@@ -182,11 +135,11 @@ mod tests {
     #[test]
     fn bitvec() {
         let mut rng = thread_rng();
-        let vec: Vec<u32> = (&mut rng)
-            .sample_iter(Uniform::from(0..=1))
+        let bv: BitVec = (&mut rng)
+            .sample_iter(Uniform::from(0u32..=1))
             .take(10000)
             .collect();
-        let bv = BitVec::from(vec);
+        eprintln!("{bv:?}");
         let mut rank1 = vec![0; 10001];
         let mut rank0 = vec![0; 10001];
         let mut select1 = vec![0];
@@ -195,33 +148,20 @@ mod tests {
             if bv.at(i) {
                 rank1[i + 1] = rank1[i] + 1;
                 rank0[i + 1] = rank0[i];
-                select1.push(i + 1);
+                select1.push(i);
             } else {
                 rank1[i + 1] = rank1[i];
                 rank0[i + 1] = rank0[i] + 1;
-                select0.push(i + 1);
+                select0.push(i);
             }
         }
-        for _ in 0..10000 {
-            let r: usize = rng.sample(Uniform::from(0..10000));
-            eprintln!("test for rank1");
-            assert_eq!(rank1[r], bv.rank1(r));
-            eprintln!("test for rank0");
-            assert_eq!(rank0[r], bv.rank0(r));
+        for r in 0..10000 {
+            assert_eq!(bv.rank1(r), rank1[r], "rank1({r})");
+            assert_eq!(bv.rank0(r), rank0[r], "rank0({r})");
             // eprintln!("rank({}) is {}", r, bv.rank1(r));
             // eprintln!("select({}) is {:?}", r, bv.select1(r as u32));
-            eprintln!("test for select1");
-            if let Some(idx) = bv.select1(r as u32) {
-                assert_eq!(select1[r], idx);
-            } else {
-                assert_eq!(select1.get(r), None);
-            }
-            eprintln!("test for select0");
-            if let Some(idx) = bv.select0(r as u32) {
-                assert_eq!(select0[r], idx);
-            } else {
-                assert_eq!(select0.get(r), None);
-            }
+            assert_eq!(bv.select1(r), select1.get(r).copied(), "select1({r})");
+            assert_eq!(bv.select0(r), select0.get(r).copied(), "select0({r})");
         }
     }
 }

@@ -1,6 +1,8 @@
 [package]
-name = "qitoy-data_structure-wavelet_matrix"
+name = "qitoy-wavelet_matrix"
 version = "0.1.0"
+edition = "2021"
 
 [dependencies]
-qitoy-data_structure-bit_vec = { path = "../bit_vec" }
+qitoy-bit_vec = { path = "../bit_vec" }
+qitoy-bit_util = { path = "../../trait/bit_util" }

@@ -1,9 +1,10 @@
 [package]
-name = "qitoy-data_structure-bit_vec"
+name = "qitoy-bit_vec"
 version = "0.1.0"
+edition = "2021"
 
 [dependencies]
-amplify = { workspace = true }
+qitoy-bit_util = { path = "../../trait/bit_util" }
 
 [dev-dependencies]
 rand = { workspace = true }
