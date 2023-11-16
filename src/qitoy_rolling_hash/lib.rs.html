@@ -184,21 +184,26 @@
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
 <a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! ローリングハッシュ
 
-</span><span class="kw">extern crate </span>once_cell;
-<span class="kw">extern crate </span>rand;
-<span class="kw">use </span>ac_library::Monoid;
-<span class="kw">use </span>once_cell::sync::Lazy;
+</span><span class="kw">use </span>ac_library::Monoid;
 <span class="kw">use </span>rand::{
     distributions::{Distribution, Uniform},
     rngs::SmallRng,
     SeedableRng,
 };
+<span class="kw">use </span>std::cell::OnceCell;
 
 <span class="doccomment">/// ロリハ
 /// [`Monoid`](ac_library::Monoid)として使う。
-</span><span class="kw">pub struct </span>RollingHash;
+</span><span class="kw">pub enum </span>RollingHash {}
 
 <span class="kw">impl </span>RollingHash {
     <span class="kw">const </span>MOD: u64 = (<span class="number">1 </span>&lt;&lt; <span class="number">61</span>) - <span class="number">1</span>;
@@ -213,33 +218,38 @@
 
     <span class="doccomment">/// https://trap.jp/post/1036/
     </span><span class="kw">fn </span>bases() -&gt; (u64, u64) {
-        <span class="kw">static </span>BASES: Lazy&lt;(u64, u64)&gt; = Lazy::new(|| {
-            <span class="kw">let </span>gcd = |<span class="kw-2">mut </span>x, <span class="kw-2">mut </span>y| {
-                <span class="kw">while </span>y &gt; <span class="number">0 </span>{
-                    (x, y) = (y, x % y)
-                }
-                x
-            };
-            <span class="kw">let </span><span class="kw-2">mut </span>rng = SmallRng::from_entropy();
-            <span class="kw">let </span>range = Uniform::from(<span class="number">0</span>..RollingHash::MOD);
-            <span class="kw">let </span><span class="kw-2">mut </span>base = |b| <span class="kw">loop </span>{
-                <span class="kw">let </span>k = range.sample(<span class="kw-2">&amp;mut </span>rng);
-                <span class="kw">if </span>gcd(k, RollingHash::MOD - <span class="number">1</span>) != <span class="number">1 </span>{
-                    <span class="kw">continue</span>;
-                }
-                <span class="kw">let </span>r = RollingHash::pow(RollingHash::ROOT, k);
-                <span class="kw">if </span>r &lt;= RollingHash::CHARSIZE || r == b {
-                    <span class="kw">continue</span>;
-                }
-                <span class="kw">return </span>r;
-            };
-            <span class="kw">let </span>b1 = base(<span class="number">0</span>);
-            (b1, base(b1))
-        });
-        <span class="kw-2">*</span>BASES
+        <span class="macro">thread_local! </span>{
+            <span class="kw">static </span>BASES: OnceCell&lt;(u64, u64)&gt; = OnceCell::new();
+        }
+        BASES.with(|bases| {
+            <span class="kw-2">*</span>bases.get_or_init(|| {
+                <span class="kw">let </span>gcd = |<span class="kw-2">mut </span>x, <span class="kw-2">mut </span>y| {
+                    <span class="kw">while </span>y &gt; <span class="number">0 </span>{
+                        (x, y) = (y, x % y)
+                    }
+                    x
+                };
+                <span class="kw">let </span><span class="kw-2">mut </span>rng = SmallRng::from_entropy();
+                <span class="kw">let </span>range = Uniform::from(<span class="number">0</span>..RollingHash::MOD);
+                <span class="kw">let </span><span class="kw-2">mut </span>base = |b| <span class="kw">loop </span>{
+                    <span class="kw">let </span>k = range.sample(<span class="kw-2">&amp;mut </span>rng);
+                    <span class="kw">if </span>gcd(k, RollingHash::MOD - <span class="number">1</span>) != <span class="number">1 </span>{
+                        <span class="kw">continue</span>;
+                    }
+                    <span class="kw">let </span>r = RollingHash::pow(RollingHash::ROOT, k);
+                    <span class="kw">if </span>r &lt;= RollingHash::CHARSIZE || r == b {
+                        <span class="kw">continue</span>;
+                    }
+                    <span class="kw">return </span>r;
+                };
+                <span class="kw">let </span>b1 = base(<span class="number">0</span>);
+                (b1, base(b1))
+            })
+        })
     }
 
-    <span class="kw">fn </span>add(a: u64, b: u64) -&gt; u64 {
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>add(a: u64, b: u64) -&gt; u64 {
         <span class="kw">let </span>c = a + b;
         <span class="kw">if </span>c &gt;= <span class="self">Self</span>::MOD {
             c - <span class="self">Self</span>::MOD
@@ -248,7 +258,8 @@
         }
     }
 
-    <span class="kw">fn </span>neg(a: u64) -&gt; u64 {
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>neg(a: u64) -&gt; u64 {
         <span class="kw">if </span>a == <span class="number">0 </span>{
             <span class="number">0
         </span>} <span class="kw">else </span>{
@@ -256,18 +267,21 @@
         }
     }
 
-    <span class="kw">fn </span>sub(a: u64, b: u64) -&gt; u64 {
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>sub(a: u64, b: u64) -&gt; u64 {
         <span class="self">Self</span>::add(a, <span class="self">Self</span>::neg(b))
     }
 
-    <span class="kw">fn </span>mul(a: u64, b: u64) -&gt; u64 {
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>mul(a: u64, b: u64) -&gt; u64 {
         <span class="kw">let </span>c = (a <span class="kw">as </span>u128) * (b <span class="kw">as </span>u128);
         <span class="kw">let </span>m = <span class="self">Self</span>::MOD <span class="kw">as </span>u128;
         <span class="kw">let </span>c = (c &gt;&gt; <span class="number">61</span>) + (c &amp; m);
         (<span class="kw">if </span>c &gt;= m { c - m } <span class="kw">else </span>{ c }) <span class="kw">as </span>u64
     }
 
-    <span class="kw">fn </span>pow(<span class="kw-2">mut </span>a: u64, <span class="kw-2">mut </span>b: u64) -&gt; u64 {
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>pow(<span class="kw-2">mut </span>a: u64, <span class="kw-2">mut </span>b: u64) -&gt; u64 {
         <span class="kw">let </span><span class="kw-2">mut </span>c = <span class="number">1</span>;
         <span class="kw">while </span>b &gt; <span class="number">0 </span>{
             <span class="kw">if </span>b % <span class="number">2 </span>== <span class="number">1 </span>{

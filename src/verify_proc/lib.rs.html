@@ -154,7 +154,7 @@
     <span class="kw">let </span>item = <span class="macro">parse_macro_input!</span>(item <span class="kw">as </span>VerifyItem);
     <span class="kw">let </span><span class="kw-2">mut </span>verify = <span class="macro">vec!</span>[];
     <span class="kw">for </span>Verify { ident, path, .. } <span class="kw">in </span>item.verify {
-        <span class="kw">let </span>path = <span class="macro">format!</span>(<span class="string">&quot;./testcases/{}/*&quot;</span>, path.value());
+        <span class="kw">let </span>path = <span class="macro">format!</span>(<span class="string">&quot;./verify/{}/*&quot;</span>, path.value());
         <span class="kw">let </span>name: TokenStream2 = to_snake_case(ident.to_string()).parse().unwrap();
         verify.push(<span class="macro">quote! </span>{
             <span class="attr">#[rstest::rstest]

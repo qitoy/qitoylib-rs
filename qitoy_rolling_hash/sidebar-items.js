@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["RhVec","RollingHash"]};
+window.SIDEBAR_ITEMS = {"enum":["RollingHash"],"struct":["RhVec"]};

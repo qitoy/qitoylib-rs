@@ -659,6 +659,20 @@
 <a href="#624" id="624">624</a>
 <a href="#625" id="625">625</a>
 <a href="#626" id="626">626</a>
+<a href="#627" id="627">627</a>
+<a href="#628" id="628">628</a>
+<a href="#629" id="629">629</a>
+<a href="#630" id="630">630</a>
+<a href="#631" id="631">631</a>
+<a href="#632" id="632">632</a>
+<a href="#633" id="633">633</a>
+<a href="#634" id="634">634</a>
+<a href="#635" id="635">635</a>
+<a href="#636" id="636">636</a>
+<a href="#637" id="637">637</a>
+<a href="#638" id="638">638</a>
+<a href="#639" id="639">639</a>
+<a href="#640" id="640">640</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering::{Equal, Greater, Less};
 <span class="kw">use </span>std::fmt::Debug;
 <span class="kw">use </span>std::ops::Range;
@@ -976,6 +990,21 @@
         }
     }
 
+    <span class="kw">fn </span>set(<span class="self">self</span>: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;, p: usize, val: M::S) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">match </span><span class="self">self</span>.lazy_push() {
+            <span class="prelude-val">None </span>=&gt; <span class="self">Self</span>::leaf(val),
+            <span class="prelude-val">Some</span>((left, right)) =&gt; {
+                <span class="kw">let </span>len = left.len();
+                <span class="kw">let </span>(left, right) = <span class="kw">if </span>p &lt; len {
+                    (left.set(p, val), right)
+                } <span class="kw">else </span>{
+                    (left, right.set(p - len, val))
+                };
+                <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right, <span class="self">self</span>.color())
+            }
+        }
+    }
+
     <span class="kw">fn </span>prod(<span class="self">self</span>: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;, l: usize, r: usize, lazy: <span class="kw-2">&amp;</span>M::F, rev: bool) -&gt; M::S {
         <span class="kw">if </span>l == r {
             <span class="kw">return </span>M::e();
@@ -1163,8 +1192,7 @@
     }
 
     <span class="kw">pub fn </span>set(<span class="kw-2">&amp;</span><span class="self">self</span>, p: usize, val: M::S) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>(l, <span class="kw">_</span>, r) = <span class="self">self</span>.split3(p..p + <span class="number">1</span>);
-        l.merge3(<span class="kw-2">&amp;</span><span class="self">Self</span>::new(val), <span class="kw-2">&amp;</span>r)
+        <span class="self">self</span>.top.as_ref().map(|top| top.set(p, val)).into()
     }
 
     <span class="kw">pub fn </span>prod(<span class="kw-2">&amp;</span><span class="self">self</span>, range: Range&lt;usize&gt;) -&gt; M::S {
