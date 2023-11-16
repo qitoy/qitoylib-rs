@@ -1,18 +1,16 @@
 //! ローリングハッシュ
 
-extern crate once_cell;
-extern crate rand;
 use ac_library::Monoid;
-use once_cell::sync::Lazy;
 use rand::{
     distributions::{Distribution, Uniform},
     rngs::SmallRng,
     SeedableRng,
 };
+use std::cell::OnceCell;
 
 /// ロリハ
 /// [`Monoid`](ac_library::Monoid)として使う。
-pub struct RollingHash;
+pub enum RollingHash {}
 
 impl RollingHash {
     const MOD: u64 = (1 << 61) - 1;
@@ -27,32 +25,37 @@ impl RollingHash {
 
     /// https://trap.jp/post/1036/
     fn bases() -> (u64, u64) {
-        static BASES: Lazy<(u64, u64)> = Lazy::new(|| {
-            let gcd = |mut x, mut y| {
-                while y > 0 {
-                    (x, y) = (y, x % y)
-                }
-                x
-            };
-            let mut rng = SmallRng::from_entropy();
-            let range = Uniform::from(0..RollingHash::MOD);
-            let mut base = |b| loop {
-                let k = range.sample(&mut rng);
-                if gcd(k, RollingHash::MOD - 1) != 1 {
-                    continue;
-                }
-                let r = RollingHash::pow(RollingHash::ROOT, k);
-                if r <= RollingHash::CHARSIZE || r == b {
-                    continue;
-                }
-                return r;
-            };
-            let b1 = base(0);
-            (b1, base(b1))
-        });
-        *BASES
+        thread_local! {
+            static BASES: OnceCell<(u64, u64)> = OnceCell::new();
+        }
+        BASES.with(|bases| {
+            *bases.get_or_init(|| {
+                let gcd = |mut x, mut y| {
+                    while y > 0 {
+                        (x, y) = (y, x % y)
+                    }
+                    x
+                };
+                let mut rng = SmallRng::from_entropy();
+                let range = Uniform::from(0..RollingHash::MOD);
+                let mut base = |b| loop {
+                    let k = range.sample(&mut rng);
+                    if gcd(k, RollingHash::MOD - 1) != 1 {
+                        continue;
+                    }
+                    let r = RollingHash::pow(RollingHash::ROOT, k);
+                    if r <= RollingHash::CHARSIZE || r == b {
+                        continue;
+                    }
+                    return r;
+                };
+                let b1 = base(0);
+                (b1, base(b1))
+            })
+        })
     }
 
+    #[inline]
     fn add(a: u64, b: u64) -> u64 {
         let c = a + b;
         if c >= Self::MOD {
@@ -62,6 +65,7 @@ impl RollingHash {
         }
     }
 
+    #[inline]
     fn neg(a: u64) -> u64 {
         if a == 0 {
             0
@@ -70,10 +74,12 @@ impl RollingHash {
         }
     }
 
+    #[inline]
     fn sub(a: u64, b: u64) -> u64 {
         Self::add(a, Self::neg(b))
     }
 
+    #[inline]
     fn mul(a: u64, b: u64) -> u64 {
         let c = (a as u128) * (b as u128);
         let m = Self::MOD as u128;
@@ -81,6 +87,7 @@ impl RollingHash {
         (if c >= m { c - m } else { c }) as u64
     }
 
+    #[inline]
     fn pow(mut a: u64, mut b: u64) -> u64 {
         let mut c = 1;
         while b > 0 {

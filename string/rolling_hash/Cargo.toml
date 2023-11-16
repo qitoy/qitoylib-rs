@@ -6,4 +6,3 @@ edition = "2021"
 [dependencies]
 ac-library-rs = { workspace = true }
 rand = { workspace = true }
-once_cell = { workspace = true }
