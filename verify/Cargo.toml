@@ -6,16 +6,16 @@ edition = "2021"
 [dependencies]
 ac-library-rs = { workspace = true }
 anyhow = "1.0.75"
+itertools = { workspace = true }
 proconio = { workspace = true }
 qitoy-derive = { path = "../proc/derive" }
+qitoy-group = { path = "../algebra/group" }
 qitoy-mo = { path = "../algorithm/mo" }
 qitoy-prelude = { path = "../prelude" }
-qitoy-rerooting_dp = { path = "../algorithm/rerooting_dp" }
-qitoy-group = { path = "../algebra/group" }
-qitoy-weighted_dsu = { path = "../data_structure/weighted_dsu" }
 qitoy-prime-check = { path = "../prime/check" }
 qitoy-prime-factorize = { path = "../prime/factorize" }
 qitoy-red_black_tree = { path = "../data_structure/red_black_tree" }
+qitoy-rerooting_dp = { path = "../algorithm/rerooting_dp" }
+qitoy-weighted_dsu = { path = "../data_structure/weighted_dsu" }
 rstest = "0.18.2"
 verify_proc = { path = "./proc" }
-itertools = { workspace = true }

@@ -1,0 +1,13 @@
+{
+  "aoj": {
+    "1595": "https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=1595",
+    "DSL_1_B": "https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_1_B",
+    "ITP1_1_D": "https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=ITP1_1_D"
+  },
+  "library_checker": {
+    "dynamic_sequence_range_affine_range_sum": "https://judge.yosupo.jp/problem/dynamic_sequence_range_affine_range_sum",
+    "factorize": "https://judge.yosupo.jp/problem/factorize",
+    "primality_test": "https://judge.yosupo.jp/problem/primality_test",
+    "static_range_inversions_query": "https://judge.yosupo.jp/problem/static_range_inversions_query"
+  }
+}

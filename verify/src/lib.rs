@@ -6,9 +6,9 @@ pub trait Verify {
     }
     fn verify(path: std::path::PathBuf) -> anyhow::Result<()> {
         let mut in_txt = path.clone();
-        in_txt.push("in.txt");
+        in_txt.push("in");
         let mut out_txt = path;
-        out_txt.push("out.txt");
+        out_txt.push("out");
         let input = std::fs::read_to_string(in_txt)?;
         let output = std::fs::read_to_string(out_txt)?;
         let mut stdout = String::new();

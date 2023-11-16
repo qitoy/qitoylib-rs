@@ -42,7 +42,7 @@ pub fn verify(item: TokenStream) -> TokenStream {
     let item = parse_macro_input!(item as VerifyItem);
     let mut verify = vec![];
     for Verify { ident, path, .. } in item.verify {
-        let path = format!("./testcases/{}/*", path.value());
+        let path = format!("./verify/{}/*", path.value());
         let name: TokenStream2 = to_snake_case(ident.to_string()).parse().unwrap();
         verify.push(quote! {
             #[rstest::rstest]

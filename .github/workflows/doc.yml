@@ -13,6 +13,14 @@ jobs:
         with:
           submodules: true
           token: ${{ secrets.GH_PAT }}
+
+      - uses: actions/setup-python@v4
+
+      - name: install oj
+        run: pip3 install -U online-judge-tools
+
+      - name: prepare test cases
+        run: ./verify/verify.sh
       
       - uses: actions-rs/toolchain@v1
         with:
