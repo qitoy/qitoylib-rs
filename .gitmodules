@@ -1,3 +1,0 @@
-[submodule "verify/testcases"]
-	path = verify/testcases
-	url = git@github.com:qitoy/libverify-testcases.git
