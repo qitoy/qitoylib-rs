@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"macro":["verify"]};
+window.SIDEBAR_ITEMS = {};
