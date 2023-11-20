@@ -1,27 +1,21 @@
-name: test and doc
+name: verify
 
 on: push
 
 jobs:
-  doc:
+  verify:
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
       - uses: actions/checkout@v3
-        with:
-          submodules: true
-          token: ${{ secrets.GH_PAT }}
 
       - uses: actions/setup-python@v4
 
-      - name: install oj
-        run: pip3 install -U online-judge-tools
+      - name: install oj-verify
+        run: pip3 install -U online-judge-verify-helper
 
-      - name: prepare test cases
-        run: ./verify/verify.sh
-      
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: 1.70.0
@@ -30,6 +24,9 @@ jobs:
         with:
           command: test
           args: --release
+
+      - name: use oj-verify
+        run: oj-verify run
 
       - uses: actions-rs/cargo@v1
         with:

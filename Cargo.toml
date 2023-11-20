@@ -1,29 +1,34 @@
 [workspace]
 members = [
-    "algebra/*",
-    "algorithm/*",
-    "automaton",
-    "data_structure/*",
-    "graph/*",
-    "math/*",
-    "prelude",
-    "prime/*",
-    "proc/*",
-    "string/*",
-    "trait/*",
-    "utils/*",
-    "verify",
+  "algebra/*",
+  "algorithm/*",
+  "automaton",
+  "data_structure/*",
+  "graph/*",
+  "math/*",
+  "prelude",
+  "prime/*",
+  "proc/*",
+  "string/*",
+  "trait/*",
+  "utils/*",
+  "verify",
 ]
 resolver = "2"
 
 [workspace.dependencies]
 ac-library-rs = "=0.1.1"
-amplify = { version = "=3.14.2", features = ["c_raw", "rand", "stringly_conversions"] }
+amplify = { version = "=3.14.2", features = [
+  "c_raw",
+  "rand",
+  "stringly_conversions",
+] }
 itertools = "=0.11.0"
 num = "=0.4.1"
 once_cell = "=1.18.0"
 rand = { version = "=0.8.5", features = ["small_rng", "min_const_gen"] }
 proconio = { version = "0.4.5", features = ["derive"] }
+regex = "=1.9.1"
 
 # proc macro
 proc-macro2 = "1.0.66"
