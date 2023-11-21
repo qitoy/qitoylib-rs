@@ -26,6 +26,6 @@ var srcIndex = JSON.parse('{\
 "qitoy_wavelet_matrix":["",[],["lib.rs"]],\
 "qitoy_weighted_dsu":["",[],["lib.rs"]],\
 "verify":["",[],["lib.rs"]],\
-"verify_proc":["",[],["lib.rs"]]\
+"verify_proc":["",[],["lib.rs","verify_docs.rs"]]\
 }');
 createSrcSidebar();
