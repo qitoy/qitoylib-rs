@@ -16,11 +16,25 @@ jobs:
       - name: install oj-verify
         run: pip3 install -U online-judge-verify-helper
 
-      - uses: actions-rs/toolchain@v1
+      - name: install rust nightly
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+
+      - name: install rust 1.70.0
+        uses: actions-rs/toolchain@v1
         with:
           toolchain: 1.70.0
+          override: true
 
-      - uses: actions-rs/cargo@v1
+      - name: install cargo udeps
+        uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: cargo-udeps --locked
+
+      - name: cargo test
+        uses: actions-rs/cargo@v1
         with:
           command: test
           args: --release
@@ -28,10 +42,14 @@ jobs:
       - name: use oj-verify
         run: oj-verify run
 
-      - uses: actions-rs/cargo@v1
+      - name: cache stats
+        run: oj-verify stats > .verify-helper/cache/stats.json
+
+      - name: cargo doc
+        uses: actions-rs/cargo@v1
         with:
           command: doc
-          args: --no-deps --workspace
+          args: --no-deps --workspace --features verify_docs
         env:
           RUSTDOCFLAGS: --html-in-header katex.html
 

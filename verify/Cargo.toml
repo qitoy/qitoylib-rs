@@ -3,6 +3,10 @@ name = "verify"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+default = []
+verify_docs = []
+
 [dependencies]
 ac-library-rs = { workspace = true }
 itertools = { workspace = true }
