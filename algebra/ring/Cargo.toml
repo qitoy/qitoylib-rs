@@ -3,4 +3,3 @@ name = "qitoy-ring"
 version = "0.1.0"
 
 [dependencies]
-ac-library-rs = { workspace = true }
