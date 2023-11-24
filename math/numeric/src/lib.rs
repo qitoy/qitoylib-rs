@@ -1,5 +1,3 @@
-extern crate num;
-
 use std::ops::{Mul, Div, Rem};
 use num::traits::Zero;
 

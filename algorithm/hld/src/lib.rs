@@ -1,4 +1,3 @@
-extern crate qitoy_tree;
 pub use qitoy_tree::{Edge, Tree};
 
 #[derive(Debug, Clone, Default)]

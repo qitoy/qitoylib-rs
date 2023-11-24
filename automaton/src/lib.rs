@@ -1,5 +1,3 @@
-extern crate ac_library;
-
 mod dfa;
 pub use dfa::Dfa;
 

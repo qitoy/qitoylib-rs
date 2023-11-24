@@ -1,6 +1,4 @@
 use std::ops::{Add, AddAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign};
-
-extern crate qitoy_ring;
 use qitoy_ring::Ring;
 
 #[derive(Debug)]

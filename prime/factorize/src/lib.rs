@@ -1,8 +1,3 @@
-extern crate num;
-extern crate qitoy_math_montgomery;
-extern crate qitoy_prime_check;
-extern crate rand;
-
 use num::Integer;
 use qitoy_math_montgomery::{Montgomery, Mvalue};
 use qitoy_prime_check::PrimeCheck;

@@ -1,6 +1,7 @@
 [package]
 name = "qitoy-weighted_dsu"
 version = "0.1.0"
+edition = "2021"
 
 [dependencies]
 qitoy-group = { path = '../../algebra/group' }

@@ -1,4 +1,3 @@
-extern crate qitoy_math_montgomery;
 use qitoy_math_montgomery::Montgomery;
 
 pub trait PrimeCheck {

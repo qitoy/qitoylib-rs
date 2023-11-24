@@ -1,5 +1,3 @@
-extern crate ac_library;
-extern crate qitoy_tree;
 use ac_library::Monoid;
 pub use qitoy_tree::{Edge, Tree};
 

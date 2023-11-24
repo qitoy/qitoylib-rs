@@ -1,5 +1,3 @@
-extern crate qitoy_group;
-
 use qitoy_group::Group;
 use std::convert::TryInto;
 

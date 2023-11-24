@@ -1,6 +1,7 @@
 [package]
 name = "qitoy-prime-check"
 version = "0.1.0"
+edition = "2021"
 
 [dependencies]
 qitoy-math-montgomery = { path = "../../math/montgomery" }

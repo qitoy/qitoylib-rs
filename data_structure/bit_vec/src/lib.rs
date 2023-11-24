@@ -115,9 +115,6 @@ fn masked(bit: u64, len: usize) -> u64 {
 }
 
 #[cfg(test)]
-extern crate rand;
-
-#[cfg(test)]
 mod tests {
     use super::*;
     use rand::distributions::Uniform;
