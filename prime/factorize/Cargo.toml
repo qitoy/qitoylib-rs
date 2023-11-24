@@ -6,5 +6,4 @@ edition = "2021"
 [dependencies]
 qitoy-prime-check = { path = "../check" }
 qitoy-math-montgomery = { path = "../../math/montgomery" }
-num = { workspace = true }
 rand = { workspace = true }

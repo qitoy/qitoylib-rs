@@ -1,4 +1,3 @@
-use num::Integer;
 use qitoy_math_montgomery::{Montgomery, Mvalue};
 use qitoy_prime_check::PrimeCheck;
 use rand::{
@@ -11,21 +10,18 @@ pub struct Factors<T> {
     buf: Vec<T>,
 }
 
-impl<T> Iterator for Factors<T>
-where
-    T: Factorize + Integer + Clone,
-{
-    type Item = T;
+impl Iterator for Factors<u64> {
+    type Item = u64;
     fn next(&mut self) -> Option<Self::Item> {
         let n = self.buf.pop()?;
-        if n == T::one() {
+        if n == 1 {
             return None;
         }
         if n.prime_check() {
             Some(n)
         } else {
             let d = n.find_factor();
-            self.buf.append(&mut vec![n / d.clone(), d]);
+            self.buf.append(&mut vec![n / d, d]);
             self.next()
         }
     }
@@ -51,6 +47,12 @@ impl Factorize for u64 {
         let mut rng = SmallRng::from_entropy();
         let range = Uniform::from(1..n);
         let mo = Montgomery::new(n);
+        let gcd = |mut a, mut b| {
+            while b > 0 {
+                (a, b) = (b, a % b);
+            }
+            a
+        };
         while {
             let (mut x, mut ys);
             let (y, c) = (range.sample(&mut rng), range.sample(&mut rng));
@@ -70,7 +72,7 @@ impl Factorize for u64 {
                         y = f(y);
                         q = q * (x.clone() - y.clone());
                     }
-                    g = q.val().gcd(&n);
+                    g = gcd(q.val(), n);
                     k += m;
                     k < r && g == 1
                 } {}
@@ -80,7 +82,7 @@ impl Factorize for u64 {
             if g == n {
                 while {
                     ys = f(ys);
-                    g = (x.clone() - ys.clone()).val().gcd(&n);
+                    g = gcd((x.clone() - ys.clone()).val(), n);
                     g == 1
                 } {}
             }

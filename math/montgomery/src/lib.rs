@@ -3,7 +3,7 @@
 use std::ops::{Add, Mul, Neg, Sub};
 
 /// モンゴメリ乗算で内部的に使われる型。
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Mvalue {
     val: u128,
     m: Montgomery,
@@ -70,7 +70,7 @@ impl Mul for Mvalue {
 }
 
 /// モンゴメリ乗算をするための構造体。
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Montgomery {
     r: u128,
     m: u128,
