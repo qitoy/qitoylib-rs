@@ -62,6 +62,11 @@ pub trait Dfa {
     }
 
     /// DFAを用いたDPを計算する。
+    /// * `M` - モノイド
+    /// * `alpha` - 文字の集合
+    /// * `len` - 受理する文字列の長さ
+    /// * `init` - DPの初期値
+    /// * `map` - DPの遷移関数
     #[inline]
     fn calc<M>(
         &self,
