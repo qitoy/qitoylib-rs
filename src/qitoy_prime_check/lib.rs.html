@@ -74,7 +74,6 @@
 <a href="#39" id="39">39</a>
 <a href="#40" id="40">40</a>
 <a href="#41" id="41">41</a>
-<a href="#42" id="42">42</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>qitoy_math_montgomery::Montgomery;
 
 <span class="kw">pub trait </span>PrimeCheck {
@@ -94,22 +93,21 @@
         <span class="kw">let </span>r = (n - <span class="number">1</span>).trailing_zeros();
         <span class="kw">let </span>d = (n - <span class="number">1</span>) &gt;&gt; r;
         <span class="kw">let </span>m = Montgomery::new(n);
+        <span class="kw">let </span>(one, n1) = (m.trans(<span class="number">1</span>), m.trans(n - <span class="number">1</span>));
         <span class="kw">for </span>a <span class="kw">in </span>[<span class="number">2</span>, <span class="number">325</span>, <span class="number">9375</span>, <span class="number">28178</span>, <span class="number">450775</span>, <span class="number">9780504</span>, <span class="number">1795265022</span>] {
             <span class="kw">if </span>a % n == <span class="number">0 </span>{
                 <span class="kw">return </span><span class="bool-val">true</span>;
             }
             <span class="kw">let </span><span class="kw-2">mut </span>x = m.trans(a).pow(d);
-            <span class="kw">let </span>v = x.val();
-            <span class="kw">if </span>v == <span class="number">1 </span>|| v == n - <span class="number">1 </span>{
+            <span class="kw">if </span>x == one || x == n1 {
                 <span class="kw">continue</span>;
             }
             <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..r {
                 x = x.clone() * x;
-                <span class="kw">let </span>v = x.val();
-                <span class="kw">if </span>v == n - <span class="number">1 </span>{
+                <span class="kw">if </span>x == n1 {
                     <span class="kw">break</span>;
                 }
-                <span class="kw">if </span>v == <span class="number">1 </span>|| i == r - <span class="number">1 </span>{
+                <span class="kw">if </span>x == one || i == r - <span class="number">1 </span>{
                     <span class="kw">return </span><span class="bool-val">false</span>;
                 }
             }

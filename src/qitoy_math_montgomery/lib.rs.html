@@ -181,7 +181,7 @@
 </span><span class="kw">use </span>std::ops::{Add, Mul, Neg, Sub};
 
 <span class="doccomment">/// モンゴメリ乗算で内部的に使われる型。
-</span><span class="attr">#[derive(Debug, Clone)]
+</span><span class="attr">#[derive(Debug, Clone, PartialEq, Eq)]
 </span><span class="kw">pub struct </span>Mvalue {
     val: u128,
     m: Montgomery,
@@ -248,7 +248,7 @@
 }
 
 <span class="doccomment">/// モンゴメリ乗算をするための構造体。
-</span><span class="attr">#[derive(Debug, Clone, PartialEq)]
+</span><span class="attr">#[derive(Debug, Clone, PartialEq, Eq)]
 </span><span class="kw">pub struct </span>Montgomery {
     r: u128,
     m: u128,
