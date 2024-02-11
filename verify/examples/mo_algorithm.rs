@@ -45,7 +45,7 @@ fn main() {
             self.inv -= self.bit.sum(a + 1..);
             self.bit.add(a, -1);
         }
-        fn assign(&mut self) -> Self::T {
+        fn assign(&mut self, _: usize) -> Self::T {
             self.inv
         }
     }

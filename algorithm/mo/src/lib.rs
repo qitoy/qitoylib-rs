@@ -4,7 +4,7 @@ pub trait Mo {
     fn pop_left(&mut self, l: usize);
     fn push_right(&mut self, r: usize);
     fn pop_right(&mut self, r: usize);
-    fn assign(&mut self) -> Self::T;
+    fn assign(&mut self, i: usize) -> Self::T;
 
     /// * query - 区間クエリ（開区間）
     fn run(&mut self, query: &[(usize, usize)]) -> Vec<Self::T> {
@@ -29,7 +29,7 @@ pub trait Mo {
                 self.pop_left(l);
                 l += 1;
             }
-            ans[idx].replace(self.assign());
+            ans[idx].replace(self.assign(idx));
         }
         ans.into_iter().map(Option::unwrap).collect()
     }

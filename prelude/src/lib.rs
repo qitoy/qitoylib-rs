@@ -20,7 +20,7 @@ macro_rules! max {
 macro_rules! chmax {
     ($a:expr, $($b:expr),*) => {
         {
-            let tmp = max!($($b),*);
+            let tmp = $crate::max!($($b),*);
             if $a < tmp {
                 $a = tmp;
                 true
@@ -41,7 +41,7 @@ macro_rules! min {
 macro_rules! chmin {
     ($a:expr, $($b:expr),*) => {
         {
-            let tmp = min!($($b),*);
+            let tmp = $crate::min!($($b),*);
             if $a > tmp {
                 $a = tmp;
                 true
