@@ -88,7 +88,7 @@
             <span class="self">self</span>.inv -= <span class="self">self</span>.bit.sum(a + <span class="number">1</span>..);
             <span class="self">self</span>.bit.add(a, -<span class="number">1</span>);
         }
-        <span class="kw">fn </span>assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="self">Self</span>::T {
+        <span class="kw">fn </span>assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw">_</span>: usize) -&gt; <span class="self">Self</span>::T {
             <span class="self">self</span>.inv
         }
     }

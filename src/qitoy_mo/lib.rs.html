@@ -109,7 +109,7 @@
     <span class="kw">fn </span>pop_left(<span class="kw-2">&amp;mut </span><span class="self">self</span>, l: usize);
     <span class="kw">fn </span>push_right(<span class="kw-2">&amp;mut </span><span class="self">self</span>, r: usize);
     <span class="kw">fn </span>pop_right(<span class="kw-2">&amp;mut </span><span class="self">self</span>, r: usize);
-    <span class="kw">fn </span>assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="self">Self</span>::T;
+    <span class="kw">fn </span>assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, i: usize) -&gt; <span class="self">Self</span>::T;
 
     <span class="doccomment">/// * query - 区間クエリ（開区間）
     </span><span class="kw">fn </span>run(<span class="kw-2">&amp;mut </span><span class="self">self</span>, query: <span class="kw-2">&amp;</span>[(usize, usize)]) -&gt; Vec&lt;<span class="self">Self</span>::T&gt; {
@@ -134,7 +134,7 @@
                 <span class="self">self</span>.pop_left(l);
                 l += <span class="number">1</span>;
             }
-            ans[idx].replace(<span class="self">self</span>.assign());
+            ans[idx].replace(<span class="self">self</span>.assign(idx));
         }
         ans.into_iter().map(Option::unwrap).collect()
     }

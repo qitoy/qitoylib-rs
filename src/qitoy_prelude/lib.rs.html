@@ -126,7 +126,7 @@
 </span><span class="macro">macro_rules! </span>chmax {
     (<span class="macro-nonterminal">$a</span>:expr, $(<span class="macro-nonterminal">$b</span>:expr),<span class="kw-2">*</span>) =&gt; {
         {
-            <span class="kw">let </span>tmp = <span class="macro">max!</span>($(<span class="macro-nonterminal">$b</span>),<span class="kw-2">*</span>);
+            <span class="kw">let </span>tmp = <span class="macro-nonterminal">$</span><span class="macro">crate::max!</span>($(<span class="macro-nonterminal">$b</span>),<span class="kw-2">*</span>);
             <span class="kw">if </span><span class="macro-nonterminal">$a </span>&lt; tmp {
                 <span class="macro-nonterminal">$a </span>= tmp;
                 <span class="bool-val">true
@@ -147,7 +147,7 @@
 </span><span class="macro">macro_rules! </span>chmin {
     (<span class="macro-nonterminal">$a</span>:expr, $(<span class="macro-nonterminal">$b</span>:expr),<span class="kw-2">*</span>) =&gt; {
         {
-            <span class="kw">let </span>tmp = <span class="macro">min!</span>($(<span class="macro-nonterminal">$b</span>),<span class="kw-2">*</span>);
+            <span class="kw">let </span>tmp = <span class="macro-nonterminal">$</span><span class="macro">crate::min!</span>($(<span class="macro-nonterminal">$b</span>),<span class="kw-2">*</span>);
             <span class="kw">if </span><span class="macro-nonterminal">$a </span>&gt; tmp {
                 <span class="macro-nonterminal">$a </span>= tmp;
                 <span class="bool-val">true
