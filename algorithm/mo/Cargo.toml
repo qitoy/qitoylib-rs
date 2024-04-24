@@ -2,3 +2,15 @@
 name = "qitoy-mo"
 version = "0.1.0"
 edition = "2021"
+
+[package.metadata.cargo-compete.example]
+mo_algorithm.problem = "https://judge.yosupo.jp/problem/static_range_inversions_query"
+
+[[example]]
+name = "mo_algorithm"
+path = "examples/mo_algorithm.rs"
+
+[dev-dependencies]
+ac-library-rs = { workspace = true }
+proconio = { workspace = true }
+itertools = { workspace = true }

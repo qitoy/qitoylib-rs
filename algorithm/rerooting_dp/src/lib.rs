@@ -21,9 +21,10 @@ pub fn rerooting_dp<T: Monoid>(
     tree.iter()
         .enumerate()
         .map(|(v, tree)| {
-            tree.iter().enumerate().fold(T::identity(), |acc, (i, e)| {
+            let ret = tree.iter().enumerate().fold(T::identity(), |acc, (i, e)| {
                 T::binary_operation(&acc, &add_edge(dp[v][i].clone(), e.index))
-            })
+            });
+            add_vertex(ret, v)
         })
         .collect()
 }

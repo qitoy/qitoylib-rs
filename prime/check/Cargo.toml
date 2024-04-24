@@ -3,5 +3,16 @@ name = "qitoy-prime-check"
 version = "0.1.0"
 edition = "2021"
 
+[package.metadata.cargo-compete.example]
+primality_test.problem = "https://judge.yosupo.jp/problem/primality_test"
+
+[[example]]
+name = "primality_test"
+path = "examples/primality_test.rs"
+
 [dependencies]
 qitoy-math-montgomery = { path = "../../math/montgomery" }
+
+[dev-dependencies]
+proconio = { workspace = true }
+itertools = { workspace = true }

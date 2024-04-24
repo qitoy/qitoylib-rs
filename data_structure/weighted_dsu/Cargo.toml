@@ -5,3 +5,15 @@ edition = "2021"
 
 [dependencies]
 qitoy-group = { path = '../../algebra/group' }
+
+[package.metadata.cargo-compete.example]
+weighted_dsu.problem = "https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_1_B"
+
+[[example]]
+name = "weighted_dsu"
+path = "examples/weighted_dsu.rs"
+
+[dev-dependencies]
+ac-library-rs = { workspace = true }
+proconio = { workspace = true }
+qitoy-derive = { path = "../../proc/derive" }

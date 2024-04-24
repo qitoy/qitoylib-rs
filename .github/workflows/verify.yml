@@ -42,14 +42,11 @@ jobs:
       - name: use oj-verify
         run: oj-verify run
 
-      - name: cache stats
-        run: oj-verify stats > .verify-helper/cache/stats.json
-
       - name: cargo doc
         uses: actions-rs/cargo@v1
         with:
           command: doc
-          args: --no-deps --workspace --features verify_docs
+          args: --no-deps --workspace
         env:
           RUSTDOCFLAGS: --html-in-header katex.html
 

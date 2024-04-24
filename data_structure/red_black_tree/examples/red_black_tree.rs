@@ -1,5 +1,4 @@
 // verification-helper: PROBLEM https://judge.yosupo.jp/problem/dynamic_sequence_range_affine_range_sum
-
 use proconio::input;
 use qitoy_derive::query_readable;
 use qitoy_red_black_tree::{MAct, RedBlackTree};

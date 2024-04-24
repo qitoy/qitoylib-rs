@@ -12,7 +12,6 @@ members = [
   "string/*",
   "trait/*",
   "utils/*",
-  "verify",
 ]
 resolver = "2"
 

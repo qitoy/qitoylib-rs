@@ -1,0 +1,5 @@
+test-suite = "testcases/{{ bin_alias }}.yml"
+
+[test]
+toolchain = "1.70.0"
+profile = "release"

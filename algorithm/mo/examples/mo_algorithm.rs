@@ -1,9 +1,7 @@
 // verification-helper: PROBLEM https://judge.yosupo.jp/problem/static_range_inversions_query
-
 use ac_library::FenwickTree;
 use itertools::Itertools;
 use qitoy_mo::Mo;
-use qitoy_prelude::LowerBound;
 
 fn main() {
     proconio::input! {
@@ -14,7 +12,9 @@ fn main() {
 
     let a = {
         let b = a.iter().copied().sorted().dedup().collect_vec();
-        a.into_iter().map(|v| b.lower_bound(v)).collect_vec()
+        a.into_iter()
+            .map(|v| b.partition_point(|&b| b < v))
+            .collect_vec()
     };
 
     struct A {

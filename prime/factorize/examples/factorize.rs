@@ -12,7 +12,9 @@ fn main() {
         a.into_iter()
             .map(|a| {
                 let fac = a.factorize().sorted().collect_vec();
-                format!("{} {}", fac.len(), fac.iter().join(" "))
+                std::iter::once(fac.len() as u64)
+                    .chain(fac.into_iter())
+                    .join(" ")
             })
             .join("\n")
     );

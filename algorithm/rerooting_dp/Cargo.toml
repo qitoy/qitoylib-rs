@@ -3,6 +3,17 @@ name = "qitoy-rerooting_dp"
 version = "0.1.0"
 edition = "2021"
 
+[package.metadata.cargo-compete.example]
+rerooting_dp.problem = "https://judge.yosupo.jp/problem/tree_path_composite_sum"
+
+[[example]]
+name = "rerooting_dp"
+path = "examples/rerooting_dp.rs"
+
 [dependencies]
 ac-library-rs = { workspace = true }
 qitoy-tree = { path = "../../graph/tree" }
+
+[dev-dependencies]
+proconio = { workspace = true }
+itertools = { workspace = true }
