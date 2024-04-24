@@ -7,8 +7,8 @@ pub fn rerooting_dp_subtree<T: Monoid>(
     add_vertex: &mut impl FnMut(T::S, usize) -> T::S,
 ) -> Vec<Vec<T::S>> {
     let mut dp = tree.iter().map(|v| vec![T::identity(); v.len()]).collect();
-    dfs::<T>(tree, &mut dp, add_edge, add_vertex, 0, 0);
-    bfs::<T>(tree, &mut dp, add_edge, add_vertex);
+    bfs1::<T>(tree, &mut dp, add_edge, add_vertex);
+    bfs2::<T>(tree, &mut dp, add_edge, add_vertex);
     dp
 }
 
@@ -29,36 +29,47 @@ pub fn rerooting_dp<T: Monoid>(
         .collect()
 }
 
-fn dfs<T: Monoid>(
-    tree: &Tree,
-    dp: &mut Vec<Vec<T::S>>,
-    add_edge: &mut impl FnMut(T::S, usize) -> T::S,
-    add_vertex: &mut impl FnMut(T::S, usize) -> T::S,
-    v: usize,
-    p: usize,
-) -> T::S {
-    let ret = tree[v].iter().enumerate().filter(|v| v.1.to != p).fold(
-        T::identity(),
-        |acc, (i, e)| {
-            dp[v][i] = dfs::<T>(tree, dp, add_edge, add_vertex, e.to, v);
-            T::binary_operation(&acc, &add_edge(dp[v][i].clone(), e.index))
-        },
-    );
-    add_vertex(ret, v)
-}
-
-fn bfs<T: Monoid>(
+fn bfs1<T: Monoid>(
     tree: &Tree,
     dp: &mut Vec<Vec<T::S>>,
     add_edge: &mut impl FnMut(T::S, usize) -> T::S,
     add_vertex: &mut impl FnMut(T::S, usize) -> T::S,
 ) {
-    let mut que = std::collections::VecDeque::new();
-    que.push_back((0, T::identity()));
-    let mut seen = vec![false; dp.len()];
-    seen[0] = true;
-    while let Some((v, value)) = que.pop_front() {
-        if let Some((i, _)) = tree[v].iter().enumerate().find(|v| seen[v.1.to]) {
+    let mut stk = Vec::with_capacity(dp.len());
+    stk.push((0, 0, 0));
+    for i in 0..dp.len() {
+        let (v, p, _) = stk[i];
+        for i in 0..tree[v].len() {
+            let u = tree[v][i].to;
+            if u != p {
+                stk.push((u, v, i));
+            }
+        }
+    }
+    for (v, p, i) in stk.into_iter().rev() {
+        let ret = tree[v]
+            .iter()
+            .enumerate()
+            .filter(|(_, e)| e.to != p)
+            .fold(T::identity(), |acc, (i, e)| {
+                T::binary_operation(&acc, &add_edge(dp[v][i].clone(), e.index))
+            });
+        if v != p {
+            dp[p][i] = add_vertex(ret, v);
+        }
+    }
+}
+
+fn bfs2<T: Monoid>(
+    tree: &Tree,
+    dp: &mut Vec<Vec<T::S>>,
+    add_edge: &mut impl FnMut(T::S, usize) -> T::S,
+    add_vertex: &mut impl FnMut(T::S, usize) -> T::S,
+) {
+    let mut que = Vec::with_capacity(dp.len());
+    que.push((0, 0, T::identity()));
+    while let Some((v, p, value)) = que.pop() {
+        if let Some((i, _)) = tree[v].iter().enumerate().find(|(_, e)| e.to == p) {
             dp[v][i] = value;
         }
         let len = tree[v].len();
@@ -72,10 +83,9 @@ fn bfs<T: Monoid>(
         }
         for i in 0..len {
             let u = tree[v][i].to;
-            if !seen[u] {
-                seen[u] = true;
+            if u != p {
                 let value = add_vertex(T::binary_operation(&cuml[i], &cumr[i + 1]), v);
-                que.push_back((u, value));
+                que.push((u, v, value));
             }
         }
     }
