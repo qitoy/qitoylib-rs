@@ -29,73 +29,74 @@ enum Color {
     Black,
 }
 
-enum Node<M: MAct> {
-    Leaf {
-        val: M::S,
-    },
-    Tree {
-        left: Rc<Node<M>>,
-        right: Rc<Node<M>>,
-        color: Color,
-        /// 葉までの黒ノードの数（自身は含まない）
-        rank: usize,
-        /// 部分木の葉ノード数
-        len: usize,
-        val: M::S,
-        lazy: M::F,
-        rev: bool,
-    },
+struct Node<M: MAct> {
+    left: Option<Rc<Node<M>>>,
+    right: Option<Rc<Node<M>>>,
+    color: Color,
+    /// 葉までの黒ノードの数（自身は含まない）
+    rank: usize,
+    /// 部分木の葉ノード数
+    len: usize,
+    val: M::S,
+    lazy: M::F,
+    rev: bool,
 }
 
 use Color::{Black, Red};
-use Node::{Leaf, Tree};
 
 impl<M: MAct> Clone for Node<M> {
     fn clone(&self) -> Self {
-        match self {
-            Leaf { val } => Leaf { val: val.clone() },
-            Tree {
-                left,
-                right,
-                color,
-                rank,
-                len,
-                val,
-                lazy,
-                rev,
-            } => Tree {
-                left: left.clone(),
-                right: right.clone(),
-                color: *color,
-                rank: *rank,
-                len: *len,
-                val: val.clone(),
-                lazy: lazy.clone(),
-                rev: *rev,
-            },
+        let Self {
+            left,
+            right,
+            color,
+            rank,
+            len,
+            val,
+            lazy,
+            rev,
+        } = self;
+        Self {
+            left: left.clone(),
+            right: right.clone(),
+            color: *color,
+            rank: *rank,
+            len: *len,
+            val: val.clone(),
+            lazy: lazy.clone(),
+            rev: *rev,
         }
     }
 }
 
 impl<M: MAct> Default for Node<M> {
     fn default() -> Self {
-        Leaf { val: M::e() }
+        Self {
+            val: M::e(),
+            lazy: M::id(),
+            len: 1,
+            left: None,
+            right: None,
+            color: Black,
+            rank: 0,
+            rev: false,
+        }
     }
 }
 
 impl<M: MAct> Node<M> {
     fn new(left: &Rc<Self>, right: &Rc<Self>, color: Color) -> Rc<Self> {
-        Tree {
-            left: left.clone(),
-            right: right.clone(),
+        Self {
+            left: Some(left.clone()),
+            right: Some(right.clone()),
             color,
-            rank: left.rank()
-                + match left.color() {
+            rank: left.rank
+                + match left.color {
                     Black => 1,
                     Red => 0,
                 },
-            len: left.len() + right.len(),
-            val: M::op(left.val(), right.val()),
+            len: left.len + right.len,
+            val: M::op(&left.val, &right.val),
             lazy: M::id(),
             rev: false,
         }
@@ -103,129 +104,76 @@ impl<M: MAct> Node<M> {
     }
 
     fn leaf(val: M::S) -> Rc<Self> {
-        Leaf { val }.into()
+        Self {
+            val,
+            ..Default::default()
+        }
+        .into()
+    }
+
+    #[inline]
+    fn is_leaf(&self) -> bool {
+        self.left.is_none()
     }
 
     #[inline]
     fn left(&self) -> Rc<Self> {
-        let Tree { left, .. } = self else { unreachable!(); };
-        left.clone()
+        self.left.clone().unwrap()
     }
 
     #[inline]
     fn right(&self) -> Rc<Self> {
-        let Tree { right, .. } = self else { unreachable!(); };
-        right.clone()
-    }
-
-    #[inline]
-    fn color(&self) -> Color {
-        match self {
-            Leaf { .. } => Black,
-            Tree { color, .. } => *color,
-        }
-    }
-
-    #[inline]
-    fn rank(&self) -> usize {
-        match self {
-            Leaf { .. } => 0,
-            Tree { rank, .. } => *rank,
-        }
-    }
-
-    #[allow(clippy::len_without_is_empty)]
-    #[inline]
-    fn len(&self) -> usize {
-        match self {
-            Leaf { .. } => 1,
-            Tree { len, .. } => *len,
-        }
-    }
-
-    #[inline]
-    fn val(&self) -> &M::S {
-        match self {
-            Leaf { val } | Tree { val, .. } => val,
-        }
+        self.right.clone().unwrap()
     }
 
     fn push_new(self: &Rc<Self>) -> Rc<Self> {
-        match self.as_ref() {
-            Leaf { .. } => self.clone(),
-            Tree {
-                lazy, rev: false, ..
-            } if lazy == &M::id() => self.clone(),
-            Tree {
-                left,
-                right,
-                color,
-                lazy,
-                rev,
-                ..
-            } => {
-                let (left, right) = (left.update(lazy, *rev), right.update(lazy, *rev));
-                if *rev {
-                    Self::new(&right, &left, *color)
-                } else {
-                    Self::new(&left, &right, *color)
-                }
+        let Self { left: Some(left), right: Some(right), color, lazy, rev, .. } = self.as_ref()
+            else { return self.clone() };
+        if lazy == &M::id() && !rev {
+            self.clone()
+        } else {
+            let (left, right) = (left.update(lazy, *rev), right.update(lazy, *rev));
+            if *rev {
+                Self::new(&right, &left, *color)
+            } else {
+                Self::new(&left, &right, *color)
             }
         }
     }
 
     fn lazy_push(&self) -> Option<(Rc<Self>, Rc<Self>)> {
-        match self {
-            Leaf { .. } => None,
-            Tree {
-                left,
-                right,
-                lazy,
-                rev,
-                ..
-            } => {
-                let (left, right) = (left.update(lazy, *rev), right.update(lazy, *rev));
-                if *rev {
-                    (right, left)
-                } else {
-                    (left, right)
-                }
-            }
-            .into(),
-        }
+        let Self { left: Some(left), right:Some(right), lazy, rev, .. } = self
+            else { return None; };
+        let (left, right) = (left.update(lazy, *rev), right.update(lazy, *rev));
+        if *rev { (right, left) } else { (left, right) }.into()
     }
 
     fn update(self: &Rc<Self>, lazy: &M::F, rev: bool) -> Rc<Self> {
-        match (self.as_ref(), lazy, rev) {
-            (Leaf { .. }, id, _) | (Tree { .. }, id, false) if id == &M::id() => self.clone(),
-            _ => Node::clone(self).update_mut(lazy, rev),
+        if (self.is_leaf() || !rev) && lazy == &M::id() {
+            self.clone()
+        } else {
+            Node::clone(self).update_mut(lazy, rev)
         }
     }
 
     #[inline]
     fn update_mut(mut self, lazy: &M::F, rev: bool) -> Rc<Self> {
-        match &mut self {
-            Leaf { val: v } => {
-                *v = M::map(lazy, v, 1);
-            }
-            Tree {
-                val: v,
-                lazy: l,
-                rev: r,
-                len,
-                ..
-            } => {
-                *r ^= rev;
-                *l = M::comp(lazy, l);
-                *v = M::map(lazy, v, *len);
-            }
-        }
+        let Self {
+            len,
+            val: v,
+            lazy: l,
+            rev: r,
+            ..
+        } = &mut self;
+        *r ^= rev;
+        *l = M::comp(lazy, l);
+        *v = M::map(lazy, v, *len);
         self.into()
     }
 
     #[inline]
     fn to_black(self: &Rc<Self>) -> Rc<Self> {
-        match self.color() {
+        match self.color {
             Red => {
                 let (left, right) = self.lazy_push().unwrap();
                 Self::new(&left, &right, Black)
@@ -241,29 +189,29 @@ impl<M: MAct> Node<M> {
 
     fn merge_sub(a: &Rc<Self>, b: &Rc<Self>) -> Rc<Self> {
         let (a, b) = (a.push_new(), b.push_new());
-        match Ord::cmp(&a.rank(), &b.rank()) {
+        match Ord::cmp(&a.rank, &b.rank) {
             Less => {
                 let c = Self::merge_sub(&a, &b.left());
-                if b.color() == Black && c.color() == Red && c.left().color() == Red {
-                    if b.right().color() == Black {
+                if b.color == Black && c.color == Red && c.left().color == Red {
+                    if b.right().color == Black {
                         Self::new(&c.left(), &Self::new(&c.right(), &b.right(), Red), Black)
                     } else {
                         Self::new(&c.to_black(), &b.right().to_black(), Red)
                     }
                 } else {
-                    Self::new(&c, &b.right(), b.color())
+                    Self::new(&c, &b.right(), b.color)
                 }
             }
             Greater => {
                 let c = Self::merge_sub(&a.right(), &b);
-                if a.color() == Black && c.color() == Red && c.right().color() == Red {
-                    if a.left().color() == Black {
+                if a.color == Black && c.color == Red && c.right().color == Red {
+                    if a.left().color == Black {
                         Self::new(&Self::new(&a.left(), &c.left(), Red), &c.right(), Black)
                     } else {
                         Self::new(&a.left().to_black(), &c.to_black(), Red)
                     }
                 } else {
-                    Self::new(&a.left(), &c, a.color())
+                    Self::new(&a.left(), &c, a.color)
                 }
             }
             Equal => Self::new(&a, &b, Red),
@@ -272,7 +220,7 @@ impl<M: MAct> Node<M> {
 
     fn split(self: &Rc<Self>, k: usize) -> (Rc<Self>, Rc<Self>) {
         let (left, right) = self.lazy_push().unwrap();
-        let len = left.len();
+        let len = left.len;
         match k.cmp(&len) {
             Less => {
                 let (l, r) = left.split(k);
@@ -289,7 +237,7 @@ impl<M: MAct> Node<M> {
     /// 0 < l < r < n
     fn split3(self: &Rc<Self>, kl: usize, kr: usize) -> (Rc<Self>, Rc<Self>, Rc<Self>) {
         let (left, right) = self.lazy_push().unwrap();
-        let len = left.len();
+        let len = left.len;
         match (kl.cmp(&len), kr.cmp(&len)) {
             (_, Less) => {
                 let (l, m, r) = left.split3(kl, kr);
@@ -319,13 +267,13 @@ impl<M: MAct> Node<M> {
         match self.lazy_push() {
             None => Self::leaf(val),
             Some((left, right)) => {
-                let len = left.len();
+                let len = left.len;
                 let (left, right) = if p < len {
                     (left.set(p, val), right)
                 } else {
                     (left, right.set(p - len, val))
                 };
-                Self::new(&left, &right, self.color())
+                Self::new(&left, &right, self.color)
             }
         }
     }
@@ -334,15 +282,15 @@ impl<M: MAct> Node<M> {
         if l == r {
             return M::e();
         }
-        if l == 0 && r == self.len() {
-            return M::map(lazy, self.val(), self.len());
+        if l == 0 && r == self.len {
+            return M::map(lazy, &self.val, self.len);
         }
-        let Tree { left, right, lazy: la, rev: re, .. } = self.as_ref() else {
+        let Self { left: Some(left), right: Some(right), lazy: la, rev: re, .. } = self.as_ref() else {
             unreachable!();
         };
         let (lazy, rev) = (&M::comp(lazy, la), rev ^ re);
         let (left, right) = if rev { (right, left) } else { (left, right) };
-        let len = &left.len();
+        let len = &left.len;
         match (l.cmp(len), r.cmp(len)) {
             (_, Less | Equal) => left.prod(l, r, lazy, rev),
             (Less, Greater) => M::op(
@@ -357,22 +305,22 @@ impl<M: MAct> Node<M> {
         if l == r {
             return self.clone();
         }
-        if l == 0 && r == self.len() {
+        if l == 0 && r == self.len {
             return self.update(lazy, false);
         }
         let (left, right) = self.lazy_push().unwrap();
-        let len = left.len();
+        let len = left.len;
         let (left, right) = match (l.cmp(&len), r.cmp(&len)) {
             (_, Less | Equal) => (left.apply(l, r, lazy), right),
             (Less, Greater) => (left.apply(l, len, lazy), right.apply(0, r - len, lazy)),
             (Equal | Greater, _) => (left, right.apply(l - len, r - len, lazy)),
         };
-        Self::new(&left, &right, self.color())
+        Self::new(&left, &right, self.color)
     }
 
     fn dump(self: &Rc<Self>, dump: &mut Vec<M::S>) {
         match self.lazy_push() {
-            None => dump.push(self.val().clone()),
+            None => dump.push(self.val.clone()),
             Some((left, right)) => {
                 left.dump(dump);
                 right.dump(dump);
@@ -385,12 +333,12 @@ impl<M: MAct> Node<M> {
         M::S: Debug,
     {
         let dbg = match self.lazy_push() {
-            None => format!("{:?}", self.val()),
+            None => format!("{:?}", self.val),
             Some((left, right)) => {
                 format!("{} {}", left.debug(), right.debug())
             }
         };
-        match self.color() {
+        match self.color {
             Red => dbg,
             Black => format!("[{}]", dbg),
         }
@@ -447,11 +395,11 @@ impl<M: MAct> RedBlackTree<M> {
     }
 
     pub fn rank(&self) -> Option<usize> {
-        self.top.as_ref().map(|top| top.rank())
+        self.top.as_ref().map(|top| top.rank)
     }
 
     pub fn len(&self) -> usize {
-        self.top.as_ref().map_or(0, |top| top.len())
+        self.top.as_ref().map_or(0, |top| top.len)
     }
 
     pub fn is_empty(&self) -> bool {
