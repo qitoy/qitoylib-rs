@@ -621,58 +621,6 @@
 <a href="#586" id="586">586</a>
 <a href="#587" id="587">587</a>
 <a href="#588" id="588">588</a>
-<a href="#589" id="589">589</a>
-<a href="#590" id="590">590</a>
-<a href="#591" id="591">591</a>
-<a href="#592" id="592">592</a>
-<a href="#593" id="593">593</a>
-<a href="#594" id="594">594</a>
-<a href="#595" id="595">595</a>
-<a href="#596" id="596">596</a>
-<a href="#597" id="597">597</a>
-<a href="#598" id="598">598</a>
-<a href="#599" id="599">599</a>
-<a href="#600" id="600">600</a>
-<a href="#601" id="601">601</a>
-<a href="#602" id="602">602</a>
-<a href="#603" id="603">603</a>
-<a href="#604" id="604">604</a>
-<a href="#605" id="605">605</a>
-<a href="#606" id="606">606</a>
-<a href="#607" id="607">607</a>
-<a href="#608" id="608">608</a>
-<a href="#609" id="609">609</a>
-<a href="#610" id="610">610</a>
-<a href="#611" id="611">611</a>
-<a href="#612" id="612">612</a>
-<a href="#613" id="613">613</a>
-<a href="#614" id="614">614</a>
-<a href="#615" id="615">615</a>
-<a href="#616" id="616">616</a>
-<a href="#617" id="617">617</a>
-<a href="#618" id="618">618</a>
-<a href="#619" id="619">619</a>
-<a href="#620" id="620">620</a>
-<a href="#621" id="621">621</a>
-<a href="#622" id="622">622</a>
-<a href="#623" id="623">623</a>
-<a href="#624" id="624">624</a>
-<a href="#625" id="625">625</a>
-<a href="#626" id="626">626</a>
-<a href="#627" id="627">627</a>
-<a href="#628" id="628">628</a>
-<a href="#629" id="629">629</a>
-<a href="#630" id="630">630</a>
-<a href="#631" id="631">631</a>
-<a href="#632" id="632">632</a>
-<a href="#633" id="633">633</a>
-<a href="#634" id="634">634</a>
-<a href="#635" id="635">635</a>
-<a href="#636" id="636">636</a>
-<a href="#637" id="637">637</a>
-<a href="#638" id="638">638</a>
-<a href="#639" id="639">639</a>
-<a href="#640" id="640">640</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering::{Equal, Greater, Less};
 <span class="kw">use </span>std::fmt::Debug;
 <span class="kw">use </span>std::ops::Range;
@@ -704,73 +652,74 @@
     Black,
 }
 
-<span class="kw">enum </span>Node&lt;M: MAct&gt; {
-    Leaf {
-        val: M::S,
-    },
-    Tree {
-        left: Rc&lt;Node&lt;M&gt;&gt;,
-        right: Rc&lt;Node&lt;M&gt;&gt;,
-        color: Color,
-        <span class="doccomment">/// 葉までの黒ノードの数（自身は含まない）
-        </span>rank: usize,
-        <span class="doccomment">/// 部分木の葉ノード数
-        </span>len: usize,
-        val: M::S,
-        lazy: M::F,
-        rev: bool,
-    },
+<span class="kw">struct </span>Node&lt;M: MAct&gt; {
+    left: <span class="prelude-ty">Option</span>&lt;Rc&lt;Node&lt;M&gt;&gt;&gt;,
+    right: <span class="prelude-ty">Option</span>&lt;Rc&lt;Node&lt;M&gt;&gt;&gt;,
+    color: Color,
+    <span class="doccomment">/// 葉までの黒ノードの数（自身は含まない）
+    </span>rank: usize,
+    <span class="doccomment">/// 部分木の葉ノード数
+    </span>len: usize,
+    val: M::S,
+    lazy: M::F,
+    rev: bool,
 }
 
 <span class="kw">use </span>Color::{Black, Red};
-<span class="kw">use </span>Node::{Leaf, Tree};
 
 <span class="kw">impl</span>&lt;M: MAct&gt; Clone <span class="kw">for </span>Node&lt;M&gt; {
     <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
-        <span class="kw">match </span><span class="self">self </span>{
-            Leaf { val } =&gt; Leaf { val: val.clone() },
-            Tree {
-                left,
-                right,
-                color,
-                rank,
-                len,
-                val,
-                lazy,
-                rev,
-            } =&gt; Tree {
-                left: left.clone(),
-                right: right.clone(),
-                color: <span class="kw-2">*</span>color,
-                rank: <span class="kw-2">*</span>rank,
-                len: <span class="kw-2">*</span>len,
-                val: val.clone(),
-                lazy: lazy.clone(),
-                rev: <span class="kw-2">*</span>rev,
-            },
+        <span class="kw">let </span><span class="self">Self </span>{
+            left,
+            right,
+            color,
+            rank,
+            len,
+            val,
+            lazy,
+            rev,
+        } = <span class="self">self</span>;
+        <span class="self">Self </span>{
+            left: left.clone(),
+            right: right.clone(),
+            color: <span class="kw-2">*</span>color,
+            rank: <span class="kw-2">*</span>rank,
+            len: <span class="kw-2">*</span>len,
+            val: val.clone(),
+            lazy: lazy.clone(),
+            rev: <span class="kw-2">*</span>rev,
         }
     }
 }
 
 <span class="kw">impl</span>&lt;M: MAct&gt; Default <span class="kw">for </span>Node&lt;M&gt; {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
-        Leaf { val: M::e() }
+        <span class="self">Self </span>{
+            val: M::e(),
+            lazy: M::id(),
+            len: <span class="number">1</span>,
+            left: <span class="prelude-val">None</span>,
+            right: <span class="prelude-val">None</span>,
+            color: Black,
+            rank: <span class="number">0</span>,
+            rev: <span class="bool-val">false</span>,
+        }
     }
 }
 
 <span class="kw">impl</span>&lt;M: MAct&gt; Node&lt;M&gt; {
     <span class="kw">fn </span>new(left: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;, right: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;, color: Color) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
-        Tree {
-            left: left.clone(),
-            right: right.clone(),
+        <span class="self">Self </span>{
+            left: <span class="prelude-val">Some</span>(left.clone()),
+            right: <span class="prelude-val">Some</span>(right.clone()),
             color,
-            rank: left.rank()
-                + <span class="kw">match </span>left.color() {
+            rank: left.rank
+                + <span class="kw">match </span>left.color {
                     Black =&gt; <span class="number">1</span>,
                     Red =&gt; <span class="number">0</span>,
                 },
-            len: left.len() + right.len(),
-            val: M::op(left.val(), right.val()),
+            len: left.len + right.len,
+            val: M::op(<span class="kw-2">&amp;</span>left.val, <span class="kw-2">&amp;</span>right.val),
             lazy: M::id(),
             rev: <span class="bool-val">false</span>,
         }
@@ -778,129 +727,76 @@
     }
 
     <span class="kw">fn </span>leaf(val: M::S) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
-        Leaf { val }.into()
+        <span class="self">Self </span>{
+            val,
+            ..Default::default()
+        }
+        .into()
+    }
+
+    <span class="attr">#[inline]
+    </span><span class="kw">fn </span>is_leaf(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.left.is_none()
     }
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>left(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>Tree { left, .. } = <span class="self">self </span><span class="kw">else </span>{ <span class="macro">unreachable!</span>(); };
-        left.clone()
+        <span class="self">self</span>.left.clone().unwrap()
     }
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>right(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span>Tree { right, .. } = <span class="self">self </span><span class="kw">else </span>{ <span class="macro">unreachable!</span>(); };
-        right.clone()
-    }
-
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>color(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Color {
-        <span class="kw">match </span><span class="self">self </span>{
-            Leaf { .. } =&gt; Black,
-            Tree { color, .. } =&gt; <span class="kw-2">*</span>color,
-        }
-    }
-
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>rank(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-        <span class="kw">match </span><span class="self">self </span>{
-            Leaf { .. } =&gt; <span class="number">0</span>,
-            Tree { rank, .. } =&gt; <span class="kw-2">*</span>rank,
-        }
-    }
-
-    <span class="attr">#[allow(clippy::len_without_is_empty)]
-    #[inline]
-    </span><span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-        <span class="kw">match </span><span class="self">self </span>{
-            Leaf { .. } =&gt; <span class="number">1</span>,
-            Tree { len, .. } =&gt; <span class="kw-2">*</span>len,
-        }
-    }
-
-    <span class="attr">#[inline]
-    </span><span class="kw">fn </span>val(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>M::S {
-        <span class="kw">match </span><span class="self">self </span>{
-            Leaf { val } | Tree { val, .. } =&gt; val,
-        }
+        <span class="self">self</span>.right.clone().unwrap()
     }
 
     <span class="kw">fn </span>push_new(<span class="self">self</span>: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">match </span><span class="self">self</span>.as_ref() {
-            Leaf { .. } =&gt; <span class="self">self</span>.clone(),
-            Tree {
-                lazy, rev: <span class="bool-val">false</span>, ..
-            } <span class="kw">if </span>lazy == <span class="kw-2">&amp;</span>M::id() =&gt; <span class="self">self</span>.clone(),
-            Tree {
-                left,
-                right,
-                color,
-                lazy,
-                rev,
-                ..
-            } =&gt; {
-                <span class="kw">let </span>(left, right) = (left.update(lazy, <span class="kw-2">*</span>rev), right.update(lazy, <span class="kw-2">*</span>rev));
-                <span class="kw">if </span><span class="kw-2">*</span>rev {
-                    <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>right, <span class="kw-2">&amp;</span>left, <span class="kw-2">*</span>color)
-                } <span class="kw">else </span>{
-                    <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right, <span class="kw-2">*</span>color)
-                }
+        <span class="kw">let </span><span class="self">Self </span>{ left: <span class="prelude-val">Some</span>(left), right: <span class="prelude-val">Some</span>(right), color, lazy, rev, .. } = <span class="self">self</span>.as_ref()
+            <span class="kw">else </span>{ <span class="kw">return </span><span class="self">self</span>.clone() };
+        <span class="kw">if </span>lazy == <span class="kw-2">&amp;</span>M::id() &amp;&amp; !rev {
+            <span class="self">self</span>.clone()
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>(left, right) = (left.update(lazy, <span class="kw-2">*</span>rev), right.update(lazy, <span class="kw-2">*</span>rev));
+            <span class="kw">if </span><span class="kw-2">*</span>rev {
+                <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>right, <span class="kw-2">&amp;</span>left, <span class="kw-2">*</span>color)
+            } <span class="kw">else </span>{
+                <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right, <span class="kw-2">*</span>color)
             }
         }
     }
 
     <span class="kw">fn </span>lazy_push(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(Rc&lt;<span class="self">Self</span>&gt;, Rc&lt;<span class="self">Self</span>&gt;)&gt; {
-        <span class="kw">match </span><span class="self">self </span>{
-            Leaf { .. } =&gt; <span class="prelude-val">None</span>,
-            Tree {
-                left,
-                right,
-                lazy,
-                rev,
-                ..
-            } =&gt; {
-                <span class="kw">let </span>(left, right) = (left.update(lazy, <span class="kw-2">*</span>rev), right.update(lazy, <span class="kw-2">*</span>rev));
-                <span class="kw">if </span><span class="kw-2">*</span>rev {
-                    (right, left)
-                } <span class="kw">else </span>{
-                    (left, right)
-                }
-            }
-            .into(),
-        }
+        <span class="kw">let </span><span class="self">Self </span>{ left: <span class="prelude-val">Some</span>(left), right:<span class="prelude-val">Some</span>(right), lazy, rev, .. } = <span class="self">self
+            </span><span class="kw">else </span>{ <span class="kw">return </span><span class="prelude-val">None</span>; };
+        <span class="kw">let </span>(left, right) = (left.update(lazy, <span class="kw-2">*</span>rev), right.update(lazy, <span class="kw-2">*</span>rev));
+        <span class="kw">if </span><span class="kw-2">*</span>rev { (right, left) } <span class="kw">else </span>{ (left, right) }.into()
     }
 
     <span class="kw">fn </span>update(<span class="self">self</span>: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;, lazy: <span class="kw-2">&amp;</span>M::F, rev: bool) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">match </span>(<span class="self">self</span>.as_ref(), lazy, rev) {
-            (Leaf { .. }, id, <span class="kw">_</span>) | (Tree { .. }, id, <span class="bool-val">false</span>) <span class="kw">if </span>id == <span class="kw-2">&amp;</span>M::id() =&gt; <span class="self">self</span>.clone(),
-            <span class="kw">_ </span>=&gt; Node::clone(<span class="self">self</span>).update_mut(lazy, rev),
+        <span class="kw">if </span>(<span class="self">self</span>.is_leaf() || !rev) &amp;&amp; lazy == <span class="kw-2">&amp;</span>M::id() {
+            <span class="self">self</span>.clone()
+        } <span class="kw">else </span>{
+            Node::clone(<span class="self">self</span>).update_mut(lazy, rev)
         }
     }
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>update_mut(<span class="kw-2">mut </span><span class="self">self</span>, lazy: <span class="kw-2">&amp;</span>M::F, rev: bool) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self </span>{
-            Leaf { val: v } =&gt; {
-                <span class="kw-2">*</span>v = M::map(lazy, v, <span class="number">1</span>);
-            }
-            Tree {
-                val: v,
-                lazy: l,
-                rev: r,
-                len,
-                ..
-            } =&gt; {
-                <span class="kw-2">*</span>r ^= rev;
-                <span class="kw-2">*</span>l = M::comp(lazy, l);
-                <span class="kw-2">*</span>v = M::map(lazy, v, <span class="kw-2">*</span>len);
-            }
-        }
+        <span class="kw">let </span><span class="self">Self </span>{
+            len,
+            val: v,
+            lazy: l,
+            rev: r,
+            ..
+        } = <span class="kw-2">&amp;mut </span><span class="self">self</span>;
+        <span class="kw-2">*</span>r ^= rev;
+        <span class="kw-2">*</span>l = M::comp(lazy, l);
+        <span class="kw-2">*</span>v = M::map(lazy, v, <span class="kw-2">*</span>len);
         <span class="self">self</span>.into()
     }
 
     <span class="attr">#[inline]
     </span><span class="kw">fn </span>to_black(<span class="self">self</span>: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">match </span><span class="self">self</span>.color() {
+        <span class="kw">match </span><span class="self">self</span>.color {
             Red =&gt; {
                 <span class="kw">let </span>(left, right) = <span class="self">self</span>.lazy_push().unwrap();
                 <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right, Black)
@@ -916,29 +812,29 @@
 
     <span class="kw">fn </span>merge_sub(a: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;, b: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>(a, b) = (a.push_new(), b.push_new());
-        <span class="kw">match </span>Ord::cmp(<span class="kw-2">&amp;</span>a.rank(), <span class="kw-2">&amp;</span>b.rank()) {
+        <span class="kw">match </span>Ord::cmp(<span class="kw-2">&amp;</span>a.rank, <span class="kw-2">&amp;</span>b.rank) {
             Less =&gt; {
                 <span class="kw">let </span>c = <span class="self">Self</span>::merge_sub(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b.left());
-                <span class="kw">if </span>b.color() == Black &amp;&amp; c.color() == Red &amp;&amp; c.left().color() == Red {
-                    <span class="kw">if </span>b.right().color() == Black {
+                <span class="kw">if </span>b.color == Black &amp;&amp; c.color == Red &amp;&amp; c.left().color == Red {
+                    <span class="kw">if </span>b.right().color == Black {
                         <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>c.left(), <span class="kw-2">&amp;</span><span class="self">Self</span>::new(<span class="kw-2">&amp;</span>c.right(), <span class="kw-2">&amp;</span>b.right(), Red), Black)
                     } <span class="kw">else </span>{
                         <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>c.to_black(), <span class="kw-2">&amp;</span>b.right().to_black(), Red)
                     }
                 } <span class="kw">else </span>{
-                    <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>c, <span class="kw-2">&amp;</span>b.right(), b.color())
+                    <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>c, <span class="kw-2">&amp;</span>b.right(), b.color)
                 }
             }
             Greater =&gt; {
                 <span class="kw">let </span>c = <span class="self">Self</span>::merge_sub(<span class="kw-2">&amp;</span>a.right(), <span class="kw-2">&amp;</span>b);
-                <span class="kw">if </span>a.color() == Black &amp;&amp; c.color() == Red &amp;&amp; c.right().color() == Red {
-                    <span class="kw">if </span>a.left().color() == Black {
+                <span class="kw">if </span>a.color == Black &amp;&amp; c.color == Red &amp;&amp; c.right().color == Red {
+                    <span class="kw">if </span>a.left().color == Black {
                         <span class="self">Self</span>::new(<span class="kw-2">&amp;</span><span class="self">Self</span>::new(<span class="kw-2">&amp;</span>a.left(), <span class="kw-2">&amp;</span>c.left(), Red), <span class="kw-2">&amp;</span>c.right(), Black)
                     } <span class="kw">else </span>{
                         <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>a.left().to_black(), <span class="kw-2">&amp;</span>c.to_black(), Red)
                     }
                 } <span class="kw">else </span>{
-                    <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>a.left(), <span class="kw-2">&amp;</span>c, a.color())
+                    <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>a.left(), <span class="kw-2">&amp;</span>c, a.color)
                 }
             }
             Equal =&gt; <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b, Red),
@@ -947,7 +843,7 @@
 
     <span class="kw">fn </span>split(<span class="self">self</span>: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;, k: usize) -&gt; (Rc&lt;<span class="self">Self</span>&gt;, Rc&lt;<span class="self">Self</span>&gt;) {
         <span class="kw">let </span>(left, right) = <span class="self">self</span>.lazy_push().unwrap();
-        <span class="kw">let </span>len = left.len();
+        <span class="kw">let </span>len = left.len;
         <span class="kw">match </span>k.cmp(<span class="kw-2">&amp;</span>len) {
             Less =&gt; {
                 <span class="kw">let </span>(l, r) = left.split(k);
@@ -964,7 +860,7 @@
     <span class="doccomment">/// 0 &lt; l &lt; r &lt; n
     </span><span class="kw">fn </span>split3(<span class="self">self</span>: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;, kl: usize, kr: usize) -&gt; (Rc&lt;<span class="self">Self</span>&gt;, Rc&lt;<span class="self">Self</span>&gt;, Rc&lt;<span class="self">Self</span>&gt;) {
         <span class="kw">let </span>(left, right) = <span class="self">self</span>.lazy_push().unwrap();
-        <span class="kw">let </span>len = left.len();
+        <span class="kw">let </span>len = left.len;
         <span class="kw">match </span>(kl.cmp(<span class="kw-2">&amp;</span>len), kr.cmp(<span class="kw-2">&amp;</span>len)) {
             (<span class="kw">_</span>, Less) =&gt; {
                 <span class="kw">let </span>(l, m, r) = left.split3(kl, kr);
@@ -994,13 +890,13 @@
         <span class="kw">match </span><span class="self">self</span>.lazy_push() {
             <span class="prelude-val">None </span>=&gt; <span class="self">Self</span>::leaf(val),
             <span class="prelude-val">Some</span>((left, right)) =&gt; {
-                <span class="kw">let </span>len = left.len();
+                <span class="kw">let </span>len = left.len;
                 <span class="kw">let </span>(left, right) = <span class="kw">if </span>p &lt; len {
                     (left.set(p, val), right)
                 } <span class="kw">else </span>{
                     (left, right.set(p - len, val))
                 };
-                <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right, <span class="self">self</span>.color())
+                <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right, <span class="self">self</span>.color)
             }
         }
     }
@@ -1009,15 +905,15 @@
         <span class="kw">if </span>l == r {
             <span class="kw">return </span>M::e();
         }
-        <span class="kw">if </span>l == <span class="number">0 </span>&amp;&amp; r == <span class="self">self</span>.len() {
-            <span class="kw">return </span>M::map(lazy, <span class="self">self</span>.val(), <span class="self">self</span>.len());
+        <span class="kw">if </span>l == <span class="number">0 </span>&amp;&amp; r == <span class="self">self</span>.len {
+            <span class="kw">return </span>M::map(lazy, <span class="kw-2">&amp;</span><span class="self">self</span>.val, <span class="self">self</span>.len);
         }
-        <span class="kw">let </span>Tree { left, right, lazy: la, rev: re, .. } = <span class="self">self</span>.as_ref() <span class="kw">else </span>{
+        <span class="kw">let </span><span class="self">Self </span>{ left: <span class="prelude-val">Some</span>(left), right: <span class="prelude-val">Some</span>(right), lazy: la, rev: re, .. } = <span class="self">self</span>.as_ref() <span class="kw">else </span>{
             <span class="macro">unreachable!</span>();
         };
         <span class="kw">let </span>(lazy, rev) = (<span class="kw-2">&amp;</span>M::comp(lazy, la), rev ^ re);
         <span class="kw">let </span>(left, right) = <span class="kw">if </span>rev { (right, left) } <span class="kw">else </span>{ (left, right) };
-        <span class="kw">let </span>len = <span class="kw-2">&amp;</span>left.len();
+        <span class="kw">let </span>len = <span class="kw-2">&amp;</span>left.len;
         <span class="kw">match </span>(l.cmp(len), r.cmp(len)) {
             (<span class="kw">_</span>, Less | Equal) =&gt; left.prod(l, r, lazy, rev),
             (Less, Greater) =&gt; M::op(
@@ -1032,22 +928,22 @@
         <span class="kw">if </span>l == r {
             <span class="kw">return </span><span class="self">self</span>.clone();
         }
-        <span class="kw">if </span>l == <span class="number">0 </span>&amp;&amp; r == <span class="self">self</span>.len() {
+        <span class="kw">if </span>l == <span class="number">0 </span>&amp;&amp; r == <span class="self">self</span>.len {
             <span class="kw">return </span><span class="self">self</span>.update(lazy, <span class="bool-val">false</span>);
         }
         <span class="kw">let </span>(left, right) = <span class="self">self</span>.lazy_push().unwrap();
-        <span class="kw">let </span>len = left.len();
+        <span class="kw">let </span>len = left.len;
         <span class="kw">let </span>(left, right) = <span class="kw">match </span>(l.cmp(<span class="kw-2">&amp;</span>len), r.cmp(<span class="kw-2">&amp;</span>len)) {
             (<span class="kw">_</span>, Less | Equal) =&gt; (left.apply(l, r, lazy), right),
             (Less, Greater) =&gt; (left.apply(l, len, lazy), right.apply(<span class="number">0</span>, r - len, lazy)),
             (Equal | Greater, <span class="kw">_</span>) =&gt; (left, right.apply(l - len, r - len, lazy)),
         };
-        <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right, <span class="self">self</span>.color())
+        <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>left, <span class="kw-2">&amp;</span>right, <span class="self">self</span>.color)
     }
 
     <span class="kw">fn </span>dump(<span class="self">self</span>: <span class="kw-2">&amp;</span>Rc&lt;<span class="self">Self</span>&gt;, dump: <span class="kw-2">&amp;mut </span>Vec&lt;M::S&gt;) {
         <span class="kw">match </span><span class="self">self</span>.lazy_push() {
-            <span class="prelude-val">None </span>=&gt; dump.push(<span class="self">self</span>.val().clone()),
+            <span class="prelude-val">None </span>=&gt; dump.push(<span class="self">self</span>.val.clone()),
             <span class="prelude-val">Some</span>((left, right)) =&gt; {
                 left.dump(dump);
                 right.dump(dump);
@@ -1060,12 +956,12 @@
         </span>M::S: Debug,
     {
         <span class="kw">let </span>dbg = <span class="kw">match </span><span class="self">self</span>.lazy_push() {
-            <span class="prelude-val">None </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>.val()),
+            <span class="prelude-val">None </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>.val),
             <span class="prelude-val">Some</span>((left, right)) =&gt; {
                 <span class="macro">format!</span>(<span class="string">&quot;{} {}&quot;</span>, left.debug(), right.debug())
             }
         };
-        <span class="kw">match </span><span class="self">self</span>.color() {
+        <span class="kw">match </span><span class="self">self</span>.color {
             Red =&gt; dbg,
             Black =&gt; <span class="macro">format!</span>(<span class="string">&quot;[{}]&quot;</span>, dbg),
         }
@@ -1122,11 +1018,11 @@
     }
 
     <span class="kw">pub fn </span>rank(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
-        <span class="self">self</span>.top.as_ref().map(|top| top.rank())
+        <span class="self">self</span>.top.as_ref().map(|top| top.rank)
     }
 
     <span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
-        <span class="self">self</span>.top.as_ref().map_or(<span class="number">0</span>, |top| top.len())
+        <span class="self">self</span>.top.as_ref().map_or(<span class="number">0</span>, |top| top.len)
     }
 
     <span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {

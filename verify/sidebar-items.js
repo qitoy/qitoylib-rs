@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"mod":["example","factorize","mo_algorithm","primality_test","red_black_tree","rerooting_dp","weighted_dsu"]};
