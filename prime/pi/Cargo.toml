@@ -2,3 +2,16 @@
 name = "qitoy-prime-pi"
 version = "0.1.0"
 edition = "2021"
+
+[package.metadata.cargo-compete.example]
+pi.problem = "https://judge.yosupo.jp/problem/counting_primes"
+
+[[example]]
+name = "pi"
+path = "examples/pi.rs"
+
+[dependencies]
+ac-library-rs = { workspace = true }
+
+[dev-dependencies]
+proconio = { workspace = true }
