@@ -29,7 +29,7 @@ jobs:
           args: --release
 
       - name: use oj-verify
-        run: oj-verify run
+        run: oj-verify run --jobs 10
 
       - name: cargo doc
         uses: actions-rs/cargo@v1
