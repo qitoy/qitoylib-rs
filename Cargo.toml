@@ -1,17 +1,17 @@
 [workspace]
 members = [
-  "algebra/*",
-  "algorithm/*",
-  "automaton",
-  "data_structure/*",
-  "graph/*",
-  "math/*",
-  "prelude",
-  "prime/*",
-  "proc/*",
-  "string/*",
-  "trait/*",
-  "utils/*",
+  "crates/algebra/*",
+  "crates/algorithm/*",
+  "crates/automaton",
+  "crates/data_structure/*",
+  "crates/graph/*",
+  "crates/math/*",
+  "crates/prelude",
+  "crates/prime/*",
+  "crates/proc/*",
+  "crates/string/*",
+  "crates/trait/*",
+  "crates/utils/*",
 ]
 resolver = "2"
 
