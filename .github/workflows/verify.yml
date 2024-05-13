@@ -26,7 +26,7 @@ jobs:
         run: oj-verify run --jobs 10
 
       - name: cargo doc
-        run: cargo doc --nodeps --workspace
+        run: cargo doc --no-deps --workspace
         env:
           RUSTDOCFLAGS: --html-in-header katex.html
 

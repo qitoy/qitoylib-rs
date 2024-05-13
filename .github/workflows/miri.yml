@@ -1,4 +1,4 @@
-name: verify
+name: miri
 
 on: push
 
