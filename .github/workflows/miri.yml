@@ -1,0 +1,21 @@
+name: verify
+
+on: push
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: install rust nightly
+        run: rustup default nightly
+
+      - name: install miri
+        run: rustup component add miri
+
+      - name: test by miri
+        run: cargo miri test

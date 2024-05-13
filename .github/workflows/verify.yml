@@ -17,25 +17,16 @@ jobs:
         run: pip3 install -U online-judge-verify-helper
 
       - name: install rust 1.70.0
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: 1.70.0
-          default: true
+        run: rustup default 1.70.0
 
       - name: cargo test
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --release
+        run: cargo test --release
 
       - name: use oj-verify
         run: oj-verify run --jobs 10
 
       - name: cargo doc
-        uses: actions-rs/cargo@v1
-        with:
-          command: doc
-          args: --no-deps --workspace
+        run: cargo doc --nodeps --workspace
         env:
           RUSTDOCFLAGS: --html-in-header katex.html
 
