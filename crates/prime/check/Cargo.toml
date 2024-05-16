@@ -14,5 +14,5 @@ path = "examples/primality_test.rs"
 qitoy-math-montgomery = { path = "../../math/montgomery" }
 
 [dev-dependencies]
-proconio = { workspace = true }
-itertools = { workspace = true }
+proconio.workspace = true
+itertools.workspace = true

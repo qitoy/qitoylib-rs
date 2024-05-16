@@ -11,9 +11,9 @@ name = "rerooting_dp"
 path = "examples/rerooting_dp.rs"
 
 [dependencies]
-ac-library-rs = { workspace = true }
+ac-library-rs.workspace = true
 qitoy-tree = { path = "../../graph/tree" }
 
 [dev-dependencies]
-proconio = { workspace = true }
-itertools = { workspace = true }
+proconio.workspace = true
+itertools.workspace = true

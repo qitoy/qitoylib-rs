@@ -13,8 +13,8 @@ path = "examples/factorize.rs"
 [dependencies]
 qitoy-prime-check = { path = "../check" }
 qitoy-math-montgomery = { path = "../../math/montgomery" }
-rand = { workspace = true }
+rand.workspace = true
 
 [dev-dependencies]
-itertools = { workspace = true }
-proconio = { workspace = true }
+itertools.workspace = true
+proconio.workspace = true

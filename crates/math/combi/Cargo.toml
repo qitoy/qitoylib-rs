@@ -7,4 +7,4 @@ edition = "2021"
 name = "qitoy_combi"
 
 [dependencies]
-ac-library-rs = { workspace = true }
+ac-library-rs.workspace = true

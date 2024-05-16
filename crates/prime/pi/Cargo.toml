@@ -11,7 +11,7 @@ name = "pi"
 path = "examples/pi.rs"
 
 [dependencies]
-ac-library-rs = { workspace = true }
+ac-library-rs.workspace = true
 
 [dev-dependencies]
-proconio = { workspace = true }
+proconio.workspace = true

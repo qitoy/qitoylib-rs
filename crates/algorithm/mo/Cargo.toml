@@ -11,6 +11,6 @@ name = "mo_algorithm"
 path = "examples/mo_algorithm.rs"
 
 [dev-dependencies]
-ac-library-rs = { workspace = true }
-proconio = { workspace = true }
-itertools = { workspace = true }
+ac-library-rs.workspace = true
+proconio.workspace = true
+itertools.workspace = true

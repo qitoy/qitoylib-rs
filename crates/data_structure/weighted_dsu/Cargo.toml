@@ -14,6 +14,6 @@ name = "weighted_dsu"
 path = "examples/weighted_dsu.rs"
 
 [dev-dependencies]
-ac-library-rs = { workspace = true }
-proconio = { workspace = true }
+ac-library-rs.workspace = true
+proconio.workspace = true
 qitoy-derive = { path = "../../proc/derive" }

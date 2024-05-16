@@ -13,5 +13,5 @@ path = "examples/red_black_tree.rs"
 [dependencies]
 
 [dev-dependencies]
-proconio = { workspace = true }
+proconio.workspace = true
 qitoy-derive = { path = "../../proc/derive" }
