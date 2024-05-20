@@ -612,6 +612,7 @@
 <a href="#577" id="577">577</a>
 <a href="#578" id="578">578</a>
 <a href="#579" id="579">579</a>
+<a href="#580" id="580">580</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering::{Equal, Greater, Less};
 <span class="kw">use </span>std::fmt::Debug;
 <span class="kw">use </span>std::ops::Range;
@@ -741,17 +742,13 @@
     }
 
     <span class="kw">fn </span>push_new(<span class="kw-2">mut </span><span class="self">self</span>: Rc&lt;<span class="self">Self</span>&gt;) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
-        <span class="kw">let </span><span class="self">Self </span>{ left: <span class="prelude-val">Some</span>(left), right: <span class="prelude-val">Some</span>(right), lazy, rev, val, .. } = Rc::make_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>)
-            <span class="kw">else </span>{ <span class="kw">return </span><span class="self">self </span>};
-        <span class="kw">if </span>lazy != <span class="kw-2">&amp;</span>M::id() || <span class="kw-2">*</span>rev {
-            <span class="kw-2">*</span>left = left.clone().update(lazy, <span class="kw-2">*</span>rev);
-            <span class="kw-2">*</span>right = right.clone().update(lazy, <span class="kw-2">*</span>rev);
-            <span class="kw">if </span><span class="kw-2">*</span>rev {
-                std::mem::swap(left, right);
-            }
-            <span class="kw-2">*</span>lazy = M::id();
-            <span class="kw-2">*</span>rev = <span class="bool-val">false</span>;
-            <span class="kw-2">*</span>val = M::op(<span class="kw-2">&amp;</span>left.val, <span class="kw-2">&amp;</span>right.val);
+        <span class="kw">if </span>!<span class="self">self</span>.is_leaf() &amp;&amp; (<span class="self">self</span>.lazy != M::id() || <span class="self">self</span>.rev) {
+            <span class="kw">let </span>(left, right) = <span class="self">self</span>.lazy_push().unwrap();
+            <span class="kw">let </span>this = Rc::make_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
+            this.left = <span class="prelude-val">Some</span>(left);
+            this.right = <span class="prelude-val">Some</span>(right);
+            this.lazy = M::id();
+            this.rev = <span class="bool-val">false</span>;
         }
         <span class="self">self
     </span>}
@@ -759,16 +756,18 @@
     <span class="kw">fn </span>lazy_push(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(Rc&lt;<span class="self">Self</span>&gt;, Rc&lt;<span class="self">Self</span>&gt;)&gt; {
         <span class="kw">let </span><span class="self">Self </span>{ left: <span class="prelude-val">Some</span>(left), right:<span class="prelude-val">Some</span>(right), lazy, rev, .. } = <span class="self">self
             </span><span class="kw">else </span>{ <span class="kw">return </span><span class="prelude-val">None</span>; };
-        <span class="kw">let </span>(left, right) = (
+        (
             left.clone().update(lazy, <span class="kw-2">*</span>rev),
             right.clone().update(lazy, <span class="kw-2">*</span>rev),
-        );
-        <span class="kw">if </span><span class="kw-2">*</span>rev { (right, left) } <span class="kw">else </span>{ (left, right) }.into()
+        )
+            .into()
     }
 
     <span class="kw">fn </span>update(<span class="kw-2">mut </span><span class="self">self</span>: Rc&lt;<span class="self">Self</span>&gt;, lazy: <span class="kw-2">&amp;</span>M::F, rev: bool) -&gt; Rc&lt;<span class="self">Self</span>&gt; {
         <span class="kw">if </span>!<span class="self">self</span>.is_leaf() &amp;&amp; rev || lazy != <span class="kw-2">&amp;</span>M::id() {
             <span class="kw">let </span><span class="self">Self </span>{
+                left,
+                right,
                 len,
                 val: v,
                 lazy: l,
@@ -777,7 +776,10 @@
             } = Rc::make_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
             <span class="kw-2">*</span>v = M::map(lazy, v, <span class="kw-2">*</span>len);
             <span class="kw-2">*</span>l = M::comp(lazy, l);
-            <span class="kw-2">*</span>r ^= rev;
+            <span class="kw">if </span>rev {
+                <span class="kw-2">*</span>r ^= <span class="bool-val">true</span>;
+                std::mem::swap(left, right);
+            }
         }
         <span class="self">self
     </span>}
@@ -895,8 +897,8 @@
         <span class="kw">let </span><span class="self">Self </span>{ left: <span class="prelude-val">Some</span>(left), right: <span class="prelude-val">Some</span>(right), lazy: la, rev: re, .. } = <span class="self">self</span>.as_ref() <span class="kw">else </span>{
             <span class="macro">unreachable!</span>();
         };
-        <span class="kw">let </span>(lazy, rev) = (<span class="kw-2">&amp;</span>M::comp(lazy, la), rev ^ re);
         <span class="kw">let </span>(left, right) = <span class="kw">if </span>rev { (right, left) } <span class="kw">else </span>{ (left, right) };
+        <span class="kw">let </span>(lazy, rev) = (<span class="kw-2">&amp;</span>M::comp(lazy, la), rev ^ re);
         <span class="kw">let </span>len = <span class="kw-2">&amp;</span>left.len;
         <span class="kw">match </span>(l.cmp(len), r.cmp(len)) {
             (<span class="kw">_</span>, Less | Equal) =&gt; left.clone().prod(l, r, lazy, rev),
