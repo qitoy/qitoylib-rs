@@ -4,11 +4,11 @@ version = "0.1.0"
 edition = "2021"
 
 [package.metadata.cargo-compete.example]
-red_black_tree.problem = "https://judge.yosupo.jp/problem/dynamic_sequence_range_affine_range_sum"
+dynamic_sequence_range_affine_range_sum.problem = "https://judge.yosupo.jp/problem/dynamic_sequence_range_affine_range_sum"
 
 [[example]]
-name = "red_black_tree"
-path = "examples/red_black_tree.rs"
+name = "dynamic_sequence_range_affine_range_sum"
+path = "examples/dynamic_sequence_range_affine_range_sum.rs"
 
 [dependencies]
 
