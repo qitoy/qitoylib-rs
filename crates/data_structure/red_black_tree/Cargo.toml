@@ -5,10 +5,15 @@ edition = "2021"
 
 [package.metadata.cargo-compete.example]
 dynamic_sequence_range_affine_range_sum.problem = "https://judge.yosupo.jp/problem/dynamic_sequence_range_affine_range_sum"
+not_graph.problem = "https://atcoder.jp/contests/arc030/tasks/arc030_4"
 
 [[example]]
 name = "dynamic_sequence_range_affine_range_sum"
 path = "examples/dynamic_sequence_range_affine_range_sum.rs"
+
+[[example]]
+name = "not_graph"
+path = "examples/not_graph.rs"
 
 [dependencies]
 
