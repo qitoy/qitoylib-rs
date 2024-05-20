@@ -127,17 +127,13 @@ impl<M: MAct> Node<M> {
     }
 
     fn push_new(mut self: Rc<Self>) -> Rc<Self> {
-        let Self { left: Some(left), right: Some(right), lazy, rev, val, .. } = Rc::make_mut(&mut self)
-            else { return self };
-        if lazy != &M::id() || *rev {
-            *left = left.clone().update(lazy, *rev);
-            *right = right.clone().update(lazy, *rev);
-            if *rev {
-                std::mem::swap(left, right);
-            }
-            *lazy = M::id();
-            *rev = false;
-            *val = M::op(&left.val, &right.val);
+        if !self.is_leaf() && (self.lazy != M::id() || self.rev) {
+            let (left, right) = self.lazy_push().unwrap();
+            let this = Rc::make_mut(&mut self);
+            this.left = Some(left);
+            this.right = Some(right);
+            this.lazy = M::id();
+            this.rev = false;
         }
         self
     }
@@ -145,16 +141,18 @@ impl<M: MAct> Node<M> {
     fn lazy_push(&self) -> Option<(Rc<Self>, Rc<Self>)> {
         let Self { left: Some(left), right:Some(right), lazy, rev, .. } = self
             else { return None; };
-        let (left, right) = (
+        (
             left.clone().update(lazy, *rev),
             right.clone().update(lazy, *rev),
-        );
-        if *rev { (right, left) } else { (left, right) }.into()
+        )
+            .into()
     }
 
     fn update(mut self: Rc<Self>, lazy: &M::F, rev: bool) -> Rc<Self> {
         if !self.is_leaf() && rev || lazy != &M::id() {
             let Self {
+                left,
+                right,
                 len,
                 val: v,
                 lazy: l,
@@ -163,7 +161,10 @@ impl<M: MAct> Node<M> {
             } = Rc::make_mut(&mut self);
             *v = M::map(lazy, v, *len);
             *l = M::comp(lazy, l);
-            *r ^= rev;
+            if rev {
+                *r ^= true;
+                std::mem::swap(left, right);
+            }
         }
         self
     }
@@ -281,8 +282,8 @@ impl<M: MAct> Node<M> {
         let Self { left: Some(left), right: Some(right), lazy: la, rev: re, .. } = self.as_ref() else {
             unreachable!();
         };
-        let (lazy, rev) = (&M::comp(lazy, la), rev ^ re);
         let (left, right) = if rev { (right, left) } else { (left, right) };
+        let (lazy, rev) = (&M::comp(lazy, la), rev ^ re);
         let len = &left.len;
         match (l.cmp(len), r.cmp(len)) {
             (_, Less | Equal) => left.clone().prod(l, r, lazy, rev),
