@@ -6,6 +6,7 @@ var sourcesIndex = JSON.parse('{\
 "qitoy_dfa":["",[],["alpha_trans.rs","and.rs","dfa.rs","into_dfa.rs","less.rs","lib.rs","multiple_of.rs","nfa.rs","non_zero.rs","unit.rs"]],\
 "qitoy_group":["",[],["lib.rs"]],\
 "qitoy_hld":["",[],["lib.rs"]],\
+"qitoy_li_chao_tree":["",[],["lib.rs"]],\
 "qitoy_link_cut_tree":["",[],["lib.rs"]],\
 "qitoy_math_montgomery":["",[],["lib.rs"]],\
 "qitoy_math_numeric":["",[],["lib.rs"]],\
