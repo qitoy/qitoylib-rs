@@ -5,10 +5,15 @@ edition = "2021"
 
 [package.metadata.cargo-compete.example]
 line_add_get_min.problem = "https://judge.yosupo.jp/problem/line_add_get_min"
+segment_add_get_min.problem = "https://judge.yosupo.jp/problem/segment_add_get_min"
 
 [[example]]
 name = "line_add_get_min"
 path = "examples/line_add_get_min.rs"
+
+[[example]]
+name = "segment_add_get_min"
+path = "examples/segment_add_get_min.rs"
 
 [dependencies]
 

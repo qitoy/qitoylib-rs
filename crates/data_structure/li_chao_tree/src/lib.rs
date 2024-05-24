@@ -78,6 +78,18 @@ impl LiChaoTree {
         self.right_mut().add_line(a, b);
     }
 
+    pub fn add_segment(&mut self, range: Range<i64>, a: i64, b: i64) {
+        if self.range.end <= range.start || range.end <= self.range.start {
+            return;
+        }
+        if range.start <= self.range.start && self.range.end <= range.end {
+            self.add_line(a, b);
+            return;
+        }
+        self.left_mut().add_segment(range.clone(), a, b);
+        self.right_mut().add_segment(range, a, b);
+    }
+
     pub fn get_min(&self, x: i64) -> i64 {
         let mut min = self.line.get(x);
         let (left_range, right_range) = self.range_divide();
