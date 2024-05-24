@@ -1,3 +1,4 @@
+// verification-helper: PROBLEM https://judge.yosupo.jp/problem/line_add_get_min
 use proconio::input;
 use qitoy_derive::query_readable;
 use qitoy_li_chao_tree::LiChaoTree;
