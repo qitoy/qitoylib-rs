@@ -136,3 +136,14 @@ impl LiChaoTree {
         (start..mid, mid..end)
     }
 }
+
+impl Drop for LiChaoTree {
+    fn drop(&mut self) {
+        if let Some(left) = self.left {
+            unsafe { drop(Box::from_raw(left.as_ptr())) }
+        }
+        if let Some(right) = self.right {
+            unsafe { drop(Box::from_raw(right.as_ptr())) }
+        }
+    }
+}
