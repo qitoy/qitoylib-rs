@@ -1,0 +1,17 @@
+[package]
+name = "qitoy-li_chao_tree"
+version = "0.1.0"
+edition = "2021"
+
+[package.metadata.cargo-compete.example]
+line_add_get_min.problem = "https://judge.yosupo.jp/problem/line_add_get_min"
+
+[[example]]
+name = "line_add_get_min"
+path = "examples/line_add_get_min.rs"
+
+[dependencies]
+
+[dev-dependencies]
+proconio.workspace = true
+qitoy-derive = { path = "../../proc/derive" }
