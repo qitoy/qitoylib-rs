@@ -61,18 +61,21 @@ impl LiChaoTree {
 
     pub fn add_line(&mut self, a: i64, b: i64) {
         let line = Line { a, b };
-        let (left_range, right_range) = self.range_divide();
-        match (
-            self.line.cmp(&line, &left_range),
-            self.line.cmp(&line, &right_range),
-        ) {
-            (Some(Equal | Less), Some(Equal | Less)) => ( /* do nothing */ ),
-            (Some(Greater), Some(Greater)) => self.line = line,
-            _ => {
-                self.left_mut().add_line(a, b);
-                self.right_mut().add_line(a, b);
+        if self.len() == 1 {
+            let start = self.range.start;
+            if self.line.get(start) > line.get(start) {
+                self.line = line;
             }
+            return;
         }
+        if let Some(ord) = self.line.cmp(&line, &self.range) {
+            if ord == Greater {
+                self.line = line;
+            }
+            return;
+        }
+        self.left_mut().add_line(a, b);
+        self.right_mut().add_line(a, b);
     }
 
     pub fn get_min(&self, x: i64) -> i64 {
@@ -110,6 +113,11 @@ impl LiChaoTree {
                 .get_or_insert_with(|| NonNull::from(Box::leak(Box::new(Self::new(right_range)))))
                 .as_mut()
         }
+    }
+
+    fn len(&self) -> i64 {
+        let Range { start, end } = self.range;
+        end - start
     }
 
     fn mid(&self) -> i64 {
