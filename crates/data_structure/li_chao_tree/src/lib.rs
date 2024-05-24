@@ -80,11 +80,16 @@ impl LiChaoTree {
 
     pub fn get_min(&self, x: i64) -> i64 {
         let mut min = self.line.get(x);
-        if let Some(left) = self.left() {
-            min = min.min(left.get_min(x));
+        let (left_range, right_range) = self.range_divide();
+        if left_range.contains(&x) {
+            if let Some(left) = self.left() {
+                min = min.min(left.get_min(x));
+            }
         }
-        if let Some(right) = self.right() {
-            min = min.min(right.get_min(x));
+        if right_range.contains(&x) {
+            if let Some(right) = self.right() {
+                min = min.min(right.get_min(x));
+            }
         }
         min
     }
