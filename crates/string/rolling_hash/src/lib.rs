@@ -14,8 +14,6 @@ pub enum RollingHash {}
 
 impl RollingHash {
     const MOD: u64 = (1 << 61) - 1;
-    const ROOT: u64 = 37;
-    const CHARSIZE: u64 = 256;
 
     /// 文字`c`からロリハを生成する。
     pub fn new(c: char) -> <Self as Monoid>::S {
@@ -23,34 +21,15 @@ impl RollingHash {
         (b1, b2, c as u64, c as u64)
     }
 
-    /// https://trap.jp/post/1036/
     fn bases() -> (u64, u64) {
         thread_local! {
             static BASES: OnceCell<(u64, u64)> = OnceCell::new();
         }
         BASES.with(|bases| {
             *bases.get_or_init(|| {
-                let gcd = |mut x, mut y| {
-                    while y > 0 {
-                        (x, y) = (y, x % y)
-                    }
-                    x
-                };
                 let mut rng = SmallRng::from_entropy();
                 let range = Uniform::from(0..RollingHash::MOD);
-                let mut base = |b| loop {
-                    let k = range.sample(&mut rng);
-                    if gcd(k, RollingHash::MOD - 1) != 1 {
-                        continue;
-                    }
-                    let r = RollingHash::pow(RollingHash::ROOT, k);
-                    if r <= RollingHash::CHARSIZE || r == b {
-                        continue;
-                    }
-                    return r;
-                };
-                let b1 = base(0);
-                (b1, base(b1))
+                (range.sample(&mut rng), range.sample(&mut rng))
             })
         })
     }
@@ -85,19 +64,6 @@ impl RollingHash {
         let m = Self::MOD as u128;
         let c = (c >> 61) + (c & m);
         (if c >= m { c - m } else { c }) as u64
-    }
-
-    #[inline]
-    fn pow(mut a: u64, mut b: u64) -> u64 {
-        let mut c = 1;
-        while b > 0 {
-            if b % 2 == 1 {
-                c = Self::mul(c, a);
-            }
-            a = Self::mul(a, a);
-            b /= 2;
-        }
-        c
     }
 }
 
