@@ -1,4 +1,4 @@
-use std::cmp::Ordering::{self, *};
+use std::cmp::Ordering::*;
 use std::ops::Range;
 use std::ptr::NonNull;
 
@@ -18,26 +18,6 @@ impl Line {
     fn get(&self, x: i64) -> i64 {
         self.a * x + self.b
     }
-
-    /// - forall x in range, self.get(x) < rhs.get(x) => Some(Less)
-    /// - forall x in range, self.get(x) == rhs.get(x) => Some(Equal)
-    /// - forall x in range, self.get(x) > rhs.get(x) => Some(Greater)
-    /// - otherwise => None
-    fn cmp(&self, rhs: &Self, range: Range<i64>) -> Option<Ordering> {
-        if self == rhs {
-            Some(Equal)
-        } else if self.get(range.start) < rhs.get(range.start)
-            && self.get(range.end) < rhs.get(range.end)
-        {
-            Some(Less)
-        } else if self.get(range.start) > rhs.get(range.start)
-            && self.get(range.end) > rhs.get(range.end)
-        {
-            Some(Greater)
-        } else {
-            None
-        }
-    }
 }
 
 struct Node {
@@ -56,36 +36,47 @@ impl Node {
         }
     }
 
-    fn add_line(&mut self, a: i64, b: i64, l: i64, r: i64) {
-        let line = Line { a, b };
+    fn add_line(&mut self, line: Line, l: i64, r: i64) {
         if r - l == 1 {
             if self.line.get(l) > line.get(l) {
                 self.line = line;
             }
             return;
         }
-        if let Some(ord) = self.line.cmp(&line, l..r) {
-            if ord == Greater {
-                self.line = line;
-            }
-            return;
-        }
         let m = (l + r) / 2;
-        self.left_mut().add_line(a, b, l, m);
-        self.right_mut().add_line(a, b, m, r);
+        match (
+            line.get(l).cmp(&self.line.get(l)),
+            line.get(m).cmp(&self.line.get(m)),
+            line.get(r).cmp(&self.line.get(r)),
+        ) {
+            (Less | Equal, Less, Less | Equal) => self.line = line,
+            (Less, Equal | Greater, Greater) => self.left_mut().add_line(line, l, m),
+            (Greater, Equal | Greater, Less) => self.right_mut().add_line(line, m, r),
+            (Less, Less, Greater) => {
+                let mut line = line;
+                std::mem::swap(&mut self.line, &mut line);
+                self.right_mut().add_line(line, m, r);
+            }
+            (Greater, Less, Less) => {
+                let mut line = line;
+                std::mem::swap(&mut self.line, &mut line);
+                self.left_mut().add_line(line, l, m);
+            }
+            _ => ( /* do nothing */ ),
+        }
     }
 
-    fn add_segment(&mut self, range: Range<i64>, a: i64, b: i64, l: i64, r: i64) {
+    fn add_segment(&mut self, range: Range<i64>, line: Line, l: i64, r: i64) {
         if r <= range.start || range.end <= l {
             return;
         }
         if range.start <= l && r <= range.end {
-            self.add_line(a, b, l, r);
+            self.add_line(line, l, r);
             return;
         }
         let m = (l + r) / 2;
-        self.left_mut().add_segment(range.clone(), a, b, l, m);
-        self.right_mut().add_segment(range, a, b, m, r);
+        self.left_mut().add_segment(range.clone(), line, l, m);
+        self.right_mut().add_segment(range, line, m, r);
     }
 
     pub fn get_min(&self, x: i64, l: i64, r: i64) -> i64 {
@@ -154,12 +145,13 @@ impl LiChaoTree {
     }
 
     pub fn add_line(&mut self, a: i64, b: i64) {
-        self.top.add_line(a, b, self.range.start, self.range.end);
+        self.top
+            .add_line(Line { a, b }, self.range.start, self.range.end);
     }
 
     pub fn add_segment(&mut self, range: Range<i64>, a: i64, b: i64) {
         self.top
-            .add_segment(range, a, b, self.range.start, self.range.end);
+            .add_segment(range, Line { a, b }, self.range.start, self.range.end);
     }
 
     pub fn get_min(&self, x: i64) -> i64 {
