@@ -193,8 +193,7 @@
 <a href="#158" id="158">158</a>
 <a href="#159" id="159">159</a>
 <a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering::{<span class="self">self</span>, <span class="kw-2">*</span>};
+</pre></div><pre class="rust"><code><span class="kw">use </span>std::cmp::Ordering::<span class="kw-2">*</span>;
 <span class="kw">use </span>std::ops::Range;
 <span class="kw">use </span>std::ptr::NonNull;
 
@@ -214,89 +213,78 @@
     </span><span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, x: i64) -&gt; i64 {
         <span class="self">self</span>.a * x + <span class="self">self</span>.b
     }
-
-    <span class="doccomment">/// - forall x in range, self.get(x) &lt; rhs.get(x) =&gt; Some(Less)
-    /// - forall x in range, self.get(x) == rhs.get(x) =&gt; Some(Equal)
-    /// - forall x in range, self.get(x) &gt; rhs.get(x) =&gt; Some(Greater)
-    /// - otherwise =&gt; None
-    </span><span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span><span class="self">Self</span>, range: <span class="kw-2">&amp;</span>Range&lt;i64&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
-        <span class="kw">if </span><span class="self">self </span>== rhs {
-            <span class="prelude-val">Some</span>(Equal)
-        } <span class="kw">else if </span><span class="self">self</span>.get(range.start) &lt; rhs.get(range.start)
-            &amp;&amp; <span class="self">self</span>.get(range.end) &lt; rhs.get(range.end)
-        {
-            <span class="prelude-val">Some</span>(Less)
-        } <span class="kw">else if </span><span class="self">self</span>.get(range.start) &gt; rhs.get(range.start)
-            &amp;&amp; <span class="self">self</span>.get(range.end) &gt; rhs.get(range.end)
-        {
-            <span class="prelude-val">Some</span>(Greater)
-        } <span class="kw">else </span>{
-            <span class="prelude-val">None
-        </span>}
-    }
 }
 
-<span class="kw">pub struct </span>LiChaoTree {
-    <span class="doccomment">/// (a, b): ax+b
+<span class="kw">struct </span>Node {
+    <span class="doccomment">/// {a, b}: ax+b
     </span>line: Line,
-    <span class="doccomment">/// (l, r): l..r
-    </span>range: Range&lt;i64&gt;,
     left: <span class="prelude-ty">Option</span>&lt;NonNull&lt;<span class="self">Self</span>&gt;&gt;,
     right: <span class="prelude-ty">Option</span>&lt;NonNull&lt;<span class="self">Self</span>&gt;&gt;,
 }
 
-<span class="kw">impl </span>LiChaoTree {
-    <span class="kw">pub fn </span>new(range: Range&lt;i64&gt;) -&gt; <span class="self">Self </span>{
+<span class="kw">impl </span>Node {
+    <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             line: Line::new(),
-            range,
             left: <span class="prelude-val">None</span>,
             right: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub fn </span>add_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: i64, b: i64) {
-        <span class="kw">let </span>line = Line { a, b };
-        <span class="kw">if </span><span class="self">self</span>.len() == <span class="number">1 </span>{
-            <span class="kw">let </span>start = <span class="self">self</span>.range.start;
-            <span class="kw">if </span><span class="self">self</span>.line.get(start) &gt; line.get(start) {
+    <span class="kw">fn </span>add_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>, line: Line, l: i64, r: i64) {
+        <span class="kw">if </span>r - l == <span class="number">1 </span>{
+            <span class="kw">if </span><span class="self">self</span>.line.get(l) &gt; line.get(l) {
                 <span class="self">self</span>.line = line;
             }
             <span class="kw">return</span>;
         }
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(ord) = <span class="self">self</span>.line.cmp(<span class="kw-2">&amp;</span>line, <span class="kw-2">&amp;</span><span class="self">self</span>.range) {
-            <span class="kw">if </span>ord == Greater {
-                <span class="self">self</span>.line = line;
+        <span class="kw">let </span>m = (l + r) / <span class="number">2</span>;
+        <span class="kw">match </span>(
+            line.get(l).cmp(<span class="kw-2">&amp;</span><span class="self">self</span>.line.get(l)),
+            line.get(m).cmp(<span class="kw-2">&amp;</span><span class="self">self</span>.line.get(m)),
+            line.get(r).cmp(<span class="kw-2">&amp;</span><span class="self">self</span>.line.get(r)),
+        ) {
+            (Less | Equal, Less, Less | Equal) =&gt; <span class="self">self</span>.line = line,
+            (Less, Equal | Greater, Greater) =&gt; <span class="self">self</span>.left_mut().add_line(line, l, m),
+            (Greater, Equal | Greater, Less) =&gt; <span class="self">self</span>.right_mut().add_line(line, m, r),
+            (Less, Less, Greater) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>line = line;
+                std::mem::swap(<span class="kw-2">&amp;mut </span><span class="self">self</span>.line, <span class="kw-2">&amp;mut </span>line);
+                <span class="self">self</span>.right_mut().add_line(line, m, r);
             }
-            <span class="kw">return</span>;
+            (Greater, Less, Less) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>line = line;
+                std::mem::swap(<span class="kw-2">&amp;mut </span><span class="self">self</span>.line, <span class="kw-2">&amp;mut </span>line);
+                <span class="self">self</span>.left_mut().add_line(line, l, m);
+            }
+            <span class="kw">_ </span>=&gt; ( <span class="comment">/* do nothing */ </span>),
         }
-        <span class="self">self</span>.left_mut().add_line(a, b);
-        <span class="self">self</span>.right_mut().add_line(a, b);
     }
 
-    <span class="kw">pub fn </span>add_segment(<span class="kw-2">&amp;mut </span><span class="self">self</span>, range: Range&lt;i64&gt;, a: i64, b: i64) {
-        <span class="kw">if </span><span class="self">self</span>.range.end &lt;= range.start || range.end &lt;= <span class="self">self</span>.range.start {
+    <span class="kw">fn </span>add_segment(<span class="kw-2">&amp;mut </span><span class="self">self</span>, range: Range&lt;i64&gt;, line: Line, l: i64, r: i64) {
+        <span class="kw">if </span>r &lt;= range.start || range.end &lt;= l {
             <span class="kw">return</span>;
         }
-        <span class="kw">if </span>range.start &lt;= <span class="self">self</span>.range.start &amp;&amp; <span class="self">self</span>.range.end &lt;= range.end {
-            <span class="self">self</span>.add_line(a, b);
+        <span class="kw">if </span>range.start &lt;= l &amp;&amp; r &lt;= range.end {
+            <span class="self">self</span>.add_line(line, l, r);
             <span class="kw">return</span>;
         }
-        <span class="self">self</span>.left_mut().add_segment(range.clone(), a, b);
-        <span class="self">self</span>.right_mut().add_segment(range, a, b);
+        <span class="kw">let </span>m = (l + r) / <span class="number">2</span>;
+        <span class="self">self</span>.left_mut().add_segment(range.clone(), line, l, m);
+        <span class="self">self</span>.right_mut().add_segment(range, line, m, r);
     }
 
-    <span class="kw">pub fn </span>get_min(<span class="kw-2">&amp;</span><span class="self">self</span>, x: i64) -&gt; i64 {
+    <span class="kw">pub fn </span>get_min(<span class="kw-2">&amp;</span><span class="self">self</span>, x: i64, l: i64, r: i64) -&gt; i64 {
         <span class="kw">let </span><span class="kw-2">mut </span>min = <span class="self">self</span>.line.get(x);
-        <span class="kw">let </span>(left_range, right_range) = <span class="self">self</span>.range_divide();
-        <span class="kw">if </span>left_range.contains(<span class="kw-2">&amp;</span>x) {
+        <span class="kw">let </span>m = (l + r) / <span class="number">2</span>;
+        <span class="kw">if </span>(l..m).contains(<span class="kw-2">&amp;</span>x) {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(left) = <span class="self">self</span>.left() {
-                min = min.min(left.get_min(x));
+                min = min.min(left.get_min(x, l, m));
             }
         }
-        <span class="kw">if </span>right_range.contains(<span class="kw-2">&amp;</span>x) {
+        <span class="kw">if </span>(m..r).contains(<span class="kw-2">&amp;</span>x) {
             <span class="kw">if let </span><span class="prelude-val">Some</span>(right) = <span class="self">self</span>.right() {
-                min = min.min(right.get_min(x));
+                min = min.min(right.get_min(x, m, r));
             }
         }
         min
@@ -311,41 +299,23 @@
     }
 
     <span class="kw">fn </span>left_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="kw">let </span>(left_range, <span class="kw">_</span>) = <span class="self">self</span>.range_divide();
         <span class="kw">unsafe </span>{
             <span class="self">self</span>.left
-                .get_or_insert_with(|| NonNull::from(Box::leak(Box::new(<span class="self">Self</span>::new(left_range)))))
+                .get_or_insert_with(|| NonNull::from(Box::leak(Box::new(<span class="self">Self</span>::new()))))
                 .as_mut()
         }
     }
 
     <span class="kw">fn </span>right_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
-        <span class="kw">let </span>(<span class="kw">_</span>, right_range) = <span class="self">self</span>.range_divide();
         <span class="kw">unsafe </span>{
             <span class="self">self</span>.right
-                .get_or_insert_with(|| NonNull::from(Box::leak(Box::new(<span class="self">Self</span>::new(right_range)))))
+                .get_or_insert_with(|| NonNull::from(Box::leak(Box::new(<span class="self">Self</span>::new()))))
                 .as_mut()
         }
     }
-
-    <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i64 {
-        <span class="kw">let </span>Range { start, end } = <span class="self">self</span>.range;
-        end - start
-    }
-
-    <span class="kw">fn </span>mid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i64 {
-        <span class="kw">let </span>Range { start, end } = <span class="self">self</span>.range;
-        (start + end).div_euclid(<span class="number">2</span>)
-    }
-
-    <span class="kw">fn </span>range_divide(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (Range&lt;i64&gt;, Range&lt;i64&gt;) {
-        <span class="kw">let </span>Range { start, end } = <span class="self">self</span>.range;
-        <span class="kw">let </span>mid = <span class="self">self</span>.mid();
-        (start..mid, mid..end)
-    }
 }
 
-<span class="kw">impl </span>Drop <span class="kw">for </span>LiChaoTree {
+<span class="kw">impl </span>Drop <span class="kw">for </span>Node {
     <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="kw">if let </span><span class="prelude-val">Some</span>(left) = <span class="self">self</span>.left {
             <span class="kw">unsafe </span>{ drop(Box::from_raw(left.as_ptr())) }
@@ -353,6 +323,34 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(right) = <span class="self">self</span>.right {
             <span class="kw">unsafe </span>{ drop(Box::from_raw(right.as_ptr())) }
         }
+    }
+}
+
+<span class="kw">pub struct </span>LiChaoTree {
+    range: Range&lt;i64&gt;,
+    top: Node,
+}
+
+<span class="kw">impl </span>LiChaoTree {
+    <span class="kw">pub fn </span>new(range: Range&lt;i64&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            range,
+            top: Node::new(),
+        }
+    }
+
+    <span class="kw">pub fn </span>add_line(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: i64, b: i64) {
+        <span class="self">self</span>.top
+            .add_line(Line { a, b }, <span class="self">self</span>.range.start, <span class="self">self</span>.range.end);
+    }
+
+    <span class="kw">pub fn </span>add_segment(<span class="kw-2">&amp;mut </span><span class="self">self</span>, range: Range&lt;i64&gt;, a: i64, b: i64) {
+        <span class="self">self</span>.top
+            .add_segment(range, Line { a, b }, <span class="self">self</span>.range.start, <span class="self">self</span>.range.end);
+    }
+
+    <span class="kw">pub fn </span>get_min(<span class="kw-2">&amp;</span><span class="self">self</span>, x: i64) -&gt; i64 {
+        <span class="self">self</span>.top.get_min(x, <span class="self">self</span>.range.start, <span class="self">self</span>.range.end)
     }
 }
 </code></pre></div></section></main></body></html>
