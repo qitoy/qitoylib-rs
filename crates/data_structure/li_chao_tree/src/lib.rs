@@ -23,7 +23,7 @@ impl Line {
     /// - forall x in range, self.get(x) == rhs.get(x) => Some(Equal)
     /// - forall x in range, self.get(x) > rhs.get(x) => Some(Greater)
     /// - otherwise => None
-    fn cmp(&self, rhs: &Self, range: &Range<i64>) -> Option<Ordering> {
+    fn cmp(&self, rhs: &Self, range: Range<i64>) -> Option<Ordering> {
         if self == rhs {
             Some(Equal)
         } else if self.get(range.start) < rhs.get(range.start)
@@ -40,67 +40,65 @@ impl Line {
     }
 }
 
-pub struct LiChaoTree {
-    /// (a, b): ax+b
+struct Node {
+    /// {a, b}: ax+b
     line: Line,
-    /// (l, r): l..r
-    range: Range<i64>,
     left: Option<NonNull<Self>>,
     right: Option<NonNull<Self>>,
 }
 
-impl LiChaoTree {
-    pub fn new(range: Range<i64>) -> Self {
+impl Node {
+    fn new() -> Self {
         Self {
             line: Line::new(),
-            range,
             left: None,
             right: None,
         }
     }
 
-    pub fn add_line(&mut self, a: i64, b: i64) {
+    fn add_line(&mut self, a: i64, b: i64, l: i64, r: i64) {
         let line = Line { a, b };
-        if self.len() == 1 {
-            let start = self.range.start;
-            if self.line.get(start) > line.get(start) {
+        if r - l == 1 {
+            if self.line.get(l) > line.get(l) {
                 self.line = line;
             }
             return;
         }
-        if let Some(ord) = self.line.cmp(&line, &self.range) {
+        if let Some(ord) = self.line.cmp(&line, l..r) {
             if ord == Greater {
                 self.line = line;
             }
             return;
         }
-        self.left_mut().add_line(a, b);
-        self.right_mut().add_line(a, b);
+        let m = (l + r) / 2;
+        self.left_mut().add_line(a, b, l, m);
+        self.right_mut().add_line(a, b, m, r);
     }
 
-    pub fn add_segment(&mut self, range: Range<i64>, a: i64, b: i64) {
-        if self.range.end <= range.start || range.end <= self.range.start {
+    fn add_segment(&mut self, range: Range<i64>, a: i64, b: i64, l: i64, r: i64) {
+        if r <= range.start || range.end <= l {
             return;
         }
-        if range.start <= self.range.start && self.range.end <= range.end {
-            self.add_line(a, b);
+        if range.start <= l && r <= range.end {
+            self.add_line(a, b, l, r);
             return;
         }
-        self.left_mut().add_segment(range.clone(), a, b);
-        self.right_mut().add_segment(range, a, b);
+        let m = (l + r) / 2;
+        self.left_mut().add_segment(range.clone(), a, b, l, m);
+        self.right_mut().add_segment(range, a, b, m, r);
     }
 
-    pub fn get_min(&self, x: i64) -> i64 {
+    pub fn get_min(&self, x: i64, l: i64, r: i64) -> i64 {
         let mut min = self.line.get(x);
-        let (left_range, right_range) = self.range_divide();
-        if left_range.contains(&x) {
+        let m = (l + r) / 2;
+        if (l..m).contains(&x) {
             if let Some(left) = self.left() {
-                min = min.min(left.get_min(x));
+                min = min.min(left.get_min(x, l, m));
             }
         }
-        if right_range.contains(&x) {
+        if (m..r).contains(&x) {
             if let Some(right) = self.right() {
-                min = min.min(right.get_min(x));
+                min = min.min(right.get_min(x, m, r));
             }
         }
         min
@@ -115,41 +113,23 @@ impl LiChaoTree {
     }
 
     fn left_mut(&mut self) -> &mut Self {
-        let (left_range, _) = self.range_divide();
         unsafe {
             self.left
-                .get_or_insert_with(|| NonNull::from(Box::leak(Box::new(Self::new(left_range)))))
+                .get_or_insert_with(|| NonNull::from(Box::leak(Box::new(Self::new()))))
                 .as_mut()
         }
     }
 
     fn right_mut(&mut self) -> &mut Self {
-        let (_, right_range) = self.range_divide();
         unsafe {
             self.right
-                .get_or_insert_with(|| NonNull::from(Box::leak(Box::new(Self::new(right_range)))))
+                .get_or_insert_with(|| NonNull::from(Box::leak(Box::new(Self::new()))))
                 .as_mut()
         }
     }
-
-    fn len(&self) -> i64 {
-        let Range { start, end } = self.range;
-        end - start
-    }
-
-    fn mid(&self) -> i64 {
-        let Range { start, end } = self.range;
-        (start + end).div_euclid(2)
-    }
-
-    fn range_divide(&self) -> (Range<i64>, Range<i64>) {
-        let Range { start, end } = self.range;
-        let mid = self.mid();
-        (start..mid, mid..end)
-    }
 }
 
-impl Drop for LiChaoTree {
+impl Drop for Node {
     fn drop(&mut self) {
         if let Some(left) = self.left {
             unsafe { drop(Box::from_raw(left.as_ptr())) }
@@ -157,5 +137,32 @@ impl Drop for LiChaoTree {
         if let Some(right) = self.right {
             unsafe { drop(Box::from_raw(right.as_ptr())) }
         }
+    }
+}
+
+pub struct LiChaoTree {
+    range: Range<i64>,
+    top: Node,
+}
+
+impl LiChaoTree {
+    pub fn new(range: Range<i64>) -> Self {
+        Self {
+            range,
+            top: Node::new(),
+        }
+    }
+
+    pub fn add_line(&mut self, a: i64, b: i64) {
+        self.top.add_line(a, b, self.range.start, self.range.end);
+    }
+
+    pub fn add_segment(&mut self, range: Range<i64>, a: i64, b: i64) {
+        self.top
+            .add_segment(range, a, b, self.range.start, self.range.end);
+    }
+
+    pub fn get_min(&self, x: i64) -> i64 {
+        self.top.get_min(x, self.range.start, self.range.end)
     }
 }
