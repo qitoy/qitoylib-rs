@@ -32,7 +32,7 @@ impl std::fmt::Debug for BitVec {
 
 impl<I: Into<u64>> FromIterator<I> for BitVec {
     fn from_iter<T: IntoIterator<Item = I>>(iter: T) -> Self {
-        let v: Vec<u64> = iter.into_iter().map(|i| i.into()).collect();
+        let v: Vec<u64> = iter.into_iter().map(Into::into).collect();
         let len = v.len();
         let mut data = vec![0u64; (len + 63) / 64];
         let mut block = vec![0; (len + 63) / 64];
