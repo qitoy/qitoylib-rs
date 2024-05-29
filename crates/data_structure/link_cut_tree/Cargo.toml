@@ -3,4 +3,10 @@ name = "qitoy-link_cut_tree"
 version = "0.1.0"
 edition = "2021"
 
+[[example]]
+name = "lca"
+path = "examples/lca.rs"
+
 [dependencies]
+proconio.workspace = true
+itertools.workspace = true
