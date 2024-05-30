@@ -231,7 +231,7 @@
 
 <span class="kw">impl</span>&lt;I: Into&lt;u64&gt;&gt; FromIterator&lt;I&gt; <span class="kw">for </span>BitVec {
     <span class="kw">fn </span>from_iter&lt;T: IntoIterator&lt;Item = I&gt;&gt;(iter: T) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>v: Vec&lt;u64&gt; = iter.into_iter().map(|i| i.into()).collect();
+        <span class="kw">let </span>v: Vec&lt;u64&gt; = iter.into_iter().map(Into::into).collect();
         <span class="kw">let </span>len = v.len();
         <span class="kw">let </span><span class="kw-2">mut </span>data = <span class="macro">vec!</span>[<span class="number">0u64</span>; (len + <span class="number">63</span>) / <span class="number">64</span>];
         <span class="kw">let </span><span class="kw-2">mut </span>block = <span class="macro">vec!</span>[<span class="number">0</span>; (len + <span class="number">63</span>) / <span class="number">64</span>];
