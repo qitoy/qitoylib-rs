@@ -75,6 +75,30 @@ impl Node {
     }
 }
 
+impl std::fmt::Debug for Node {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let (left, right, parent) = unsafe {
+            let Self {
+                left,
+                right,
+                parent,
+                ..
+            } = self;
+            (
+                left.map(|ptr| ptr.as_ref().idx),
+                right.map(|ptr| ptr.as_ref().idx),
+                parent.map(|ptr| ptr.as_ref().idx),
+            )
+        };
+        f.debug_struct("Node")
+            .field("idx", &self.idx)
+            .field("left", &left)
+            .field("right", &right)
+            .field("parent", &parent)
+            .finish()
+    }
+}
+
 pub struct LinkCutTree {
     node: Vec<NonNull<Node>>,
 }
@@ -140,5 +164,13 @@ impl Drop for LinkCutTree {
                 drop(Box::from_raw(node.as_ptr()));
             }
         }
+    }
+}
+
+impl std::fmt::Debug for LinkCutTree {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_list()
+            .entries(self.node.iter().map(|ptr| unsafe { ptr.as_ref() }))
+            .finish()
     }
 }

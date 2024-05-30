@@ -13,5 +13,6 @@ fn main () {
     for (p, v) in p.into_iter().zip(1..) {
         lct.link(v, p);
     }
+    eprintln!("{lct:?}");
     println!("{}", q.into_iter().map(|(u, v)| lct.lca(u, v)).join("\n"));
 }
