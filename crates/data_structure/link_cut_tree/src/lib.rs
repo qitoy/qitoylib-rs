@@ -49,7 +49,7 @@ impl Node {
         }
         this.as_mut().parent = parent.as_ref().parent;
         parent.as_mut().parent = Some(this);
-        if let Some(mut pp) = parent.as_ref().parent {
+        if let Some(mut pp) = this.as_ref().parent {
             if pp.as_ref().left == Some(parent) {
                 pp.as_mut().left = Some(this);
             }
@@ -64,11 +64,11 @@ impl Node {
             let parent = this.as_ref().parent.unwrap();
             if Self::is_root(parent) {
                 Self::rotate(this);
-            } else if Self::is_left_child(this) ^ Self::is_left_child(parent) {
-                Self::rotate(this);
+            } else if Self::is_left_child(this) == Self::is_left_child(parent) {
+                Self::rotate(parent);
                 Self::rotate(this);
             } else {
-                Self::rotate(parent);
+                Self::rotate(this);
                 Self::rotate(this);
             }
         }
