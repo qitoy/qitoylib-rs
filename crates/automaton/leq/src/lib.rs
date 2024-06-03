@@ -1,16 +1,16 @@
-use super::Dfa;
+use qitoy_dfa::Dfa;
 
-pub struct Less<'a> {
+pub struct Leq<'a> {
     n: &'a [u8],
 }
 
-impl<'a> Less<'a> {
+impl<'a> Leq<'a> {
     pub fn new(n: &'a [u8]) -> Self {
         Self { n }
     }
 }
 
-impl Dfa for Less<'_> {
+impl Dfa for Leq<'_> {
     /// (index, smaller)
     type State = (usize, bool);
     type Alphabet = u8;
@@ -38,4 +38,3 @@ impl Dfa for Less<'_> {
         state.0 == self.n.len()
     }
 }
-

@@ -2,11 +2,7 @@
 members = [
   "crates/algebra/*",
   "crates/algorithm/*",
-  "crates/automaton/dfa",
-  "crates/automaton/less",
-  "crates/automaton/multiple_of",
-  "crates/automaton/nfa",
-  "crates/automaton/non_zero",
+  "crates/automaton/*",
   "crates/data_structure/*",
   "crates/graph/*",
   "crates/math/*",

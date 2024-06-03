@@ -1,14 +1,30 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+use qitoy_dfa::Dfa;
+
+#[derive(Default)]
+pub struct NonZero;
+
+impl NonZero {
+    pub fn new() -> Self {
+        Self::default()
+    }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+impl Dfa for NonZero {
+    type State = bool;
+    type Alphabet = u8;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+    #[inline]
+    fn trans(&self, state: &Self::State, alpha: &Self::Alphabet) -> Option<Self::State> {
+        Some(*state || alpha != &0)
+    }
+
+    #[inline]
+    fn init(&self) -> Self::State {
+        false
+    }
+
+    #[inline]
+    fn accept(&self, state: &Self::State) -> bool {
+        *state
     }
 }
