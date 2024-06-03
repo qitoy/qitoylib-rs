@@ -79,10 +79,3 @@ pub trait Dfa {
             .fold(M::identity(), |acc, x| M::binary_operation(&acc, &x))
     }
 }
-
-pub trait IntoDfa {
-    type State;
-    type Alphabet;
-    type IntoDfa: Dfa<State = Self::State, Alphabet = Self::Alphabet>;
-    fn into_dfa(self) -> Self::IntoDfa;
-}
