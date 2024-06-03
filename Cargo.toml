@@ -7,7 +7,6 @@ members = [
   "crates/automaton/multiple_of",
   "crates/automaton/nfa",
   "crates/automaton/non_zero",
-  "crates/automaton/unit",
   "crates/data_structure/*",
   "crates/graph/*",
   "crates/math/*",
