@@ -1,0 +1,7 @@
+[package]
+name = "qitoy-dfa-leq_inv"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+qitoy-dfa.path = "../dfa"
