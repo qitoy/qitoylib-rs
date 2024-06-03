@@ -2,8 +2,6 @@
 members = [
   "crates/algebra/*",
   "crates/algorithm/*",
-  "crates/automaton/alpha_trans",
-  "crates/automaton/and",
   "crates/automaton/dfa",
   "crates/automaton/less",
   "crates/automaton/multiple_of",
