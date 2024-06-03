@@ -1,10 +1,12 @@
 use qitoy_dfa::Dfa;
 
+/// `n`以下の非負整数を受理する（上の位から見る）
 pub struct Leq<'a> {
     n: &'a [u8],
 }
 
 impl<'a> Leq<'a> {
+    /// `n`を任意の進法で表記した配列から作成する
     pub fn new(n: &'a [u8]) -> Self {
         Self { n }
     }

@@ -1,13 +1,14 @@
 use qitoy_dfa::Dfa;
 
+/// `digit`進法で表わされる数字のうち、`multiple`の倍数のものを受理する。
 pub struct MultipleOf {
     d: u64,
     m: u64,
 }
 
 impl MultipleOf {
-    pub fn new(digit: u64, modulus: u64) -> Self {
-        Self { d: digit, m: modulus }
+    pub fn new(digit: u64, multiple: u64) -> Self {
+        Self { d: digit, m: multiple }
     }
 }
 

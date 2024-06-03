@@ -1,11 +1,17 @@
 use qitoy_dfa::Dfa;
 use std::collections::BTreeSet;
 
+/// 非決定性有限オートマトン
 pub trait Nfa {
+    /// 状態の型
     type State: Ord + Clone;
+    /// 文字の型
     type Alphabet;
+    /// 遷移関数
     fn trans(&self, state: &Self::State, alpha: Option<&Self::Alphabet>) -> BTreeSet<Self::State>;
+    /// 開始状態
     fn init(&self) -> BTreeSet<Self::State>;
+    /// 受理関数
     fn accept(&self, state: &Self::State) -> bool;
 
     fn epsilon_closure(&self, mut state: BTreeSet<Self::State>) -> BTreeSet<Self::State> {

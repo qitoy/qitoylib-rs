@@ -3,6 +3,7 @@ use qitoy_dfa::Dfa;
 #[derive(Default)]
 pub struct NonZero;
 
+/// 正整数を受理する。
 impl NonZero {
     pub fn new() -> Self {
         Self::default()
