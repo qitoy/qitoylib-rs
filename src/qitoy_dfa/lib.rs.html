@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/automaton/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="qitoy_dfa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `crates/automaton/dfa/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="qitoy_dfa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css" integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js" integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4" crossorigin="anonymous"></script>
 <script>
   // from https://github.com/CAD97/katex-doc/blob/master/katex.html
@@ -114,113 +114,85 @@
 <a href="#79" id="79">79</a>
 <a href="#80" id="80">80</a>
 <a href="#81" id="81">81</a>
-<a href="#82" id="82">82</a>
-<a href="#83" id="83">83</a>
-<a href="#84" id="84">84</a>
-<a href="#85" id="85">85</a>
-<a href="#86" id="86">86</a>
-<a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
-<a href="#89" id="89">89</a>
-<a href="#90" id="90">90</a>
-<a href="#91" id="91">91</a>
-<a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-</pre></div><pre class="rust"><code><span class="kw">mod </span>dfa;
-<span class="kw">pub use </span>dfa::Dfa;
-
-<span class="kw">mod </span>nfa;
-<span class="kw">pub use </span>nfa::Nfa;
-
-<span class="kw">mod </span>into_dfa;
-<span class="kw">pub use </span>into_dfa::IntoDfa;
-
+</pre></div><pre class="rust"><code><span class="kw">mod </span>alpha_trans;
 <span class="kw">mod </span>and;
+
+<span class="kw">use </span>ac_library::Monoid;
+<span class="kw">pub use </span>alpha_trans::AlphaTrans;
 <span class="kw">pub use </span>and::And;
 
-<span class="kw">mod </span>alpha_trans;
-<span class="kw">pub use </span>alpha_trans::AlphaTrans;
+<span class="doccomment">/// 決定性有限オートマトン
+</span><span class="kw">pub trait </span>Dfa {
+    <span class="doccomment">/// 状態の型
+    </span><span class="kw">type </span>State: Ord;
+    <span class="doccomment">/// 文字の型
+    </span><span class="kw">type </span>Alphabet;
+    <span class="doccomment">/// 遷移関数
+    </span><span class="kw">fn </span>trans(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;</span><span class="self">Self</span>::State, alpha: <span class="kw-2">&amp;</span><span class="self">Self</span>::Alphabet) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::State&gt;;
+    <span class="doccomment">/// 開始状態
+    </span><span class="kw">fn </span>init(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::State;
+    <span class="doccomment">/// 受理関数
+    </span><span class="kw">fn </span>accept(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;</span><span class="self">Self</span>::State) -&gt; bool;
 
-<span class="kw">mod </span>multiple_of;
-<span class="kw">pub use </span>multiple_of::MultipleOf;
-
-<span class="kw">mod </span>less;
-<span class="kw">pub use </span>less::Less;
-
-<span class="kw">mod </span>non_zero;
-<span class="kw">pub use </span>non_zero::NonZero;
-
-<span class="kw">mod </span>unit;
-<span class="kw">pub use </span>unit::Unit;
-
-<span class="kw">pub fn </span>dfa_new&lt;T&gt;() -&gt; Unit&lt;T&gt; {
-    Unit::&lt;T&gt;::default()
-}
-
-<span class="attr">#[cfg(test)]
-</span><span class="kw">mod </span>test {
-    <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span>ac_library::{Additive, ModInt998244353 <span class="kw">as </span>Mint, Monoid};
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test1() {
-        <span class="macro">assert_eq!</span>(
-            MultipleOf::new(<span class="number">10</span>, <span class="number">3</span>)
-                .and(MultipleOf::new(<span class="number">10</span>, <span class="number">5</span>))
-                .and(Less::new(<span class="kw-2">&amp;</span>[<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>]))
-                .calc::&lt;Additive&lt;i32&gt;&gt;(<span class="number">0</span>..=<span class="number">9</span>, <span class="number">3</span>, <span class="number">1</span>, |x, <span class="kw">_</span>| <span class="kw-2">*</span>x),
-            <span class="number">100 </span>/ <span class="number">15 </span>+ <span class="number">1
-        </span>);
+    <span class="doccomment">/// `Alphabet`が同じDFAの積をとる。
+    </span><span class="attr">#[inline]
+    </span><span class="kw">fn </span>and&lt;E&gt;(<span class="self">self</span>, other: E) -&gt; And&lt;<span class="self">Self</span>, E&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        E: Dfa&lt;Alphabet = <span class="self">Self</span>::Alphabet&gt;,
+    {
+        And::new(<span class="self">self</span>, other)
     }
 
-    <span class="kw">struct </span>M;
-
-    <span class="kw">impl </span>Monoid <span class="kw">for </span>M {
-        <span class="kw">type </span>S = Mint;
-        <span class="kw">fn </span>identity() -&gt; <span class="self">Self</span>::S {
-            Mint::raw(<span class="number">0</span>)
-        }
-        <span class="kw">fn </span>binary_operation(a: <span class="kw-2">&amp;</span><span class="self">Self</span>::S, b: <span class="kw-2">&amp;</span><span class="self">Self</span>::S) -&gt; <span class="self">Self</span>::S {
-            a + b
-        }
+    <span class="doccomment">/// `f`を通じて異なる`Alphabet`を受理できるようにする。
+    </span><span class="attr">#[inline]
+    </span><span class="kw">fn </span>alpha_trans&lt;F, A&gt;(<span class="self">self</span>, f: F) -&gt; AlphaTrans&lt;<span class="self">Self</span>, F, A&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
+        F: Fn(<span class="kw-2">&amp;</span>A) -&gt; <span class="self">Self</span>::Alphabet,
+    {
+        AlphaTrans::new(<span class="self">self</span>, f)
     }
 
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test2() {
-        <span class="kw">let </span>n: Vec&lt;<span class="kw">_</span>&gt; = <span class="macro">format!</span>(<span class="string">&quot;{:#b}&quot;</span>, <span class="number">31415926535897932u64</span>)[<span class="number">2</span>..]
-            .bytes()
-            .map(|b| b - <span class="string">b&#39;0&#39;</span>)
-            .collect();
-        <span class="macro">assert_eq!</span>(
-            dfa_new()
-                .multiple_of(<span class="number">2</span>, <span class="number">3</span>)
-                .less(<span class="kw-2">&amp;</span>n)
-                .non_zero()
-                .alpha_trans(|v: <span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)| v.<span class="number">0</span>)
-                .and(
-                    dfa_new()
-                        .multiple_of(<span class="number">2</span>, <span class="number">8</span>)
-                        .less(<span class="kw-2">&amp;</span>n)
-                        .non_zero()
-                        .alpha_trans(|v: <span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)| v.<span class="number">1</span>)
-                )
-                .and(
-                    dfa_new()
-                        .multiple_of(<span class="number">2</span>, <span class="number">4</span>)
-                        .less(<span class="kw-2">&amp;</span>n)
-                        .non_zero()
-                        .alpha_trans(|v: <span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>)| v.<span class="number">2</span>)
-                )
-                .calc::&lt;M&gt;(
-                    [(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>), (<span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>), (<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>), (<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>)],
-                    n.len(),
-                    Mint::raw(<span class="number">1</span>),
-                    |x, <span class="kw">_</span>| <span class="kw-2">*</span>x
-                )
-                .val(),
-            <span class="number">759934997
-        </span>)
+    <span class="doccomment">/// DFAを用いたDPを計算する。
+    /// * `M` - モノイド
+    /// * `alpha` - 文字の集合
+    /// * `len` - 受理する文字列の長さ
+    /// * `init` - DPの初期値
+    /// * `map` - DPの遷移関数
+    </span><span class="attr">#[inline]
+    </span><span class="kw">fn </span>calc&lt;M&gt;(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        alpha: <span class="kw">impl </span>IntoIterator&lt;Item = <span class="self">Self</span>::Alphabet&gt; + Clone,
+        len: usize,
+        init: M::S,
+        <span class="kw-2">mut </span>map: <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;</span>M::S, <span class="kw-2">&amp;</span><span class="self">Self</span>::Alphabet) -&gt; M::S,
+    ) -&gt; M::S
+    <span class="kw">where
+        </span>M: Monoid,
+    {
+        <span class="kw">use </span>std::collections::BTreeMap;
+
+        <span class="kw">let </span><span class="kw-2">mut </span>dp = BTreeMap::new();
+        dp.insert(<span class="self">self</span>.init(), init);
+
+        <span class="kw">for _ in </span><span class="number">0</span>..len {
+            <span class="kw">let </span><span class="kw-2">mut </span>ndp = BTreeMap::new();
+            <span class="kw">for </span>(state, value) <span class="kw">in </span>dp {
+                <span class="kw">for </span>a <span class="kw">in </span>alpha.clone() {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(nstate) = <span class="self">self</span>.trans(<span class="kw-2">&amp;</span>state, <span class="kw-2">&amp;</span>a) {
+                        <span class="kw">let </span>nvalue = map(<span class="kw-2">&amp;</span>value, <span class="kw-2">&amp;</span>a);
+                        ndp.entry(nstate)
+                            .and_modify(|v| <span class="kw-2">*</span>v = M::binary_operation(v, <span class="kw-2">&amp;</span>nvalue))
+                            .or_insert(nvalue);
+                    }
+                }
+            }
+            dp = ndp;
+        }
+        dp.into_iter()
+            .filter_map(|v| <span class="kw">if </span><span class="self">self</span>.accept(<span class="kw-2">&amp;</span>v.<span class="number">0</span>) { <span class="prelude-val">Some</span>(v.<span class="number">1</span>) } <span class="kw">else </span>{ <span class="prelude-val">None </span>})
+            .fold(M::identity(), |acc, x| M::binary_operation(<span class="kw-2">&amp;</span>acc, <span class="kw-2">&amp;</span>x))
     }
 }
 </code></pre></div></section></main></body></html>

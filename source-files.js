@@ -3,7 +3,11 @@ var sourcesIndex = JSON.parse('{\
 "qitoy_bit_vec":["",[],["lib.rs"]],\
 "qitoy_combi":["",[],["lib.rs"]],\
 "qitoy_derive":["",[],["lib.rs","query_readable.rs"]],\
-"qitoy_dfa":["",[],["alpha_trans.rs","and.rs","dfa.rs","into_dfa.rs","less.rs","lib.rs","multiple_of.rs","nfa.rs","non_zero.rs","unit.rs"]],\
+"qitoy_dfa":["",[],["alpha_trans.rs","and.rs","lib.rs"]],\
+"qitoy_dfa_leq":["",[],["lib.rs"]],\
+"qitoy_dfa_leq_inv":["",[],["lib.rs"]],\
+"qitoy_dfa_multiple_of":["",[],["lib.rs"]],\
+"qitoy_dfa_non_zero":["",[],["lib.rs"]],\
 "qitoy_group":["",[],["lib.rs"]],\
 "qitoy_hld":["",[],["lib.rs"]],\
 "qitoy_li_chao_tree":["",[],["lib.rs"]],\
@@ -12,6 +16,7 @@ var sourcesIndex = JSON.parse('{\
 "qitoy_math_numeric":["",[],["lib.rs"]],\
 "qitoy_matrix":["",[],["lib.rs"]],\
 "qitoy_mo":["",[],["lib.rs"]],\
+"qitoy_nfa":["",[],["lib.rs"]],\
 "qitoy_prelude":["",[],["lib.rs"]],\
 "qitoy_prime_check":["",[],["lib.rs"]],\
 "qitoy_prime_factorize":["",[],["lib.rs"]],\
