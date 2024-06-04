@@ -1,9 +1,9 @@
-mod and;
 mod alpha_trans;
+mod and;
 
 use ac_library::Monoid;
-pub use and::And;
 pub use alpha_trans::AlphaTrans;
+pub use and::And;
 
 /// 決定性有限オートマトン
 pub trait Dfa {

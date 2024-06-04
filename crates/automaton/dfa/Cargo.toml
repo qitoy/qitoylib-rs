@@ -3,5 +3,14 @@ name = "qitoy-dfa"
 version = "0.1.0"
 edition = "2021"
 
+[[example]]
+name = "xor_sum"
+path = "examples/xor_sum.rs"
+
 [dependencies]
 ac-library-rs.workspace = true
+
+[dev-dependencies]
+proconio.workspace = true
+qitoy-nfa.path = "../nfa"
+qitoy-dfa-leq_inv.path = "../leq_inv"
