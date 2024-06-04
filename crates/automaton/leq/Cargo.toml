@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 qitoy-dfa.path = "../dfa"
+ac-library-rs.workspace = true
