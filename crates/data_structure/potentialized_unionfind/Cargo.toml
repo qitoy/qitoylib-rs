@@ -1,17 +1,14 @@
 [package]
-name = "qitoy-weighted_dsu"
+name = "qitoy-potentialized_unionfind"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 qitoy-group = { path = '../../algebra/group' }
 
-[package.metadata.cargo-compete.example]
-weighted_dsu.problem = "https://judge.u-aizu.ac.jp/onlinejudge/description.jsp?id=DSL_1_B"
-
 [[example]]
-name = "weighted_dsu"
-path = "examples/weighted_dsu.rs"
+name = "unionfind_with_potential_non_commutative_group"
+path = "examples/unionfind_with_potential_non_commutative_group.rs"
 
 [dev-dependencies]
 ac-library-rs.workspace = true
