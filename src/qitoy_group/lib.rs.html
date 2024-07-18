@@ -56,7 +56,7 @@
 <span class="kw">use </span>std::ops::Neg;
 
 <span class="kw">pub trait </span>Group: Monoid {
-    <span class="kw">fn </span>negate(a: <span class="kw-2">&amp;</span><span class="self">Self</span>::S) -&gt; <span class="self">Self</span>::S;
+    <span class="kw">fn </span>inverse(a: <span class="kw-2">&amp;</span><span class="self">Self</span>::S) -&gt; <span class="self">Self</span>::S;
 }
 
 <span class="kw">impl</span>&lt;S&gt; Group <span class="kw">for </span>Additive&lt;S&gt;
@@ -64,7 +64,7 @@
     </span>S: Neg&lt;Output = S&gt; + Copy,
     Additive&lt;S&gt;: Monoid&lt;S = S&gt;,
 {
-    <span class="kw">fn </span>negate(a: <span class="kw-2">&amp;</span><span class="self">Self</span>::S) -&gt; <span class="self">Self</span>::S {
+    <span class="kw">fn </span>inverse(a: <span class="kw-2">&amp;</span><span class="self">Self</span>::S) -&gt; <span class="self">Self</span>::S {
         -<span class="kw-2">*</span>a
     }
 }
