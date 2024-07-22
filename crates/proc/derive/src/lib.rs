@@ -3,7 +3,7 @@ use syn::parse::Parser;
 
 mod query_readable;
 
-/// query_readable! {}
+/// query_readable!()
 ///
 /// ```
 /// # use qitoy_derive::query_readable;
@@ -13,13 +13,11 @@ mod query_readable;
 /// // * 0
 /// // * 1 n s
 /// // * 2 l r
-/// query_readable! {
-///     Query {
-///         {},
-///         { n: usize, s: String },
-///         { l: Usize1, r: usize, },
-///     }
-/// }
+/// query_readable!(Query, [
+///     {},
+///     { n: usize, s: String },
+///     { l: Usize1, r: usize, },
+/// ]);
 ///
 /// # let source = proconio::source::auto::AutoSource::from("0 1 4 hoge 2 3 5");
 /// // input

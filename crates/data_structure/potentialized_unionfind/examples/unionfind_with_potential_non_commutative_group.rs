@@ -6,12 +6,10 @@ use qitoy_derive::query_readable;
 use qitoy_group::Group;
 use qitoy_potentialized_unionfind::PotentializedUnionfind;
 
-query_readable! {
-    Query {
-        { u: usize, v: usize, x: G, },
-        { u: usize, v: usize }
-    }
-}
+query_readable!(Query, [
+    { u: usize, v: usize, x: G, },
+    { u: usize, v: usize }
+]);
 
 enum G {}
 impl Monoid for G {

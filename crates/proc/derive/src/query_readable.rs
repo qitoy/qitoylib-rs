@@ -2,7 +2,7 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
-use syn::{braced, token, Ident, Token};
+use syn::{braced, bracketed, token, Ident, Token};
 
 struct Value {
     ident: Ident,
@@ -35,25 +35,27 @@ impl Parse for Query {
     }
 }
 
-struct QueryEnum {
+struct QueryArray {
     ident: Ident,
-    _brace: token::Brace,
+    _comma: Token![,],
+    _bracket: token::Bracket,
     querys: Punctuated<Query, Token![,]>,
 }
 
-impl Parse for QueryEnum {
+impl Parse for QueryArray {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         let querys;
         Ok(Self {
             ident: input.parse()?,
-            _brace: braced!(querys in input),
+            _comma: input.parse()?,
+            _bracket: bracketed!(querys in input),
             querys: querys.parse_terminated(Query::parse, Token![,])?,
         })
     }
 }
 
 pub fn main(input: ParseStream) -> syn::Result<TokenStream> {
-    let item = QueryEnum::parse(input)?;
+    let item = QueryArray::parse(input)?;
     let qenum = make_enum(&item);
     let qimpl = make_impl(&item);
     Ok(quote! {
@@ -62,7 +64,7 @@ pub fn main(input: ParseStream) -> syn::Result<TokenStream> {
     })
 }
 
-fn make_enum(item: &QueryEnum) -> TokenStream {
+fn make_enum(item: &QueryArray) -> TokenStream {
     let ident = &item.ident;
     let items: Vec<_> = item
         .querys
@@ -89,7 +91,7 @@ fn make_enum(item: &QueryEnum) -> TokenStream {
     }
 }
 
-fn make_impl(item: &QueryEnum) -> TokenStream {
+fn make_impl(item: &QueryArray) -> TokenStream {
     let ident = &item.ident;
     let arms: Vec<_> = item
         .querys
@@ -127,19 +129,19 @@ fn make_impl(item: &QueryEnum) -> TokenStream {
 #[cfg(test)]
 mod test {
     use super::*;
-    use syn::parse::Parser;
     use pretty_assertions::assert_eq;
     use quote::quote;
+    use syn::parse::Parser;
 
     #[test]
     fn test1() {
         assert_eq!(
             main.parse2(quote! {
-                Query {
+                Query, [
                     {},
                     { a: Usize1, b: usize, },
                     { hoge: i32, fuga: Chars },
-                }
+                ]
             })
             .unwrap()
             .to_string(),

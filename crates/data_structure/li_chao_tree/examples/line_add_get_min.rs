@@ -3,12 +3,10 @@ use proconio::input;
 use qitoy_derive::query_readable;
 use qitoy_li_chao_tree::LiChaoTree;
 
-query_readable! {
-    Query {
-        { a: i64, b: i64, },
-        { p: i64, },
-    }
-}
+query_readable!(Query, [
+    { a: i64, b: i64, },
+    { p: i64, },
+]);
 
 fn main() {
     input! {

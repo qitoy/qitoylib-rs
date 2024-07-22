@@ -34,15 +34,13 @@ impl MAct for F {
     }
 }
 
-query_readable! {
-    Query {
-        { i: usize, x: u64 },
-        { i: usize },
-        { l: usize, r: usize },
-        { l: usize, r: usize, b: u64, c: u64 },
-        { l: usize, r: usize },
-    }
-}
+query_readable!(Query, [
+    { i: usize, x: u64 },
+    { i: usize },
+    { l: usize, r: usize },
+    { l: usize, r: usize, b: u64, c: u64 },
+    { l: usize, r: usize },
+]);
 
 fn main() {
     input! {
