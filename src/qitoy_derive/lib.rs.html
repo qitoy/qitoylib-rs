@@ -76,14 +76,12 @@
 <a href="#41" id="41">41</a>
 <a href="#42" id="42">42</a>
 <a href="#43" id="43">43</a>
-<a href="#44" id="44">44</a>
-<a href="#45" id="45">45</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>proc_macro::TokenStream;
 <span class="kw">use </span>syn::parse::Parser;
 
 <span class="kw">mod </span>query_readable;
 
-<span class="doccomment">/// query_readable! {}
+<span class="doccomment">/// query_readable!()
 ///
 /// ```
 /// # use qitoy_derive::query_readable;
@@ -93,13 +91,11 @@
 /// // * 0
 /// // * 1 n s
 /// // * 2 l r
-/// query_readable! {
-///     Query {
-///         {},
-///         { n: usize, s: String },
-///         { l: Usize1, r: usize, },
-///     }
-/// }
+/// query_readable!(Query, [
+///     {},
+///     { n: usize, s: String },
+///     { l: Usize1, r: usize, },
+/// ]);
 ///
 /// # let source = proconio::source::auto::AutoSource::from(&quot;0 1 4 hoge 2 3 5&quot;);
 /// // input

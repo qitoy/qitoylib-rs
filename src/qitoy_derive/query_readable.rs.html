@@ -215,11 +215,13 @@
 <a href="#180" id="180">180</a>
 <a href="#181" id="181">181</a>
 <a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>proc_macro2::TokenStream;
 <span class="kw">use </span>quote::{format_ident, quote};
 <span class="kw">use </span>syn::parse::{Parse, ParseStream};
 <span class="kw">use </span>syn::punctuated::Punctuated;
-<span class="kw">use </span>syn::{braced, token, Ident, Token};
+<span class="kw">use </span>syn::{braced, bracketed, token, Ident, Token};
 
 <span class="kw">struct </span>Value {
     ident: Ident,
@@ -252,25 +254,27 @@
     }
 }
 
-<span class="kw">struct </span>QueryEnum {
+<span class="kw">struct </span>QueryArray {
     ident: Ident,
-    _brace: token::Brace,
+    _comma: <span class="macro">Token!</span>[,],
+    _bracket: token::Bracket,
     querys: Punctuated&lt;Query, <span class="macro">Token!</span>[,]&gt;,
 }
 
-<span class="kw">impl </span>Parse <span class="kw">for </span>QueryEnum {
+<span class="kw">impl </span>Parse <span class="kw">for </span>QueryArray {
     <span class="kw">fn </span>parse(input: ParseStream) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>querys;
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             ident: input.parse()<span class="question-mark">?</span>,
-            _brace: <span class="macro">braced!</span>(querys <span class="kw">in </span>input),
+            _comma: input.parse()<span class="question-mark">?</span>,
+            _bracket: <span class="macro">bracketed!</span>(querys <span class="kw">in </span>input),
             querys: querys.parse_terminated(Query::parse, <span class="macro">Token!</span>[,])<span class="question-mark">?</span>,
         })
     }
 }
 
 <span class="kw">pub fn </span>main(input: ParseStream) -&gt; syn::Result&lt;TokenStream&gt; {
-    <span class="kw">let </span>item = QueryEnum::parse(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>item = QueryArray::parse(input)<span class="question-mark">?</span>;
     <span class="kw">let </span>qenum = make_enum(<span class="kw-2">&amp;</span>item);
     <span class="kw">let </span>qimpl = make_impl(<span class="kw-2">&amp;</span>item);
     <span class="prelude-val">Ok</span>(<span class="macro">quote! </span>{
@@ -279,7 +283,7 @@
     })
 }
 
-<span class="kw">fn </span>make_enum(item: <span class="kw-2">&amp;</span>QueryEnum) -&gt; TokenStream {
+<span class="kw">fn </span>make_enum(item: <span class="kw-2">&amp;</span>QueryArray) -&gt; TokenStream {
     <span class="kw">let </span>ident = <span class="kw-2">&amp;</span>item.ident;
     <span class="kw">let </span>items: Vec&lt;<span class="kw">_</span>&gt; = item
         .querys
@@ -306,7 +310,7 @@
     }
 }
 
-<span class="kw">fn </span>make_impl(item: <span class="kw-2">&amp;</span>QueryEnum) -&gt; TokenStream {
+<span class="kw">fn </span>make_impl(item: <span class="kw-2">&amp;</span>QueryArray) -&gt; TokenStream {
     <span class="kw">let </span>ident = <span class="kw-2">&amp;</span>item.ident;
     <span class="kw">let </span>arms: Vec&lt;<span class="kw">_</span>&gt; = item
         .querys
@@ -344,19 +348,19 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>test {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span>syn::parse::Parser;
     <span class="kw">use </span>pretty_assertions::assert_eq;
     <span class="kw">use </span>quote::quote;
+    <span class="kw">use </span>syn::parse::Parser;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test1() {
         <span class="macro">assert_eq!</span>(
             main.parse2(<span class="macro">quote! </span>{
-                Query {
+                Query, [
                     {},
                     { a: Usize1, b: usize, },
                     { hoge: i32, fuga: Chars },
-                }
+                ]
             })
             .unwrap()
             .to_string(),
