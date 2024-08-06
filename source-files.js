@@ -1,4 +1,5 @@
 var sourcesIndex = JSON.parse('{\
+"qitoy_binary_search":["",[],["lib.rs"]],\
 "qitoy_bit_util":["",[],["lib.rs"]],\
 "qitoy_bit_vec":["",[],["lib.rs"]],\
 "qitoy_combi":["",[],["lib.rs"]],\
