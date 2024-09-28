@@ -1,4 +1,4 @@
-use qitoy_group::Group;
+pub use qitoy_group::Group;
 use std::convert::TryInto;
 
 pub struct PotentializedUnionfind<T: Group> {
@@ -56,6 +56,11 @@ impl<T: Group> PotentializedUnionfind<T> {
         self.parent_or_size[x] = y as isize;
         self.potential_diff[x] = f;
         true
+    }
+
+    /// `x`'s group's leader
+    pub fn leader(&mut self, x: usize) -> usize {
+        self.leader_potential(x).0
     }
 
     /// `(e, f)` where e is leader, x = f(e)
