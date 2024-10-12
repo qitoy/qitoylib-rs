@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["PotentializedUnionfind"]};
+window.SIDEBAR_ITEMS = {"struct":["PotentializedUnionfind"],"trait":["Group"]};

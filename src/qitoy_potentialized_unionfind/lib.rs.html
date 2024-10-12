@@ -105,7 +105,12 @@
 <a href="#70" id="70">70</a>
 <a href="#71" id="71">71</a>
 <a href="#72" id="72">72</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>qitoy_group::Group;
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+</pre></div><pre class="rust"><code><span class="kw">pub use </span>qitoy_group::Group;
 <span class="kw">use </span>std::convert::TryInto;
 
 <span class="kw">pub struct </span>PotentializedUnionfind&lt;T: Group&gt; {
@@ -163,6 +168,11 @@
         <span class="self">self</span>.parent_or_size[x] = y <span class="kw">as </span>isize;
         <span class="self">self</span>.potential_diff[x] = f;
         <span class="bool-val">true
+    </span>}
+
+    <span class="doccomment">/// `x`&#39;s group&#39;s leader
+    </span><span class="kw">pub fn </span>leader(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: usize) -&gt; usize {
+        <span class="self">self</span>.leader_potential(x).<span class="number">0
     </span>}
 
     <span class="doccomment">/// `(e, f)` where e is leader, x = f(e)
