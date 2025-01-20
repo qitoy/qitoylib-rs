@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"macro":["chmax","chmin","max","min","mvec"],"trait":["LowerBound","UpperBound"]};

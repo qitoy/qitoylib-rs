@@ -1,8 +1,10 @@
 var sourcesIndex = JSON.parse('{\
+"qitoy_berlekamp_massey":["",[],["lib.rs"]],\
 "qitoy_binary_search":["",[],["lib.rs"]],\
 "qitoy_binary_trie":["",[],["lib.rs"]],\
 "qitoy_bit_util":["",[],["lib.rs"]],\
 "qitoy_bit_vec":["",[],["lib.rs"]],\
+"qitoy_bostan_mori":["",[],["lib.rs"]],\
 "qitoy_combi":["",[],["lib.rs"]],\
 "qitoy_derive":["",[],["lib.rs","query_readable.rs"]],\
 "qitoy_dfa":["",[],["alpha_trans.rs","and.rs","lib.rs"]],\
@@ -20,7 +22,6 @@ var sourcesIndex = JSON.parse('{\
 "qitoy_mo":["",[],["lib.rs"]],\
 "qitoy_nfa":["",[],["lib.rs"]],\
 "qitoy_potentialized_unionfind":["",[],["lib.rs"]],\
-"qitoy_prelude":["",[],["lib.rs"]],\
 "qitoy_prime_check":["",[],["lib.rs"]],\
 "qitoy_prime_factorize":["",[],["lib.rs"]],\
 "qitoy_prime_pi":["",[],["lib.rs"]],\
