@@ -186,6 +186,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "qitoy-berlekamp_massey"
+version = "0.1.0"
+dependencies = [
+ "ac-library-rs",
+ "itertools",
+ "proconio",
+]
+
+[[package]]
 name = "qitoy-binary_search"
 version = "0.1.0"
 dependencies = [
@@ -209,6 +218,14 @@ version = "0.1.0"
 dependencies = [
  "qitoy-bit_util",
  "rand",
+]
+
+[[package]]
+name = "qitoy-bostan_mori"
+version = "0.1.0"
+dependencies = [
+ "ac-library-rs",
+ "proconio",
 ]
 
 [[package]]

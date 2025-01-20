@@ -1,0 +1,15 @@
+[package]
+name = "qitoy-berlekamp_massey"
+version = "0.1.0"
+edition = "2021"
+
+[[example]]
+name = "find_linear_recurrence"
+path = "examples/find_linear_recurrence.rs"
+
+[dependencies]
+ac-library-rs.workspace = true
+
+[dev-dependencies]
+proconio.workspace = true
+itertools.workspace = true

@@ -1,0 +1,14 @@
+[package]
+name = "qitoy-bostan_mori"
+version = "0.1.0"
+edition = "2021"
+
+[[example]]
+name = "kth_term_of_linearly_recurrent_sequence"
+path = "examples/kth_term_of_linearly_recurrent_sequence.rs"
+
+[dependencies]
+ac-library-rs.workspace = true
+
+[dev-dependencies]
+proconio.workspace = true

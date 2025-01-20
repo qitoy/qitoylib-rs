@@ -4,6 +4,7 @@ members = [
   "crates/algorithm/*",
   "crates/automaton/*",
   "crates/data_structure/*",
+  "crates/fps/*",
   "crates/graph/*",
   "crates/math/*",
   "crates/prime/*",
