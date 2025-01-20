@@ -6,7 +6,6 @@ members = [
   "crates/data_structure/*",
   "crates/graph/*",
   "crates/math/*",
-  "crates/prelude",
   "crates/prime/*",
   "crates/proc/*",
   "crates/string/*",
