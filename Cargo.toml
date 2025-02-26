@@ -9,6 +9,7 @@ members = [
   "crates/math/*",
   "crates/prime/*",
   "crates/proc/*",
+  "crates/qitoylib",
   "crates/string/*",
   "crates/trait/*",
   "crates/utils/*",

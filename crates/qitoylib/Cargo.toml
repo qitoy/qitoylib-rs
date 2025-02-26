@@ -1,0 +1,38 @@
+[package]
+name = "qitoylib"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+qitoy-berlekamp_massey.path = "../fps/berlekamp_massey"
+qitoy-bostan_mori.path = "../fps/bostan_mori"
+
+qitoy-derive.path = "../proc/derive"
+
+qitoy-dfa.path = "../automaton/dfa"
+qitoy-dfa-leq.path = "../automaton/leq"
+qitoy-dfa-leq_inv.path = "../automaton/leq_inv"
+qitoy-dfa-multiple_of.path = "../automaton/multiple_of"
+qitoy-dfa-non_zero.path = "../automaton/non_zero"
+qitoy-nfa.path = "../automaton/nfa"
+
+qitoy-group.path = "../algebra/group"
+qitoy-ring.path = "../algebra/ring"
+
+qitoy-math-combi.path = "../math/combi"
+qitoy-math-matrix.path = "../math/matrix"
+
+qitoy-mo.path = "../algorithm/mo"
+qitoy-rerooting_dp.path = "../algorithm/rerooting_dp"
+
+qitoy-potentialized_unionfind.path = "../data_structure/potentialized_unionfind"
+qitoy-red_black_tree.path = "../data_structure/red_black_tree"
+
+qitoy-prime-check.path = "../prime/check"
+qitoy-prime-factorize.path = "../prime/factorize"
+qitoy-prime-sieve.path = "../prime/sieve"
+qitoy-prime-pi.path = "../prime/pi"
+
+qitoy-rolling_hash.path = "../string/rolling_hash"
+
+qitoy-utils-float2uint.path = "../utils/float2uint"

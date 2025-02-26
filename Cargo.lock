@@ -450,6 +450,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "qitoylib"
+version = "0.1.0"
+dependencies = [
+ "qitoy-berlekamp_massey",
+ "qitoy-bostan_mori",
+ "qitoy-derive",
+ "qitoy-dfa",
+ "qitoy-dfa-leq",
+ "qitoy-dfa-leq_inv",
+ "qitoy-dfa-multiple_of",
+ "qitoy-dfa-non_zero",
+ "qitoy-group",
+ "qitoy-math-combi",
+ "qitoy-math-matrix",
+ "qitoy-mo",
+ "qitoy-nfa",
+ "qitoy-potentialized_unionfind",
+ "qitoy-prime-check",
+ "qitoy-prime-factorize",
+ "qitoy-prime-pi",
+ "qitoy-prime-sieve",
+ "qitoy-red_black_tree",
+ "qitoy-rerooting_dp",
+ "qitoy-ring",
+ "qitoy-rolling_hash",
+ "qitoy-utils-float2uint",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.38"
 source = "registry+https://github.com/rust-lang/crates.io-index"
