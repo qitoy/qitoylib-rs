@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["AddMul","XorAnd"],"trait":["Abelian","Group","Ring"]};

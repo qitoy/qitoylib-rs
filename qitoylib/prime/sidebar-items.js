@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["eratosthenes","pi"],"struct":["Factors"],"trait":["Factorize","PrimeCheck"]};

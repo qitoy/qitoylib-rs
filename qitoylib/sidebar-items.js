@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["algebra","algorithm","automaton","data_structure","fps","math","prime","proc","string","utils"]};

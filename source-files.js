@@ -34,6 +34,7 @@ var sourcesIndex = JSON.parse('{\
 "qitoy_tree":["",[],["lib.rs"]],\
 "qitoy_utils_bound":["",[],["lib.rs"]],\
 "qitoy_utils_float2uint":["",[],["lib.rs"]],\
-"qitoy_wavelet_matrix":["",[],["lib.rs"]]\
+"qitoy_wavelet_matrix":["",[],["lib.rs"]],\
+"qitoylib":["",[],["lib.rs"]]\
 }');
 createSourceSidebar();
