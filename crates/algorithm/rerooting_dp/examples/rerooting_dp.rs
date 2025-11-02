@@ -2,7 +2,7 @@
 use ac_library::{ModInt998244353 as Mint, Monoid};
 use itertools::Itertools;
 use proconio::input;
-use qitoy_rerooting_dp::{rerooting_dp, Tree};
+use qitoy_rerooting_dp::{Tree, rerooting_dp};
 
 fn main() {
     input! {

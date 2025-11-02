@@ -106,11 +106,7 @@ impl Montgomery {
         let mask: u128 = u64::MAX.into();
         let b = ((val & mask) * self.r) & mask;
         let c = (val + b * self.m) >> 64;
-        if c >= self.m {
-            c - self.m
-        } else {
-            c
-        }
+        if c >= self.m { c - self.m } else { c }
     }
 }
 

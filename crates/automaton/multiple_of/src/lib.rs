@@ -8,7 +8,10 @@ pub struct MultipleOf {
 
 impl MultipleOf {
     pub fn new(digit: u64, multiple: u64) -> Self {
-        Self { d: digit, m: multiple }
+        Self {
+            d: digit,
+            m: multiple,
+        }
     }
 }
 

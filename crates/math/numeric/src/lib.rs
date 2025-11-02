@@ -1,5 +1,5 @@
-use std::ops::{Mul, Div, Rem};
 use num::traits::Zero;
+use std::ops::{Div, Mul, Rem};
 
 pub trait Gcd: Rem<Output = Self> + Zero + PartialEq + Copy {
     fn gcd(self, rhs: Self) -> Self;

@@ -118,7 +118,7 @@ fn masked(bit: u64, len: usize) -> u64 {
 mod tests {
     use super::*;
     use rand::distributions::Uniform;
-    use rand::{thread_rng, Rng};
+    use rand::{Rng, thread_rng};
 
     #[test]
     fn print() {

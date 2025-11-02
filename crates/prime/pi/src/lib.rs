@@ -55,7 +55,7 @@ pub fn pi(x: usize) -> usize {
                 }
             }
         }
-        }
+    }
 
     for p in (x_13 + 1..=x_12).filter(|&p| is_prime[p]) {
         primes.push(p);

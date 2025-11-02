@@ -1,6 +1,6 @@
 // verification-helper: PROBLEM https://judge.yosupo.jp/problem/counting_primes
-use qitoy_prime_pi::pi;
 use proconio::input;
+use qitoy_prime_pi::pi;
 
 fn main() {
     input! {

@@ -17,11 +17,7 @@ impl Monoid for ModInt {
 
     fn binary_operation(a: &Self::S, b: &Self::S) -> Self::S {
         let c = a + b;
-        if c >= Self::MOD {
-            c - Self::MOD
-        } else {
-            c
-        }
+        if c >= Self::MOD { c - Self::MOD } else { c }
     }
 }
 
@@ -37,7 +33,9 @@ impl Nfa for XorSum {
         state: &Self::State,
         alpha: Option<&Self::Alphabet>,
     ) -> std::collections::BTreeSet<Self::State> {
-        let Some(&(u, v)) = alpha else { return Default::default(); };
+        let Some(&(u, v)) = alpha else {
+            return Default::default();
+        };
         let mut ret = std::collections::BTreeSet::new();
         for a in 0..2 {
             for b in 0..2 {

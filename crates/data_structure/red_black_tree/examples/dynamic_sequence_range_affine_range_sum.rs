@@ -15,11 +15,7 @@ impl MAct for F {
     }
     fn op(a: &Self::S, b: &Self::S) -> Self::S {
         let c = a + b;
-        if c > Self::MOD {
-            c - Self::MOD
-        } else {
-            c
-        }
+        if c > Self::MOD { c - Self::MOD } else { c }
     }
     fn id() -> Self::F {
         (1, 0)

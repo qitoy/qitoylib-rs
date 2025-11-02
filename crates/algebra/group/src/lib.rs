@@ -16,4 +16,3 @@ where
 }
 
 pub trait Abelian: Group {}
-

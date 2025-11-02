@@ -1,9 +1,8 @@
-use std::ops::{Add, AddAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign};
 use qitoy_ring::Ring;
+use std::ops::{Add, AddAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign};
 
 #[derive(Debug)]
-pub struct Matrix<T: Ring>
-{
+pub struct Matrix<T: Ring> {
     row: usize,
     column: usize,
     mat: Vec<Vec<T::S>>,

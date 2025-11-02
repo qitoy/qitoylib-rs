@@ -21,7 +21,7 @@ macro_rules! int_impl {
                 ((a as $wide + b as $wide) / 2) as $ty
             }
         }
-    }
+    };
 }
 
 int_impl!(u32, u128);

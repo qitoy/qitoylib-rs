@@ -36,7 +36,7 @@ pub struct Hld {
 impl std::ops::Index<usize> for Hld {
     type Output = Node;
     fn index(&self, index: usize) -> &Self::Output {
-       &self.data[index] 
+        &self.data[index]
     }
 }
 

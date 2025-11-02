@@ -2,7 +2,7 @@ use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
-use syn::{braced, bracketed, token, Ident, Token};
+use syn::{Ident, Token, braced, bracketed, token};
 
 struct Value {
     ident: Ident,

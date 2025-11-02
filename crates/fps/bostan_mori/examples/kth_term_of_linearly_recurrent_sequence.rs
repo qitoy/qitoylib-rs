@@ -9,7 +9,9 @@ fn main() {
         a: [Mint; d],
         c: [Mint; d],
     }
-    let c: Vec<_> = std::iter::once(1.into()).chain(c.into_iter().map(|c| -c)).collect();
+    let c: Vec<_> = std::iter::once(1.into())
+        .chain(c.into_iter().map(|c| -c))
+        .collect();
     let mut b = ac_library::convolution(&a, &c);
     b.truncate(d);
     println!("{}", bostan_mori(&b, &c, k));

@@ -65,8 +65,9 @@ impl<T: Group> PotentializedUnionfind<T> {
 
     /// `(e, f)` where e is leader, x = f(e)
     fn leader_potential(&mut self, x: usize) -> (usize, T::S) {
-        let Ok(p): Result<usize, _> = self.parent_or_size[x].try_into()
-                   else { return (x, T::identity()); };
+        let Ok(p): Result<usize, _> = self.parent_or_size[x].try_into() else {
+            return (x, T::identity());
+        };
         // e = g(p), p = f(x) => e = gf(x)
         // where f = self.potential_diff[x]
         let (e, g) = self.leader_potential(p);

@@ -139,8 +139,16 @@ impl<M: MAct> Node<M> {
     }
 
     fn lazy_push(&self) -> Option<(Rc<Self>, Rc<Self>)> {
-        let Self { left: Some(left), right:Some(right), lazy, rev, .. } = self
-            else { return None; };
+        let Self {
+            left: Some(left),
+            right: Some(right),
+            lazy,
+            rev,
+            ..
+        } = self
+        else {
+            return None;
+        };
         (
             left.clone().update(lazy, *rev),
             right.clone().update(lazy, *rev),
@@ -279,7 +287,14 @@ impl<M: MAct> Node<M> {
         if l == 0 && r == self.len {
             return M::map(lazy, &self.val, self.len);
         }
-        let Self { left: Some(left), right: Some(right), lazy: la, rev: re, .. } = self.as_ref() else {
+        let Self {
+            left: Some(left),
+            right: Some(right),
+            lazy: la,
+            rev: re,
+            ..
+        } = self.as_ref()
+        else {
             unreachable!();
         };
         let (left, right) = if rev { (right, left) } else { (left, right) };

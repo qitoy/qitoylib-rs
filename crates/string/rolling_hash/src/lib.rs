@@ -2,9 +2,9 @@
 
 use ac_library::Monoid;
 use rand::{
+    SeedableRng,
     distr::{Distribution, Uniform},
     rngs::SmallRng,
-    SeedableRng,
 };
 use std::cell::OnceCell;
 
@@ -37,20 +37,12 @@ impl RollingHash {
     #[inline]
     fn add(a: u64, b: u64) -> u64 {
         let c = a + b;
-        if c >= Self::MOD {
-            c - Self::MOD
-        } else {
-            c
-        }
+        if c >= Self::MOD { c - Self::MOD } else { c }
     }
 
     #[inline]
     fn neg(a: u64) -> u64 {
-        if a == 0 {
-            0
-        } else {
-            Self::MOD - a
-        }
+        if a == 0 { 0 } else { Self::MOD - a }
     }
 
     #[inline]

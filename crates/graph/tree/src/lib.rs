@@ -60,12 +60,12 @@ impl FromIterator<(usize, usize)> for Tree {
 impl Deref for Tree {
     type Target = Vec<Vec<Edge>>;
     fn deref(&self) -> &Self::Target {
-       &self.data
+        &self.data
     }
 }
 
 impl DerefMut for Tree {
     fn deref_mut(&mut self) -> &mut Self::Target {
-       &mut self.data
+        &mut self.data
     }
 }

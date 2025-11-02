@@ -1,9 +1,9 @@
 // verification-helper: PROBLEM https://judge.yosupo.jp/problem/lca
-use proconio::input;
 use itertools::Itertools;
+use proconio::input;
 use qitoy_link_cut_tree::LinkCutTree;
 
-fn main () {
+fn main() {
     input! {
         n: usize, q: usize,
         p: [usize; n-1],

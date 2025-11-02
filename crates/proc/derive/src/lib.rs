@@ -37,7 +37,8 @@ mod query_readable;
 /// ```
 #[proc_macro]
 pub fn query_readable(input: TokenStream) -> TokenStream {
-    query_readable::main.parse2(input.into())
+    query_readable::main
+        .parse2(input.into())
         .unwrap_or_else(syn::Error::into_compile_error)
         .into()
 }

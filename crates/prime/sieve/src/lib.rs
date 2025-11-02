@@ -20,7 +20,9 @@ mod tests {
     fn test() {
         assert_eq!(
             eratosthenes(10),
-            [false, false, true, true, false, true, false, true, false, false, false]
+            [
+                false, false, true, true, false, true, false, true, false, false, false
+            ]
         );
     }
 }

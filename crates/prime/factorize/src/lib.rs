@@ -1,9 +1,9 @@
 use qitoy_math_montgomery::{Montgomery, Mvalue};
 use qitoy_prime_check::PrimeCheck;
 use rand::{
+    SeedableRng,
     distr::{Distribution, Uniform},
     rngs::SmallRng,
-    SeedableRng,
 };
 
 pub struct Factors<T> {
