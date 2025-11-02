@@ -1,0 +1,1 @@
+searchState.loadedDescShard("qitoy_math_montgomery", 0, "モンゴメリ乗算\nモンゴメリ乗算をするための構造体。\nモンゴメリ乗算で内部的に使われる型。\nReturns the argument unchanged.\nReturns the argument unchanged.\nCalls <code>U::from(self)</code>.\nCalls <code>U::from(self)</code>.\n<code>modulus</code>で前計算をする。ただし<code>modulus</code>…\n<code>val</code>をモンゴメリ乗算用に変換する。\n保有している数値を取り出す。")

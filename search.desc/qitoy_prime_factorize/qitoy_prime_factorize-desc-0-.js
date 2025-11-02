@@ -1,0 +1,1 @@
+searchState.loadedDescShard("qitoy_prime_factorize", 0, "<code>self</code>…\n<code>self</code>…\nReturns the argument unchanged.\nCalls <code>U::from(self)</code>.")

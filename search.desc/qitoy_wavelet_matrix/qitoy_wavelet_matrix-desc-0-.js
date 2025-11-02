@@ -1,0 +1,1 @@
+searchState.loadedDescShard("qitoy_wavelet_matrix", 0, "Wavelet Matrix\nReturns the argument unchanged.\nCalls <code>U::from(self)</code>.\nmax data &lt; 1 &lt;&lt; size")

@@ -1,0 +1,1 @@
+searchState.loadedDescShard("qitoy_dfa_multiple_of", 0, "<code>digit</code>進法で表わされる数字のうち、<code>multiple</code>…\nReturns the argument unchanged.\nCalls <code>U::from(self)</code>.")

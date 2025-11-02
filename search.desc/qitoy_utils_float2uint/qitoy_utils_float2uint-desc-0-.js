@@ -1,0 +1,1 @@
+searchState.loadedDescShard("qitoy_utils_float2uint", 0, "floatとuintを順序を保って相互変換します")

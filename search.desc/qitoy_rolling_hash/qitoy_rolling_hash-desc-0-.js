@@ -1,0 +1,1 @@
+searchState.loadedDescShard("qitoy_rolling_hash", 0, "ローリングハッシュ\nロリハによる文字列検索のための構造体。\nロリハ <code>Monoid</code>として使う。\nReturns the argument unchanged.\nReturns the argument unchanged.\nCalls <code>U::from(self)</code>.\nCalls <code>U::from(self)</code>.\n文字<code>c</code>からロリハを生成する。")

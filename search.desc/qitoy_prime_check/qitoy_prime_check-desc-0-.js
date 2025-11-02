@@ -1,0 +1,1 @@
+searchState.loadedDescShard("qitoy_prime_check", 0, "素数判定をする。")

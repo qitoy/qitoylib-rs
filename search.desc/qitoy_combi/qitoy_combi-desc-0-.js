@@ -1,0 +1,1 @@
+searchState.loadedDescShard("qitoy_combi", 0, "…\n$<code>{}_{n}C{}_{k}</code>$を返します。 計算量$<code>O(1)</code>$\n階乗を返します。 計算量$<code>O(1)</code>$\n階乗の逆元を返します。 計算量$<code>O(1)</code>$\nReturns the argument unchanged.\nCalls <code>U::from(self)</code>.\n<code>n</code>までの階乗とその逆元を前計算します。 …\n$<code>{}_{n}P{}_{k}</code>$を返します。 計算量$<code>O(1)</code>$")

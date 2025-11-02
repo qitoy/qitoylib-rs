@@ -1,0 +1,1 @@
+searchState.loadedDescShard("qitoy_dfa", 0, "文字の型\n決定性有限オートマトン\n状態の型\n受理関数\n<code>f</code>を通じて異なる<code>Alphabet</code>…\n<code>Alphabet</code>が同じDFAの積をとる。\nDFAを用いたDPを計算する。\nReturns the argument unchanged.\nReturns the argument unchanged.\n開始状態\nCalls <code>U::from(self)</code>.\nCalls <code>U::from(self)</code>.\n遷移関数")

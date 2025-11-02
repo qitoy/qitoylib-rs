@@ -1,0 +1,1 @@
+searchState.loadedDescShard("qitoy_prime_sieve", 0, "エラトステネスの篩 計算量$<code>O(n \\log n)</code>$")

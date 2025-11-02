@@ -1,0 +1,1 @@
+searchState.loadedDescShard("qitoy_mo", 0, "query - 区間クエリ（開区間）")

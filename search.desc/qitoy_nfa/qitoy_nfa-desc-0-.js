@@ -1,0 +1,1 @@
+searchState.loadedDescShard("qitoy_nfa", 0, "文字の型\n非決定性有限オートマトン\n状態の型\n受理関数\nReturns the argument unchanged.\n開始状態\nCalls <code>U::from(self)</code>.\n遷移関数")

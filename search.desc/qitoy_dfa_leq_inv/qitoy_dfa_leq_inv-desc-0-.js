@@ -1,0 +1,1 @@
+searchState.loadedDescShard("qitoy_dfa_leq_inv", 0, "<code>n</code>…\nReturns the argument unchanged.\nCalls <code>U::from(self)</code>.\n<code>n</code>を任意の進法で表記した配列から作成する")

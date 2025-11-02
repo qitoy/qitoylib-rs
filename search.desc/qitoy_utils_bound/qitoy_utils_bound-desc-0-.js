@@ -1,0 +1,1 @@
+searchState.loadedDescShard("qitoy_utils_bound", 0, "配列上の二分探索をします")

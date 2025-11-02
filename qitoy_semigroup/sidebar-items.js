@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"trait":["SemiGroup"]};
+window.SIDEBAR_ITEMS = {"struct":["Maybe"],"trait":["SemiGroup"]};

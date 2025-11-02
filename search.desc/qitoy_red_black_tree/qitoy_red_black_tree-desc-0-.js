@@ -1,0 +1,1 @@
+searchState.loadedDescShard("qitoy_red_black_tree", 0, "map type\nelement type\ncomposition <code>|x| f(g(x))</code>\nidentity element\nReturns the argument unchanged.\nidentity map\nCalls <code>U::from(self)</code>.\nmapping <code>f(x)</code>\nbinary operation")
