@@ -1,7 +1,7 @@
 [package]
 name = "qitoy-prime-pi"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
 
 [package.metadata.cargo-compete.example]
 pi.problem = "https://judge.yosupo.jp/problem/counting_primes"

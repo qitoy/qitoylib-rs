@@ -6,7 +6,7 @@ pub trait SemiGroup {
     fn binary_operation(a: &Self::S, b: &Self::S) -> Self::S;
 }
 
-struct Maybe<T>(Infallible, PhantomData<fn() -> T>);
+pub struct Maybe<T>(Infallible, PhantomData<fn() -> T>);
 
 impl<T: SemiGroup> Monoid for Maybe<T> {
     type S = Option<T::S>;

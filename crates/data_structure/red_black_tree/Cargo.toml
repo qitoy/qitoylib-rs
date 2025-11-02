@@ -1,7 +1,7 @@
 [package]
 name = "qitoy-red_black_tree"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
 
 [package.metadata.cargo-compete.example]
 dynamic_sequence_range_affine_range_sum.problem = "https://judge.yosupo.jp/problem/dynamic_sequence_range_affine_range_sum"

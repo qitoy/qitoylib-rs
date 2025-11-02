@@ -1,7 +1,7 @@
 use qitoy_math_montgomery::{Montgomery, Mvalue};
 use qitoy_prime_check::PrimeCheck;
 use rand::{
-    distributions::{Distribution, Uniform},
+    distr::{Distribution, Uniform},
     rngs::SmallRng,
     SeedableRng,
 };
@@ -44,8 +44,8 @@ impl Factorize for u64 {
             return 2;
         }
         let mut g;
-        let mut rng = SmallRng::from_entropy();
-        let range = Uniform::from(1..n);
+        let mut rng = SmallRng::from_os_rng();
+        let range = Uniform::new(1, n).unwrap();
         let mo = Montgomery::new(n);
         let gcd = |mut a, mut b| {
             while b > 0 {

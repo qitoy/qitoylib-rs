@@ -2,7 +2,7 @@
 
 use ac_library::Monoid;
 use rand::{
-    distributions::{Distribution, Uniform},
+    distr::{Distribution, Uniform},
     rngs::SmallRng,
     SeedableRng,
 };
@@ -23,12 +23,12 @@ impl RollingHash {
 
     fn bases() -> (u64, u64) {
         thread_local! {
-            static BASES: OnceCell<(u64, u64)> = OnceCell::new();
+            static BASES: OnceCell<(u64, u64)> = const {OnceCell::new()};
         }
         BASES.with(|bases| {
             *bases.get_or_init(|| {
-                let mut rng = SmallRng::from_entropy();
-                let range = Uniform::from(0..RollingHash::MOD);
+                let mut rng = SmallRng::from_os_rng();
+                let range = Uniform::new(0, RollingHash::MOD).unwrap();
                 (range.sample(&mut rng), range.sample(&mut rng))
             })
         })

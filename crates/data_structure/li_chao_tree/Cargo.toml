@@ -1,7 +1,7 @@
 [package]
 name = "qitoy-li_chao_tree"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
 
 [package.metadata.cargo-compete.example]
 line_add_get_min.problem = "https://judge.yosupo.jp/problem/line_add_get_min"
