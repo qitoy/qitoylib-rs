@@ -17,59 +17,67 @@ impl Node {
     }
 
     unsafe fn is_root(this: NonNull<Self>) -> bool {
-        !(Self::is_left_child(this) || Self::is_right_child(this))
+        unsafe { !(Self::is_left_child(this) || Self::is_right_child(this)) }
     }
 
     unsafe fn is_left_child(this: NonNull<Self>) -> bool {
-        this.as_ref()
-            .parent
-            .is_some_and(|ptr| ptr.as_ref().left == Some(this))
+        unsafe {
+            this.as_ref()
+                .parent
+                .is_some_and(|ptr| ptr.as_ref().left == Some(this))
+        }
     }
 
     unsafe fn is_right_child(this: NonNull<Self>) -> bool {
-        this.as_ref()
-            .parent
-            .is_some_and(|ptr| ptr.as_ref().right == Some(this))
+        unsafe {
+            this.as_ref()
+                .parent
+                .is_some_and(|ptr| ptr.as_ref().right == Some(this))
+        }
     }
 
     unsafe fn rotate(mut this: NonNull<Self>) {
-        let mut parent = this.as_ref().parent.unwrap();
-        if let Some(mut mid) = if Self::is_left_child(this) {
-            let mid = this.as_ref().right;
-            parent.as_mut().left = mid;
-            this.as_mut().right = Some(parent);
-            mid
-        } else {
-            let mid = this.as_ref().left;
-            parent.as_mut().right = mid;
-            this.as_mut().left = Some(parent);
-            mid
-        } {
-            mid.as_mut().parent = Some(parent);
-        }
-        this.as_mut().parent = parent.as_ref().parent;
-        parent.as_mut().parent = Some(this);
-        if let Some(mut pp) = this.as_ref().parent {
-            if pp.as_ref().left == Some(parent) {
-                pp.as_mut().left = Some(this);
+        unsafe {
+            let mut parent = this.as_ref().parent.unwrap();
+            if let Some(mut mid) = if Self::is_left_child(this) {
+                let mid = this.as_ref().right;
+                parent.as_mut().left = mid;
+                this.as_mut().right = Some(parent);
+                mid
+            } else {
+                let mid = this.as_ref().left;
+                parent.as_mut().right = mid;
+                this.as_mut().left = Some(parent);
+                mid
+            } {
+                mid.as_mut().parent = Some(parent);
             }
-            if pp.as_ref().right == Some(parent) {
-                pp.as_mut().right = Some(this);
+            this.as_mut().parent = parent.as_ref().parent;
+            parent.as_mut().parent = Some(this);
+            if let Some(mut pp) = this.as_ref().parent {
+                if pp.as_ref().left == Some(parent) {
+                    pp.as_mut().left = Some(this);
+                }
+                if pp.as_ref().right == Some(parent) {
+                    pp.as_mut().right = Some(this);
+                }
             }
         }
     }
 
     unsafe fn splay(this: NonNull<Self>) {
-        while !Self::is_root(this) {
-            let parent = this.as_ref().parent.unwrap();
-            if Self::is_root(parent) {
-                Self::rotate(this);
-            } else if Self::is_left_child(this) == Self::is_left_child(parent) {
-                Self::rotate(parent);
-                Self::rotate(this);
-            } else {
-                Self::rotate(this);
-                Self::rotate(this);
+        unsafe {
+            while !Self::is_root(this) {
+                let parent = this.as_ref().parent.unwrap();
+                if Self::is_root(parent) {
+                    Self::rotate(this);
+                } else if Self::is_left_child(this) == Self::is_left_child(parent) {
+                    Self::rotate(parent);
+                    Self::rotate(this);
+                } else {
+                    Self::rotate(this);
+                    Self::rotate(this);
+                }
             }
         }
     }

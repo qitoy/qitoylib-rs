@@ -30,7 +30,7 @@ mod tests {
 
     #[test]
     fn test() {
-        let v = vec![1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9];
+        let v = [1, 1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9, 9];
         assert_eq!(v.lower_bound(5), 6);
         assert_eq!(v.upper_bound(5), 7);
         assert_eq!(v.lower_bound(-1), 0);

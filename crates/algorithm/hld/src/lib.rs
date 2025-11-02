@@ -120,11 +120,11 @@ impl Hld {
         let p = data[a].parent;
         size[a] = tree[a]
             .iter()
-            .filter(|e| !p.is_some_and(|p| e.to == p))
+            .filter(|e| p.is_none_or(|p| e.to != p))
             .fold(1, |acc, e| {
                 data[e.to].parent = Some(a);
                 Self::dfs_sz(tree, data, size, e.to);
-                let light = if !data[a].heavy.is_some_and(|u| size[u] >= size[e.to]) {
+                let light = if data[a].heavy.is_none_or(|u| size[u] < size[e.to]) {
                     data[a].heavy.replace(e.to)
                 } else {
                     Some(e.to)
@@ -148,8 +148,8 @@ impl Hld {
         // light
         tree[a]
             .iter()
-            .filter(|e| !parent.is_some_and(|p| e.to == p))
-            .filter(|e| !heavy.is_some_and(|h| e.to == h))
+            .filter(|e| parent.is_none_or(|p| e.to != p))
+            .filter(|e| heavy.is_none_or(|h| e.to != h))
             .for_each(|e| {
                 data[e.to].head = e.to;
                 data[e.to].depth = data[a].depth + 1;

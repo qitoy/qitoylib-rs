@@ -6,7 +6,7 @@ pub fn rerooting_dp_subtree<T: Monoid>(
     add_edge: &mut impl FnMut(T::S, usize) -> T::S,
     add_vertex: &mut impl FnMut(T::S, usize) -> T::S,
 ) -> Vec<Vec<T::S>> {
-    let mut dp = tree.iter().map(|v| vec![T::identity(); v.len()]).collect();
+    let mut dp: Vec<_> = tree.iter().map(|v| vec![T::identity(); v.len()]).collect();
     bfs1::<T>(tree, &mut dp, add_edge, add_vertex);
     bfs2::<T>(tree, &mut dp, add_edge, add_vertex);
     dp
@@ -31,7 +31,7 @@ pub fn rerooting_dp<T: Monoid>(
 
 fn bfs1<T: Monoid>(
     tree: &Tree,
-    dp: &mut Vec<Vec<T::S>>,
+    dp: &mut [Vec<T::S>],
     add_edge: &mut impl FnMut(T::S, usize) -> T::S,
     add_vertex: &mut impl FnMut(T::S, usize) -> T::S,
 ) {
@@ -62,7 +62,7 @@ fn bfs1<T: Monoid>(
 
 fn bfs2<T: Monoid>(
     tree: &Tree,
-    dp: &mut Vec<Vec<T::S>>,
+    dp: &mut [Vec<T::S>],
     add_edge: &mut impl FnMut(T::S, usize) -> T::S,
     add_vertex: &mut impl FnMut(T::S, usize) -> T::S,
 ) {

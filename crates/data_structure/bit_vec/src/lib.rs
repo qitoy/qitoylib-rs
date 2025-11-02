@@ -34,8 +34,8 @@ impl<I: Into<u64>> FromIterator<I> for BitVec {
     fn from_iter<T: IntoIterator<Item = I>>(iter: T) -> Self {
         let v: Vec<u64> = iter.into_iter().map(Into::into).collect();
         let len = v.len();
-        let mut data = vec![0u64; (len + 63) / 64];
-        let mut block = vec![0; (len + 63) / 64];
+        let mut data = vec![0u64; len.div_ceil(64)];
+        let mut block = vec![0; len.div_ceil(64)];
         for i in v
             .into_iter()
             .enumerate()
@@ -117,12 +117,11 @@ fn masked(bit: u64, len: usize) -> u64 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rand::distributions::Uniform;
-    use rand::{Rng, thread_rng};
+    use rand::{Rng, distr::Uniform, rng};
 
     #[test]
     fn print() {
-        let bv: BitVec = std::iter::repeat(1u32).take(1030).collect();
+        let bv: BitVec = std::iter::repeat_n(1u32, 1030).collect();
         eprintln!("{:?}", bv);
         eprintln!("{}", bv.rank1(1030));
         eprintln!("{:?}", bv.select1(100));
@@ -131,9 +130,9 @@ mod tests {
 
     #[test]
     fn bitvec() {
-        let mut rng = thread_rng();
+        let mut rng = rng();
         let bv: BitVec = (&mut rng)
-            .sample_iter(Uniform::from(0u32..=1))
+            .sample_iter(Uniform::new_inclusive(0u32, 1).unwrap())
             .take(10000)
             .collect();
         eprintln!("{bv:?}");

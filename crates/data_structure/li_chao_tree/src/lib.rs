@@ -82,16 +82,17 @@ impl Node {
     pub fn get_min(&self, x: i64, l: i64, r: i64) -> i64 {
         let mut min = self.line.get(x);
         let m = (l + r) / 2;
-        if (l..m).contains(&x) {
-            if let Some(left) = self.left() {
-                min = min.min(left.get_min(x, l, m));
-            }
+        if (l..m).contains(&x)
+            && let Some(left) = self.left()
+        {
+            min = min.min(left.get_min(x, l, m));
         }
-        if (m..r).contains(&x) {
-            if let Some(right) = self.right() {
-                min = min.min(right.get_min(x, m, r));
-            }
+        if (m..r).contains(&x)
+            && let Some(right) = self.right()
+        {
+            min = min.min(right.get_min(x, m, r));
         }
+
         min
     }
 

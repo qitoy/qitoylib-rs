@@ -87,7 +87,7 @@ mod tests {
 
     #[test]
     fn fixed() {
-        let vec = vec![5u32, 4, 5, 5, 2, 1, 5, 6, 1, 3, 5, 0];
+        let vec = [5u32, 4, 5, 5, 2, 1, 5, 6, 1, 3, 5, 0];
         let wm: WaveletMatrix = vec.iter().copied().collect();
         // 4cf, 409, 5eb
         // println!("{:?}", wm);
